@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"log" 
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -23,7 +23,6 @@ func startServer(userHandler *handler.UserHandler, router *mux.Router) {
 
 	router.HandleFunc("/userCreate", userHandler.Create).Methods("POST")
 
-
 	corsObj := handlers.CORS(
 		handlers.AllowedOrigins([]string{"http://localhost:4200"}),
 		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}),
@@ -36,9 +35,7 @@ func startServer(userHandler *handler.UserHandler, router *mux.Router) {
 }
 
 func main() {
-
-	router := mux.NewRouter().StrictSlash(true)
-
+	
 	err := godotenv.Load()
 	if err != nil {
 		log.Println("Error loading .env file, using default values.")
@@ -77,6 +74,8 @@ func main() {
 	repo := repo.NewUserRepository(client, dbName, collectionName)
 	service := &service.UserService{UserRepositroy: repo}
 	handler := &handler.UserHandler{UserService: service}
+
+	router := mux.NewRouter().StrictSlash(true)
 
 	startServer(handler, router)
 

@@ -11,6 +11,14 @@ type UserService struct {
 	UserRepositroy *repo.UserRepository
 }
 
+func (service *UserService) GetAllUsers(ctx context.Context) ([]model.User, error) {
+	users, err := service.UserRepositroy.GetAllUsers(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return users, err
+
+}
 func (service *UserService) Create(ctx context.Context, user *model.User) error {
 	err := service.UserRepositroy.CreateUser(ctx, user)
 	if err != nil {

@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 
 	"github.com/pavlovicisidora/soa-team7/model"
@@ -13,8 +12,21 @@ type UserHandler struct {
 	UserService *service.UserService
 }
 
-func (h *UserHandler) GetAllUsers(v http.ResponseWriter, r *http.Request) {
-	log.Println("Test?")
+func (handler *UserHandler) GetAllUsers(writer http.ResponseWriter, req *http.Request) {
+	users, err := handler.UserService.GetAllUsers(req.Context())
+	if err != nil {
+		http.Error(writer, "Error while collecting all users", http.StatusInternalServerError)
+		return
+	}
+
+	writer.Header().Set("Content-Type", "application/json")
+	writer.WriteHeader(http.StatusOK) 
+
+	// Encode users slice into JSON and write to response
+	if err := json.NewEncoder(writer).Encode(users); err != nil {
+		http.Error(writer, "Error encoding JSON", http.StatusInternalServerError)
+		return
+	}
 }
 
 func (handler *UserHandler) Create(writer http.ResponseWriter, req *http.Request) {
@@ -30,7 +42,8 @@ func (handler *UserHandler) Create(writer http.ResponseWriter, req *http.Request
 		http.Error(writer, "Error while creating a new user", http.StatusInternalServerError)
 		return
 	}
+	println("Succesfully added user!")
 	writer.WriteHeader(http.StatusCreated)
 	writer.Header().Set("Content-Type", "application/json")
-	
+
 }
