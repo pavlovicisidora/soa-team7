@@ -1,7 +1,7 @@
 package model
 
 type User struct {
-	ID       int    `json:"id" gorm:"not null;type:int"`
+	//Id       string `json:"id" gorm:"not null;type:string"`     $Nisam siguran jel treba id, s obzirom da mi Mongo stalno svoj izbacuje
 	Username string `json:"username" gorm:"not null;type:string"`
 	Password string `json:"password" gorm:"not null;type:string"`
 	Mail     string `json:"mail"`
