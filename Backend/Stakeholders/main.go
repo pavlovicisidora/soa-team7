@@ -17,7 +17,19 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func startServer(userHandler *handler.UserHandler, router *mux.Router) {
+// func initDB() *gorm.DB {
+// 	connectionStr := "host=localhost user=postgres password=super dbname=nova port=5432 sslmode=disable"
+// 	database, err := gorm.Open(postgres.Open(connectionStr), &gorm.Config{})
+// 	if err != nil {
+// 		print(err)
+// 		return nil
+// 	}
+
+//		database.AutoMigrate(&model.Profile{})
+//		database.Exec("INSERT INTO profiles (user_id, name, surname, profile_pic, bio, motto) VALUES ('aec7e123-233d-4a09-a289-75308ea5b7e6', 'Marko',' Markovic', 'image','Bio','Moto')")
+//		return database
+//	}
+func startServer(userHandler *handler.UserHandler, profileHandler *handler.ProfileHandler, router *mux.Router) {
 
 	router.HandleFunc("/users", userHandler.GetAllUsers).Methods("GET")
 
@@ -27,6 +39,8 @@ func startServer(userHandler *handler.UserHandler, router *mux.Router) {
 
 	router.HandleFunc("/blockUser/{username}", userHandler.BlockUser).Methods("PUT")
 
+	router.HandleFunc("/usersInfo/", userHandler.FindAllInfo).Methods("GET")
+	router.HandleFunc("/profiles/{userId}", profileHandler.FindByUserId).Methods("GET")
 	corsObj := handlers.CORS(
 		handlers.AllowedOrigins([]string{"http://localhost:4200"}),
 		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}),
@@ -75,12 +89,13 @@ func main() {
 		collectionName = "stakeholders"
 	}
 
-	repo := repo.NewUserRepository(client, dbName, collectionName)
-	service := &service.UserService{UserRepository: repo}
-	handler := &handler.UserHandler{UserService: service}
+	userRepo := repo.NewUserRepository(client, dbName, collectionName)
+	userService := &service.UserService{UserRepository: userRepo}
+	userHandler := &handler.UserHandler{UserService: userService}
 
+	profileService := &service.ProfileService{UserRepo: userRepo}
+	profileHandler := &handler.ProfileHandler{ProfileService: profileService}
 	router := mux.NewRouter().StrictSlash(true)
 
-	startServer(handler, router)
-
+	startServer(userHandler, profileHandler, router)
 }
