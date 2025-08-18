@@ -17,7 +17,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func startServer(userHandler *handler.UserHandler, router *mux.Router) {
+func startServer(userHandler *handler.UserHandler, profileHandler *handler.ProfileHandler, router *mux.Router) {
 
 	router.HandleFunc("/users", userHandler.GetAllUsers).Methods("GET")
 
@@ -27,6 +27,8 @@ func startServer(userHandler *handler.UserHandler, router *mux.Router) {
 
 	router.HandleFunc("/blockUser/{username}", userHandler.BlockUser).Methods("PUT")
 
+	router.HandleFunc("/usersInfo/", userHandler.FindAllInfo).Methods("GET")
+	router.HandleFunc("/profiles/{userId}", profileHandler.FindByUserId).Methods("GET")
 	corsObj := handlers.CORS(
 		handlers.AllowedOrigins([]string{"http://localhost:4200"}),
 		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}),
@@ -75,12 +77,13 @@ func main() {
 		collectionName = "stakeholders"
 	}
 
-	repo := repo.NewUserRepository(client, dbName, collectionName)
-	service := &service.UserService{UserRepository: repo}
-	handler := &handler.UserHandler{UserService: service}
+	userRepo := repo.NewUserRepository(client, dbName, collectionName)
+	userService := &service.UserService{UserRepository: userRepo}
+	userHandler := &handler.UserHandler{UserService: userService}
 
+	profileService := &service.ProfileService{UserRepo: userRepo}
+	profileHandler := &handler.ProfileHandler{ProfileService: profileService}
 	router := mux.NewRouter().StrictSlash(true)
 
-	startServer(handler, router)
-
+	startServer(userHandler, profileHandler, router)
 }

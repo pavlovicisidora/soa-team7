@@ -6,7 +6,9 @@ import (
 
 	"github.com/pavlovicisidora/soa-team7/model"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -68,6 +70,7 @@ func (r *UserRepository) UpdateUser(ctx context.Context, user model.User) error 
 			"role":     user.Role,
 			"blocked":  user.Blocked,
 			"password": user.Password,
+			"profile":  user.Profile,
 		},
 	}
 	result, err := collection.UpdateOne(ctx, filter, update)
@@ -132,4 +135,43 @@ func (r *UserRepository) FindByMail(ctx context.Context, mail string) (model.Use
 		return model.User{}, err
 	}
 	return user, err
+}
+func (r *UserRepository) FindAllInfo(ctx context.Context) ([]model.User, error) {
+	collection := r.client.Database(r.dbName).Collection(r.collectionName)
+	projection := bson.M{
+		"username": 1,
+		"mail":     1,
+		"role":     1,
+		"_id":      0,
+		"blocked":  1,
+	}
+	findOptions := options.Find().SetProjection(projection)
+	cursor, err := collection.Find(ctx, bson.M{}, findOptions)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var users []model.User
+	if err := cursor.All(ctx, &users); err != nil {
+		return nil, err
+	}
+
+	return users, nil
+}
+func (r *UserRepository) FindUserById(ctx context.Context, id primitive.ObjectID) (*model.User, error) {
+	collection := r.client.Database(r.dbName).Collection(r.collectionName)
+
+	var user model.User
+
+	// Kreiramo filter da nađemo dokument sa odgovarajućim _id poljem
+	filter := bson.M{"_id": id}
+
+	// FindOne vraća jedan dokument
+	err := collection.FindOne(ctx, filter).Decode(&user)
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
 }

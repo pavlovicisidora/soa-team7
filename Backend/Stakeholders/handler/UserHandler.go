@@ -105,3 +105,18 @@ func (handler *UserHandler) BlockUser(writer http.ResponseWriter, req *http.Requ
 
 	writer.WriteHeader(http.StatusNoContent) // 204 No Content
 }
+func (handler *UserHandler) FindAllInfo(writer http.ResponseWriter, req *http.Request) {
+	users, err := handler.UserService.FindAllInfo(req.Context())
+	if err != nil {
+		http.Error(writer, "Error while collecting all users", http.StatusInternalServerError)
+		return
+	}
+
+	writer.Header().Set("Content-Type", "application/json")
+	writer.WriteHeader(http.StatusOK)
+
+	if err := json.NewEncoder(writer).Encode(users); err != nil {
+		http.Error(writer, "Error encoding JSON", http.StatusInternalServerError)
+		return
+	}
+}

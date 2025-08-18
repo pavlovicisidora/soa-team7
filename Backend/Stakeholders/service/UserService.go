@@ -77,5 +77,12 @@ func (service *UserService) BlockUser(ctx context.Context, username string) erro
 		return fmt.Errorf("DB error: %v", err)
 	}
 	return nil
+}
+func (service *UserService) FindAllInfo(ctx context.Context) ([]model.User, error) {
+	users, err := service.UserRepository.FindAllInfo(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return users, err
 
 }
