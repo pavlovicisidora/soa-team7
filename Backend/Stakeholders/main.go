@@ -21,7 +21,11 @@ func startServer(userHandler *handler.UserHandler, router *mux.Router) {
 
 	router.HandleFunc("/users", userHandler.GetAllUsers).Methods("GET")
 
-	router.HandleFunc("/userCreate", userHandler.Create).Methods("POST")
+	router.HandleFunc("/register", userHandler.Create).Methods("POST")
+
+	router.HandleFunc("/login", userHandler.Login).Methods("GET")
+
+	router.HandleFunc("/blockUser/{username}", userHandler.BlockUser).Methods("PUT")
 
 	corsObj := handlers.CORS(
 		handlers.AllowedOrigins([]string{"http://localhost:4200"}),
@@ -35,7 +39,7 @@ func startServer(userHandler *handler.UserHandler, router *mux.Router) {
 }
 
 func main() {
-	
+
 	err := godotenv.Load()
 	if err != nil {
 		log.Println("Error loading .env file, using default values.")
@@ -72,7 +76,7 @@ func main() {
 	}
 
 	repo := repo.NewUserRepository(client, dbName, collectionName)
-	service := &service.UserService{UserRepositroy: repo}
+	service := &service.UserService{UserRepository: repo}
 	handler := &handler.UserHandler{UserService: service}
 
 	router := mux.NewRouter().StrictSlash(true)
