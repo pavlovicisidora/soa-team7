@@ -17,18 +17,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// func initDB() *gorm.DB {
-// 	connectionStr := "host=localhost user=postgres password=super dbname=nova port=5432 sslmode=disable"
-// 	database, err := gorm.Open(postgres.Open(connectionStr), &gorm.Config{})
-// 	if err != nil {
-// 		print(err)
-// 		return nil
-// 	}
-
-//		database.AutoMigrate(&model.Profile{})
-//		database.Exec("INSERT INTO profiles (user_id, name, surname, profile_pic, bio, motto) VALUES ('aec7e123-233d-4a09-a289-75308ea5b7e6', 'Marko',' Markovic', 'image','Bio','Moto')")
-//		return database
-//	}
 func startServer(userHandler *handler.UserHandler, profileHandler *handler.ProfileHandler, router *mux.Router) {
 
 	router.HandleFunc("/users", userHandler.GetAllUsers).Methods("GET")
