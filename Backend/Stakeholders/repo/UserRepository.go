@@ -2,10 +2,12 @@ package repo
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/pavlovicisidora/soa-team7/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UserRepository struct {
@@ -29,7 +31,7 @@ func (r *UserRepository) GetAllUsers(ctx context.Context) ([]model.User, error) 
 	if err != nil {
 		return nil, err
 	}
-	defer cursor.Close(ctx)    //Ovo pomaze da na dodje do leaka, cursor predstavlja otvoreni reyultat upita pa ga zatvarmao da 
+	defer cursor.Close(ctx) //Ovo pomaze da na dodje do leaka, cursor predstavlja otvoreni reyultat upita pa ga zatvarmao da
 
 	var users []model.User
 	if err := cursor.All(ctx, &users); err != nil {
@@ -41,9 +43,93 @@ func (r *UserRepository) GetAllUsers(ctx context.Context) ([]model.User, error) 
 
 func (r *UserRepository) CreateUser(ctx context.Context, user *model.User) error {
 	collection := r.client.Database(r.dbName).Collection(r.collectionName)
-	_, err := collection.InsertOne(ctx, user)
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	user.Password = string(hashedPassword)
+
+	_, err = collection.InsertOne(ctx, user)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func (r *UserRepository) UpdateUser(ctx context.Context, user model.User) error {
+	collection := r.client.Database(r.dbName).Collection(r.collectionName)
+
+	filter := bson.M{"username": user.Username}
+
+	update := bson.M{
+		"$set": bson.M{
+			"mail":     user.Mail,
+			"role":     user.Role,
+			"blocked":  user.Blocked,
+			"password": user.Password,
+		},
+	}
+	result, err := collection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return err
+	}
+
+	// ako nije pronađen nijedan dokument
+	if result.MatchedCount == 0 {
+		return fmt.Errorf("user with username %s not found", user.Username)
+	}
+
+	return nil
+
+}
+
+func (r *UserRepository) Login(ctx context.Context, username string, password string) (model.User, error) {
+	collection := r.client.Database(r.dbName).Collection(r.collectionName)
+
+	var user model.User
+	err := collection.FindOne(ctx, bson.M{"username": username}).Decode(&user)
+
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return model.User{}, fmt.Errorf("this username doesn't exist")
+		}
+		return model.User{}, err
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	if err != nil {
+		return model.User{}, fmt.Errorf("wrong password")
+	}
+
+	return user, nil
+
+}
+func (r *UserRepository) FindByUsername(ctx context.Context, username string) (model.User, error) {
+	collection := r.client.Database(r.dbName).Collection(r.collectionName)
+
+	var user model.User
+	err := collection.FindOne(ctx, bson.M{"username": username}).Decode(&user)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return model.User{}, nil
+		}
+		return model.User{}, err
+	}
+	return user, err
+
+}
+
+func (r *UserRepository) FindByMail(ctx context.Context, mail string) (model.User, error) {
+	collection := r.client.Database(r.dbName).Collection(r.collectionName)
+
+	var user model.User
+	err := collection.FindOne(ctx, bson.M{"mail": mail}).Decode(&user)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return model.User{}, nil
+		}
+		return model.User{}, err
+	}
+	return user, err
 }
