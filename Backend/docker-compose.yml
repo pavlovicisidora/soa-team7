@@ -1,9 +1,9 @@
 version: "3.7"
 
 services:
-  server:
+  stakeholders_server:
     build:
-      context: ./
+      context: ./Stakeholders
       dockerfile: Dockerfile
     restart: always
     container_name: "stakeholders"
@@ -15,6 +15,24 @@ services:
       - MONGO_URI=mongodb://root:pass@mongo:27017
       - MONGO_DB_NAME=stakeholders_db
       - MONGO_COLLECTION_NAME=stakeholders
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  blog_server:
+    build:
+      context: ./Blog
+      dockerfile: Dockerfile
+    restart: always
+    container_name: "blog"
+    hostname: "blog-server"
+    ports:
+      - "8082:8082"
+    environment:
+      - PORT=8082
+      - MONGO_URI=mongodb://root:pass@mongo:27017
+      - MONGO_DB_NAME=blog_db
+      - MONGO_COLLECTION_NAME=blog
     depends_on:
       mongo:
         condition: service_healthy
@@ -49,7 +67,7 @@ services:
     depends_on:
       - mongo
     ports:
-      - "8082:8081"
+      - "50525:8081"
     volumes:
       - mongo_express_data:/data/db
 
