@@ -1,0 +1,76 @@
+version: "3.7"
+
+services:
+  stakeholders_server:
+    build:
+      context: ./Stakeholders
+      dockerfile: Dockerfile
+    restart: always
+    container_name: "stakeholders"
+    hostname: "stakeholders-server"
+    ports:
+      - "8081:8081"
+    environment:
+      - PORT=8081
+      - MONGO_URI=mongodb://root:pass@mongo:27017
+      - MONGO_DB_NAME=stakeholders_db
+      - MONGO_COLLECTION_NAME=stakeholders
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  blog_server:
+    build:
+      context: ./Blog
+      dockerfile: Dockerfile
+    restart: always
+    container_name: "blog"
+    hostname: "blog-server"
+    ports:
+      - "8082:8082"
+    environment:
+      - PORT=8082
+      - MONGO_URI=mongodb://root:pass@mongo:27017
+      - MONGO_DB_NAME=blog_db
+      - MONGO_COLLECTION_NAME=blog
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: pass
+      MONGO_INITDB_DATABASE: stakeholders_db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok'
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    volumes:
+      - mongo_store:/data/db
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongo
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=root
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=pass
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=admin
+      - ME_CONFIG_MONGODB_URL=mongodb://root:pass@mongo:27017/
+    depends_on:
+      - mongo
+    ports:
+      - "50525:8081"
+    volumes:
+      - mongo_express_data:/data/db
+
+volumes:
+  mongo_store:
+  mongo_express_data:
