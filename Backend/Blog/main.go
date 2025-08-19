@@ -3,10 +3,15 @@ package main
 import (
 	"context"
 	"log"
+	"net/http"
 	"os"
 	"time"
 
+	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
+	"github.com/pavlovicisidora/soa-team7/Backend/Blog/handler"
+	"github.com/pavlovicisidora/soa-team7/Backend/Blog/repo"
+	"github.com/pavlovicisidora/soa-team7/Backend/Blog/service"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -48,4 +53,22 @@ func main() {
 		collectionName = "blog"
 	}
 
+	collection := client.Database(dbName).Collection(collectionName)
+
+	blogRepo := repo.NewBlogRepository(collection)
+	blogService := service.NewBlogService(blogRepo)
+	blogHandler := handler.NewBlogHandler(blogService)
+
+	router := mux.NewRouter()
+
+	router.HandleFunc("/blog", blogHandler.CreateBlog).Methods("POST")
+	router.HandleFunc("/blog", blogHandler.GetAllBlogs).Methods("GET")
+	router.HandleFunc("/blog/{id}", blogHandler.GetBlogByID).Methods("GET")
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8082"
+	}
+	log.Printf("Blog service listening on port %s...", port)
+	log.Fatal(http.ListenAndServe(":"+port, router))
 }
