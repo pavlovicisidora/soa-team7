@@ -7,5 +7,5 @@ RUN go build -o blog
 
 FROM alpine
 COPY --from=build_container /app/blog /usr/bin
-EXPOSE 8081
+EXPOSE 8082
 ENTRYPOINT ["blog"]
