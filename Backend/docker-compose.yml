@@ -67,7 +67,7 @@ services:
     depends_on:
       - mongo
     ports:
-      - "50525:8081"
+      - "9200:8081"
     volumes:
       - mongo_express_data:/data/db
 

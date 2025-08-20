@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/gorilla/mux"
+	"github.com/pavlovicisidora/soa-team7/auth"
 	"github.com/pavlovicisidora/soa-team7/model"
 	"github.com/pavlovicisidora/soa-team7/service"
 )
@@ -88,16 +89,49 @@ func (handler *UserHandler) Login(writer http.ResponseWriter, req *http.Request)
 		return
 	}
 
-	println("Succesfull login!")
+	token, err := auth.GenerateJWT(user.ID.Hex(), user.Role)
+	if err != nil {
+		http.Error(writer, "Failed to generate token", http.StatusInternalServerError)
+		return
+	}
+
+	response := map[string]interface{}{
+		"token": token,
+		"user": map[string]interface{}{
+			"username": user.Username,
+			"role":     user.Role,
+		},
+	}
+
 	writer.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(writer).Encode(user)
+	json.NewEncoder(writer).Encode(response)
+
+	println("Succesfull login!")
 }
 
 func (handler *UserHandler) BlockUser(writer http.ResponseWriter, req *http.Request) {
+
+	//Uzimamo token iz heder-a
+	tokenStr := req.Header.Get("Authorization") // "Bearer <token>"
+	tokenStr = strings.TrimPrefix(tokenStr, "Bearer ")
+
+	//Verifikujemo token, autentifikacija, da li je token uopste validan(ispravan potpis, nije istekao, ispravan format)
+	claims, err := auth.VerifyJWT(tokenStr)
+	if err != nil {
+		http.Error(writer, "Unathorized"+err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	//Proveravamo ulogu, autorizacija
+	if claims.Role != "ADMIN" {
+		http.Error(writer, "Forbidden: only ADMIN can block users", http.StatusForbidden)
+		return
+	}
+
 	vars := mux.Vars(req)
 	username := vars["username"]
 
-	err := handler.UserService.BlockUser(req.Context(), username)
+	err = handler.UserService.BlockUser(req.Context(), username)
 	if err != nil {
 		http.Error(writer, err.Error(), http.StatusInternalServerError)
 		return
@@ -105,6 +139,7 @@ func (handler *UserHandler) BlockUser(writer http.ResponseWriter, req *http.Requ
 
 	writer.WriteHeader(http.StatusNoContent) // 204 No Content
 }
+
 func (handler *UserHandler) FindAllInfo(writer http.ResponseWriter, req *http.Request) {
 	users, err := handler.UserService.FindAllInfo(req.Context())
 	if err != nil {
