@@ -1,11 +1,13 @@
 package model
 
+import "go.mongodb.org/mongo-driver/bson/primitive"
+
 type User struct {
-	//Id       string `json:"id" gorm:"not null;type:string"`     $Nisam siguran jel treba id, s obzirom da mi Mongo stalno svoj izbacuje
-	Username string  `json:"username" gorm:"not null;type:string"`
-	Password string  `json:"password" gorm:"not null;type:string"`
-	Mail     string  `json:"mail"`
-	Role     string  `json:"role" gorm:"not null;type:string"`
-	Blocked  bool    `json:"blocked"`
-	Profile  Profile `json:"profile"`
+	ID       primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
+	Username string             `json:"username" bson:"username"`
+	Password string             `json:"password" bson:"password"`
+	Mail     string             `json:"mail" bson:"mail"`
+	Role     string             `json:"role" bson:"role"`
+	Blocked  bool               `json:"blocked" bson:"blocked"`
+	Profile  Profile            `json:"profile" bson:"profile"`
 }
