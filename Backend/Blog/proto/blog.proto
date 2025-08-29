@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/pavlovicisidora/soa-team7/Backend/Blog/proto";
+
+package blog;
+
+service BlogService {
+  rpc CreateBlog(CreateBlogRequest) returns (CreateBlogResponse) {}
+}
+
+message Image {
+    string url = 1;
+}
+
+message Blog {
+  string id = 1;
+  string title = 2;
+  string content = 3;
+  google.protobuf.Timestamp created_at = 4;
+  string user_id = 5;
+  repeated Image images = 6;
+}
+
+message CreateBlogRequest {
+  string title = 1;
+  string content = 2;
+  string user_id = 3;
+  repeated Image images = 4; 
+}
+
+message CreateBlogResponse {
+  Blog blog = 1;
+}
