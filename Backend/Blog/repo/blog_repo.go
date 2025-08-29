@@ -13,6 +13,8 @@ type BlogRepository interface {
 	CreateBlog(ctx context.Context, blog *model.Blog) (*primitive.ObjectID, error)
 	GetBlogs(ctx context.Context) ([]model.Blog, error)
 	GetBlogByID(ctx context.Context, id primitive.ObjectID) (*model.Blog, error)
+	LikeBlog(ctx context.Context, blogID primitive.ObjectID, userID string) error
+	UnlikeBlog(ctx context.Context, blogID primitive.ObjectID, userID string) error
 }
 
 type blogRepository struct {
@@ -56,4 +58,18 @@ func (r *blogRepository) GetBlogByID(ctx context.Context, id primitive.ObjectID)
 		return nil, err
 	}
 	return &blog, nil
+}
+
+func (r *blogRepository) LikeBlog(ctx context.Context, blogID primitive.ObjectID, userID string) error {
+	filter := bson.M{"_id": blogID}
+	update := bson.M{"$addToSet": bson.M{"liked_by": userID}}
+	_, err := r.collection.UpdateOne(ctx, filter, update)
+	return err
+}
+
+func (r *blogRepository) UnlikeBlog(ctx context.Context, blogID primitive.ObjectID, userID string) error {
+	filter := bson.M{"_id": blogID}
+	update := bson.M{"$pull": bson.M{"liked_by": userID}}
+	_, err := r.collection.UpdateOne(ctx, filter, update)
+	return err
 }

@@ -8,6 +8,10 @@ package blog;
 
 service BlogService {
   rpc CreateBlog(CreateBlogRequest) returns (CreateBlogResponse) {}
+  rpc GetBlog(GetBlogRequest) returns (GetBlogResponse) {}
+  rpc GetAllBlogs(GetAllBlogsRequest) returns (GetAllBlogsResponse) {}
+  rpc LikeBlog(LikeBlogRequest) returns (LikeBlogResponse) {}
+  rpc UnlikeBlog(UnlikeBlogRequest) returns (UnlikeBlogResponse) {}
 }
 
 message Image {
@@ -21,6 +25,7 @@ message Blog {
   google.protobuf.Timestamp created_at = 4;
   string user_id = 5;
   repeated Image images = 6;
+  int32 like_count = 7;
 }
 
 message CreateBlogRequest {
@@ -29,7 +34,34 @@ message CreateBlogRequest {
   string user_id = 3;
   repeated Image images = 4; 
 }
-
 message CreateBlogResponse {
+  Blog blog = 1;
+}
+
+message GetBlogRequest {
+  string id = 1;
+}
+message GetBlogResponse {
+  Blog blog = 1;
+}
+
+message GetAllBlogsRequest {}
+message GetAllBlogsResponse {
+  repeated Blog blogs = 1;
+}
+
+message LikeBlogRequest {
+  string blog_id = 1;
+  string user_id = 2;
+}
+message LikeBlogResponse {
+  Blog blog = 1;
+}
+
+message UnlikeBlogRequest {
+  string blog_id = 1;
+  string user_id = 2;
+}
+message UnlikeBlogResponse {
   Blog blog = 1;
 }

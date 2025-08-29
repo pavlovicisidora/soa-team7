@@ -10,6 +10,26 @@ import (
 	pb "github.com/pavlovicisidora/soa-team7/Backend/Blog/proto"
 )
 
+func toProtoBlog(blog *model.Blog) *pb.Blog {
+	return &pb.Blog{
+		Id:        blog.ID.Hex(),
+		Title:     blog.Title,
+		Content:   blog.Content,
+		CreatedAt: timestamppb.New(blog.CreatedAt),
+		UserId:    blog.UserID,
+		Images:    toProtoImages(blog.Images),
+		LikeCount: int32(len(blog.LikedBy)),
+	}
+}
+
+func toProtoImages(images []model.Image) []*pb.Image {
+	var protoImages []*pb.Image
+	for _, img := range images {
+		protoImages = append(protoImages, &pb.Image{Url: img.URL})
+	}
+	return protoImages
+}
+
 type BlogHandler struct {
 	pb.UnimplementedBlogServiceServer
 	blogService service.BlogService
@@ -54,29 +74,38 @@ func (h *BlogHandler) CreateBlog(ctx context.Context, req *pb.CreateBlogRequest)
 	}, nil
 }
 
-/*
-func (h *BlogHandler) GetAllBlogs(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
-	blogs, err := h.blogService.GetAllBlogs(r.Context())
+func (h *BlogHandler) GetBlog(ctx context.Context, req *pb.GetBlogRequest) (*pb.GetBlogResponse, error) {
+	blog, err := h.blogService.GetBlogByID(ctx, req.GetId())
 	if err != nil {
-		http.Error(w, "Failed to retrieve blog posts", http.StatusInternalServerError)
-		return
+		return nil, err
 	}
-
-	json.NewEncoder(w).Encode(blogs)
+	return &pb.GetBlogResponse{Blog: toProtoBlog(blog)}, nil
 }
 
-func (h *BlogHandler) GetBlogByID(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	params := mux.Vars(r)
-	id := params["id"]
-
-	blog, err := h.blogService.GetBlogByID(r.Context(), id)
+func (h *BlogHandler) GetAllBlogs(ctx context.Context, req *pb.GetAllBlogsRequest) (*pb.GetAllBlogsResponse, error) {
+	blogs, err := h.blogService.GetAllBlogs(ctx)
 	if err != nil {
-		http.Error(w, "Blog post not found", http.StatusNotFound)
-		return
+		return nil, err
 	}
+	var protoBlogs []*pb.Blog
+	for _, blog := range blogs {
+		protoBlogs = append(protoBlogs, toProtoBlog(&blog))
+	}
+	return &pb.GetAllBlogsResponse{Blogs: protoBlogs}, nil
+}
 
-	json.NewEncoder(w).Encode(blog)
-}*/
+func (h *BlogHandler) LikeBlog(ctx context.Context, req *pb.LikeBlogRequest) (*pb.LikeBlogResponse, error) {
+	blog, err := h.blogService.LikeBlog(ctx, req.GetBlogId(), req.GetUserId())
+	if err != nil {
+		return nil, err
+	}
+	return &pb.LikeBlogResponse{Blog: toProtoBlog(blog)}, nil
+}
+
+func (h *BlogHandler) UnlikeBlog(ctx context.Context, req *pb.UnlikeBlogRequest) (*pb.UnlikeBlogResponse, error) {
+	blog, err := h.blogService.UnlikeBlog(ctx, req.GetBlogId(), req.GetUserId())
+	if err != nil {
+		return nil, err
+	}
+	return &pb.UnlikeBlogResponse{Blog: toProtoBlog(blog)}, nil
+}
