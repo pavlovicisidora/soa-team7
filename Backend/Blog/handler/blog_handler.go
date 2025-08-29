@@ -1,15 +1,17 @@
 package handler
 
 import (
-	"encoding/json"
-	"net/http"
+	"context"
 
-	"github.com/gorilla/mux"
 	"github.com/pavlovicisidora/soa-team7/Backend/Blog/model"
 	"github.com/pavlovicisidora/soa-team7/Backend/Blog/service"
+	"google.golang.org/protobuf/types/known/timestamppb"
+
+	pb "github.com/pavlovicisidora/soa-team7/Backend/Blog/proto"
 )
 
 type BlogHandler struct {
+	pb.UnimplementedBlogServiceServer
 	blogService service.BlogService
 }
 
@@ -19,37 +21,40 @@ func NewBlogHandler(blogService service.BlogService) *BlogHandler {
 	}
 }
 
-func (h *BlogHandler) CreateBlog(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
-	var requestBody struct {
-		Title   string        `json:"title"`
-		Content string        `json:"content"`
-		UserID  string        `json:"user_id"`
-		Images  []model.Image `json:"images"`
+func (h *BlogHandler) CreateBlog(ctx context.Context, req *pb.CreateBlogRequest) (*pb.CreateBlogResponse, error) {
+	var images []model.Image
+	for _, img := range req.GetImages() {
+		images = append(images, model.Image{URL: img.Url})
 	}
 
-	if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
-		return
-	}
-
-	blog, err := h.blogService.CreateBlog(
-		r.Context(),
-		requestBody.Title,
-		requestBody.Content,
-		requestBody.Images,
-		requestBody.UserID,
+	createdBlog, err := h.blogService.CreateBlog(
+		ctx,
+		req.GetTitle(),
+		req.GetContent(),
+		images,
+		req.GetUserId(),
 	)
 	if err != nil {
-		http.Error(w, "Failed to create blog post", http.StatusInternalServerError)
-		return
+		return nil, err
 	}
 
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(blog)
+	protoBlog := &pb.Blog{
+		Id:        createdBlog.ID.Hex(),
+		Title:     createdBlog.Title,
+		Content:   createdBlog.Content,
+		CreatedAt: timestamppb.New(createdBlog.CreatedAt),
+		UserId:    createdBlog.UserID,
+	}
+	for _, img := range createdBlog.Images {
+		protoBlog.Images = append(protoBlog.Images, &pb.Image{Url: img.URL})
+	}
+
+	return &pb.CreateBlogResponse{
+		Blog: protoBlog,
+	}, nil
 }
 
+/*
 func (h *BlogHandler) GetAllBlogs(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -74,4 +79,4 @@ func (h *BlogHandler) GetBlogByID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(blog)
-}
+}*/

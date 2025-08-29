@@ -1,11 +1,22 @@
-FROM golang:alpine as build_container
+FROM golang:1.25-alpine as builder
 WORKDIR /app
-COPY go.mod go.sum ./
-RUN go mod download
-COPY . .
-RUN go build -o blog
 
-FROM alpine
-COPY --from=build_container /app/blog /usr/bin
+RUN go mod init temp-build-module
+
+COPY go.work go.work.sum ./
+COPY Blog/go.mod Blog/go.sum ./Blog/
+COPY api_gateway/go.mod api_gateway/go.sum ./api_gateway/
+COPY Stakeholders/go.mod Stakeholders/go.sum ./Stakeholders/
+
+RUN go get -d ./...
+
+COPY Blog/ ./Blog/
+
+WORKDIR /app/Blog
+
+RUN CGO_ENABLED=0 GOOS=linux go build -o /app/blog .
+
+FROM alpine:latest
+COPY --from=builder /app/blog /usr/bin/blog
 EXPOSE 8082
-ENTRYPOINT ["blog"]
+ENTRYPOINT ["/usr/bin/blog"]

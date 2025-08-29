@@ -1,10 +1,27 @@
 version: "3.7"
 
 services:
+  api_gateway:
+    build:
+      context: .
+      dockerfile: ./api_gateway/Dockerfile 
+    restart: always
+    container_name: "api_gateway"
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - BLOG_SERVICE_ADDRESS=blog_server:8082 
+      - STAKEHOLDERS_SERVICE_ADDRESS=stakeholders-server:8081
+      - JWT_SECRET_KEY=tvoja-super-tajna-rec 
+    depends_on:
+      - blog_server
+      - stakeholders_server
+
   stakeholders_server:
     build:
-      context: ./Stakeholders
-      dockerfile: Dockerfile
+      context: . 
+      dockerfile: ./Stakeholders/Dockerfile
     restart: always
     container_name: "stakeholders"
     hostname: "stakeholders-server"
@@ -21,8 +38,8 @@ services:
 
   blog_server:
     build:
-      context: ./Blog
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./Blog/Dockerfile
     restart: always
     container_name: "blog"
     hostname: "blog-server"

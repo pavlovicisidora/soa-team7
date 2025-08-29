@@ -3,17 +3,18 @@ package main
 import (
 	"context"
 	"log"
-	"net/http"
+	"net"
 	"os"
 	"time"
 
-	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 	"github.com/pavlovicisidora/soa-team7/Backend/Blog/handler"
+	pb "github.com/pavlovicisidora/soa-team7/Backend/Blog/proto"
 	"github.com/pavlovicisidora/soa-team7/Backend/Blog/repo"
 	"github.com/pavlovicisidora/soa-team7/Backend/Blog/service"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"google.golang.org/grpc"
 )
 
 func main() {
@@ -59,16 +60,21 @@ func main() {
 	blogService := service.NewBlogService(blogRepo)
 	blogHandler := handler.NewBlogHandler(blogService)
 
-	router := mux.NewRouter()
-
-	router.HandleFunc("/blog", blogHandler.CreateBlog).Methods("POST")
-	router.HandleFunc("/blog", blogHandler.GetAllBlogs).Methods("GET")
-	router.HandleFunc("/blog/{id}", blogHandler.GetBlogByID).Methods("GET")
-
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8082"
 	}
-	log.Printf("Blog service listening on port %s...", port)
-	log.Fatal(http.ListenAndServe(":"+port, router))
+
+	lis, err := net.Listen("tcp", ":"+port)
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+
+	grpcServer := grpc.NewServer()
+	pb.RegisterBlogServiceServer(grpcServer, blogHandler)
+
+	log.Printf("gRPC server listening at %v", lis.Addr())
+	if err := grpcServer.Serve(lis); err != nil {
+		log.Fatalf("failed to serve: %v", err)
+	}
 }
