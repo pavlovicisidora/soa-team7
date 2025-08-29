@@ -12,6 +12,18 @@ import (
 	blog_proto "github.com/pavlovicisidora/soa-team7/Backend/Blog/proto"
 )
 
+func (h *BlogHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	router := mux.NewRouter()
+
+	router.HandleFunc("/blogs", h.CreateBlogHandler).Methods("POST")
+	router.HandleFunc("/blogs", h.GetAllBlogsHandler).Methods("GET")
+	router.HandleFunc("/blogs/{id}", h.GetBlogByIDHandler).Methods("GET")
+	router.HandleFunc("/blogs/{id}/like", h.LikeBlogHandler).Methods("POST")
+	router.HandleFunc("/blogs/{id}/like", h.UnlikeBlogHandler).Methods("DELETE")
+
+	router.ServeHTTP(w, r)
+}
+
 type CreateBlogRequest struct {
 	Title   string  `json:"title"`
 	Content string  `json:"content"`
@@ -27,13 +39,6 @@ type BlogHandler struct {
 
 func NewBlogHandler(client blog_proto.BlogServiceClient) *BlogHandler {
 	return &BlogHandler{client: client}
-}
-
-func (h *BlogHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	router := mux.NewRouter()
-	router.HandleFunc("/blogs", h.CreateBlogHandler).Methods("POST")
-
-	router.ServeHTTP(w, r)
 }
 
 func (h *BlogHandler) CreateBlogHandler(w http.ResponseWriter, r *http.Request) {
@@ -77,4 +82,69 @@ func (h *BlogHandler) CreateBlogHandler(w http.ResponseWriter, r *http.Request) 
 		log.Printf("Failed to encode response: %v", err)
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
 	}
+}
+
+func (h *BlogHandler) GetAllBlogsHandler(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
+	defer cancel()
+
+	resp, err := h.client.GetAllBlogs(ctx, &blog_proto.GetAllBlogsRequest{})
+	if err != nil {
+		http.Error(w, "Failed to get blogs", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(resp.GetBlogs())
+}
+
+func (h *BlogHandler) GetBlogByIDHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
+	defer cancel()
+
+	resp, err := h.client.GetBlog(ctx, &blog_proto.GetBlogRequest{Id: id})
+	if err != nil {
+		http.Error(w, "Blog not found", http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(resp.GetBlog())
+}
+
+func (h *BlogHandler) LikeBlogHandler(w http.ResponseWriter, r *http.Request) {
+	blogID := mux.Vars(r)["id"]
+	userID := r.Context().Value(middleware.UserKey).(string)
+
+	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
+	defer cancel()
+
+	resp, err := h.client.LikeBlog(ctx, &blog_proto.LikeBlogRequest{BlogId: blogID, UserId: userID})
+	if err != nil {
+		http.Error(w, "Failed to like blog", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(resp.GetBlog())
+}
+
+func (h *BlogHandler) UnlikeBlogHandler(w http.ResponseWriter, r *http.Request) {
+	blogID := mux.Vars(r)["id"]
+	userID := r.Context().Value(middleware.UserKey).(string)
+
+	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
+	defer cancel()
+
+	resp, err := h.client.UnlikeBlog(ctx, &blog_proto.UnlikeBlogRequest{BlogId: blogID, UserId: userID})
+	if err != nil {
+		http.Error(w, "Failed to unlike blog", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(resp.GetBlog())
 }

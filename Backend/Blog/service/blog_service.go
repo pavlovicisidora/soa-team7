@@ -13,6 +13,8 @@ type BlogService interface {
 	CreateBlog(ctx context.Context, title, content string, images []model.Image, userID string) (*model.Blog, error)
 	GetAllBlogs(ctx context.Context) ([]model.Blog, error)
 	GetBlogByID(ctx context.Context, id string) (*model.Blog, error)
+	LikeBlog(ctx context.Context, blogID, userID string) (*model.Blog, error)
+	UnlikeBlog(ctx context.Context, blogID, userID string) (*model.Blog, error)
 }
 
 type blogService struct {
@@ -54,4 +56,26 @@ func (s *blogService) GetBlogByID(ctx context.Context, id string) (*model.Blog, 
 	}
 
 	return s.blogRepo.GetBlogByID(ctx, objID)
+}
+
+func (s *blogService) LikeBlog(ctx context.Context, blogID, userID string) (*model.Blog, error) {
+	objBlogID, err := primitive.ObjectIDFromHex(blogID)
+	if err != nil {
+		return nil, err
+	}
+	if err := s.blogRepo.LikeBlog(ctx, objBlogID, userID); err != nil {
+		return nil, err
+	}
+	return s.blogRepo.GetBlogByID(ctx, objBlogID)
+}
+
+func (s *blogService) UnlikeBlog(ctx context.Context, blogID, userID string) (*model.Blog, error) {
+	objBlogID, err := primitive.ObjectIDFromHex(blogID)
+	if err != nil {
+		return nil, err
+	}
+	if err := s.blogRepo.UnlikeBlog(ctx, objBlogID, userID); err != nil {
+		return nil, err
+	}
+	return s.blogRepo.GetBlogByID(ctx, objBlogID)
 }
