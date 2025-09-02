@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/gorilla/mux"
+	"github.com/pavlovicisidora/soa-team7/auth"
 	"github.com/pavlovicisidora/soa-team7/service"
 	"github.com/pavlovicisidora/soa-team7/auth"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -16,6 +17,19 @@ type ProfileHandler struct {
 }
 
 func (handler *ProfileHandler) FindByUserId(writer http.ResponseWriter, req *http.Request) {
+	tokenStr := req.Header.Get("Authorization") // "Bearer <token>"
+	tokenStr = strings.TrimPrefix(tokenStr, "Bearer ")
+
+	claims, err := auth.VerifyJWT(tokenStr)
+	if err != nil {
+		http.Error(writer, "Unathorized"+err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	if claims.Role != "TURISTA" && claims.Role != "VODIC" {
+		http.Error(writer, "Forbidden: only TURISTA AND VODIC can see user profile", http.StatusForbidden)
+		return
+	}
 	userIdStr := mux.Vars(req)["userId"]
 	userId, err := primitive.ObjectIDFromHex(userIdStr)
 	if err != nil {
