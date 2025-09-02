@@ -20,3 +20,8 @@ func (s *ProfileService) GetUserProfile(ctx context.Context, userID primitive.Ob
 	}
 	return &user.Profile, nil
 }
+
+
+func (s *ProfileService) UpdateUserProfileFields(ctx context.Context, userID primitive.ObjectID, updates map[string]interface{}) error {
+	return s.UserRepo.UpdateUserProfileFields(ctx, userID, updates)
+}

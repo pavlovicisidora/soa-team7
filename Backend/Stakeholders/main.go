@@ -29,9 +29,10 @@ func startServer(userHandler *handler.UserHandler, profileHandler *handler.Profi
 
 	router.HandleFunc("/usersInfo/", userHandler.FindAllInfo).Methods("GET")
 	router.HandleFunc("/profiles/{userId}", profileHandler.FindByUserId).Methods("GET")
+	router.HandleFunc("/profile", profileHandler.PatchProfile).Methods("PATCH")
 	corsObj := handlers.CORS(
 		handlers.AllowedOrigins([]string{"http://localhost:4200"}),
-		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}),
+		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"}),
 		handlers.AllowedHeaders([]string{"Content-Type", "Authorization"}),
 	)
 
