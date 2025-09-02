@@ -175,3 +175,45 @@ func (r *UserRepository) FindUserById(ctx context.Context, id primitive.ObjectID
 
 	return &user, nil
 }
+/*
+func (r *UserRepository) UpdateUserProfileById(ctx context.Context, id primitive.ObjectID, profile model.Profile) error {
+	collection := r.client.Database(r.dbName).Collection(r.collectionName)
+
+	filter := bson.M{"_id": id}
+	update := bson.M{
+		"$set": bson.M{
+			"profile": profile,
+		},
+	}
+
+	result, err := collection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return err
+	}
+
+	if result.MatchedCount == 0 {
+		return fmt.Errorf("user with id %s not found", id.Hex())
+	}
+
+	return nil
+}*/
+
+func (r *UserRepository) UpdateUserProfileFields(ctx context.Context, id primitive.ObjectID, updates map[string]interface{}) error {
+	collection := r.client.Database(r.dbName).Collection(r.collectionName)
+
+	update := bson.M{"$set": bson.M{}}
+	for key, value := range updates {
+		update["$set"].(bson.M)["profile."+key] = value
+	}
+
+	result, err := collection.UpdateOne(ctx, bson.M{"_id": id}, update)
+	if err != nil {
+		return err
+	}
+
+	if result.MatchedCount == 0 {
+		return fmt.Errorf("user with id %s not found", id.Hex())
+	}
+
+	return nil
+}
