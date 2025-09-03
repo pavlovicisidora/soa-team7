@@ -34,6 +34,9 @@ func main() {
 	blogClient := blog_proto.NewBlogServiceClient(conn)
 	blogHandler := handler.NewBlogHandler(blogClient)
 
+	commentClient := blog_proto.NewCommentServiceClient(conn)
+	commentHandler := handler.NewCommentHandler(commentClient)
+
 	stakeholdersURL, err := url.Parse("http://" + stakeholdersServiceAddress)
 	if err != nil {
 		log.Fatalf("Failed to parse stakeholders service URL: %v", err)
@@ -47,6 +50,7 @@ func main() {
 	apiRouter.Use(middleware.AuthMiddleware)
 
 	apiRouter.PathPrefix("/blogs").Handler(http.StripPrefix("/api", blogHandler))
+	apiRouter.PathPrefix("/comments").Handler(http.StripPrefix("/api", commentHandler))
 	apiRouter.PathPrefix("/stakeholders").Handler(http.StripPrefix("/api", stakeholdersProxy))
 
 	port := os.Getenv("PORT")
