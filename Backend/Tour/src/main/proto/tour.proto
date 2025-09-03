@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.example.tour.grpc";
+
+package tour;
+
+service TourGrpcService {
+  rpc CreateTour(CreateTourRequest) returns (CreateTourResponse);
+}
+
+message Tour {
+  int32 id = 1;
+  string name = 2;
+  string description = 3;
+  string difficulty = 4;
+  string tags = 5;
+  string status = 6;
+  double price = 7;
+  int64 author_id = 8;
+}
+
+message CreateTourRequest {
+  string name = 1;
+  string description = 2;
+  string difficulty = 3;
+  string tags = 4;
+  int64 author_id = 5;
+}
+message CreateTourResponse{
+  Tour tour = 1;
+}
