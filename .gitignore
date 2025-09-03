@@ -25,10 +25,9 @@ replay_pid*
 
 .env
 
-# Maven
-/target/
-*.class
-*.log
+# Maven build artefacts
+target/
+**/target/
 
 # IntelliJ IDEA
 .idea/
