@@ -41,6 +41,7 @@ func (handler *ProfileHandler) FindByUserId(writer http.ResponseWriter, req *htt
 		http.Error(writer, "Profile not found", http.StatusNotFound)
 		return
 	}
+	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(http.StatusOK)
 	json.NewEncoder(writer).Encode(profile)
 }

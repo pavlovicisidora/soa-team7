@@ -136,7 +136,11 @@ func (r *UserRepository) FindByMail(ctx context.Context, mail string) (model.Use
 	}
 	return user, err
 }
-func (r *UserRepository) FindAllInfo(ctx context.Context) ([]model.User, error) {
+func (r *UserRepository) FindAllInfo(ctx context.Context, userID string) ([]model.User, error) {
+	userObjectID, err := primitive.ObjectIDFromHex(userID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid userID format: %v", err)
+	}
 	collection := r.client.Database(r.dbName).Collection(r.collectionName)
 	projection := bson.M{
 		"username": 1,
@@ -146,7 +150,8 @@ func (r *UserRepository) FindAllInfo(ctx context.Context) ([]model.User, error) 
 		"blocked":  1,
 	}
 	findOptions := options.Find().SetProjection(projection)
-	cursor, err := collection.Find(ctx, bson.M{}, findOptions)
+	filter := bson.M{"_id": bson.M{"$ne": userObjectID}}
+	cursor, err := collection.Find(ctx, filter, findOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -164,10 +169,8 @@ func (r *UserRepository) FindUserById(ctx context.Context, id primitive.ObjectID
 
 	var user model.User
 
-	// Kreiramo filter da nađemo dokument sa odgovarajućim _id poljem
 	filter := bson.M{"_id": id}
 
-	// FindOne vraća jedan dokument
 	err := collection.FindOne(ctx, filter).Decode(&user)
 	if err != nil {
 		return nil, err
