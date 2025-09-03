@@ -78,8 +78,8 @@ func (service *UserService) BlockUser(ctx context.Context, username string) erro
 	}
 	return nil
 }
-func (service *UserService) FindAllInfo(ctx context.Context) ([]model.User, error) {
-	users, err := service.UserRepository.FindAllInfo(ctx)
+func (service *UserService) FindAllInfo(ctx context.Context, userID string) ([]model.User, error) {
+	users, err := service.UserRepository.FindAllInfo(ctx, userID)
 	if err != nil {
 		return nil, err
 	}

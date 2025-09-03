@@ -154,7 +154,8 @@ func (handler *UserHandler) FindAllInfo(writer http.ResponseWriter, req *http.Re
 		http.Error(writer, "Forbidden: only ADMIN can see users information", http.StatusForbidden)
 		return
 	}
-	users, err := handler.UserService.FindAllInfo(req.Context())
+	id := claims.UserID
+	users, err := handler.UserService.FindAllInfo(req.Context(), id)
 	if err != nil {
 		http.Error(writer, "Error while collecting all users", http.StatusInternalServerError)
 		return
