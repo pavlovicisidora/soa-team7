@@ -46,6 +46,11 @@ func (h *KeyPointHandler) CreateKeyPoint(w http.ResponseWriter, r *http.Request)
 		http.Error(w, "User ID not found in context", http.StatusUnauthorized)
 		return
 	}
+	role := r.Context().Value("userRole").(string)
+	if role != "VODIC" {
+		http.Error(w, "Forbidden: only VODIC can create keypoints.", http.StatusForbidden)
+		return
+	}
 	var reqBody CreateKeyPointRequest
 	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
@@ -87,6 +92,11 @@ func (h *KeyPointHandler) GetKeyPointsTour(w http.ResponseWriter, r *http.Reques
 
 	if !ok || userID == "" {
 		http.Error(w, "User ID not found in context", http.StatusUnauthorized)
+		return
+	}
+	role := r.Context().Value("userRole").(string)
+	if role != "VODIC" {
+		http.Error(w, "Forbidden: only VODIC can see keypoints.", http.StatusForbidden)
 		return
 	}
 	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)

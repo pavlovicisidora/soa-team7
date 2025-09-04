@@ -14,6 +14,7 @@ const UserKey contextKey = "userID"
 
 type Claims struct {
 	UserID string `json:"user_id"`
+	Role   string `json:"role"`
 	jwt.RegisteredClaims
 }
 
@@ -45,6 +46,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		}
 
 		ctx := context.WithValue(r.Context(), UserKey, claims.UserID)
+		ctx = context.WithValue(ctx, "userRole", claims.Role)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
