@@ -2,6 +2,7 @@ syntax = "proto3";
 
 option java_multiple_files = true;
 option java_package = "com.example.tour.grpc";
+option go_package = "github.com/pavlovicisidora/soa-team7/Backend/APIGateway/proto/tour";
 
 package tour;
 

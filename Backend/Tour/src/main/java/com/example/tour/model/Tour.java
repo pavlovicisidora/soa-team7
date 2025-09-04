@@ -12,7 +12,7 @@ public class Tour {
     @Column(name="description")
     private String description;
     @Column(name="Difficulty",nullable = false)
-    private String Difficulty;
+    private String difficulty;
     @Column(name="tags")
     private String tags;
     @Column(name="status",nullable = false)
@@ -20,7 +20,7 @@ public class Tour {
     @Column(name="price",nullable = false)
     private Double price;
     @Column(name="author_id",nullable = false)
-    private Long authorId;
+    private String authorId;
 
     @PrePersist
     public void setInitialValues(){
@@ -35,11 +35,11 @@ public class Tour {
     public Tour() {
     }
 
-    public Tour(Integer id, String name, String description, String difficulty, String tags, Status status, Double price, Long authorId) {
+    public Tour(Integer id, String name, String description, String difficulty, String tags, Status status, Double price, String authorId) {
         this.id = id;
         this.name = name;
         this.description = description;
-        Difficulty = difficulty;
+        this.difficulty = difficulty;
         this.tags = tags;
         this.status = status;
         this.price = price;
@@ -71,11 +71,11 @@ public class Tour {
     }
 
     public String getDifficulty() {
-        return Difficulty;
+        return difficulty;
     }
 
     public void setDifficulty(String difficulty) {
-        Difficulty = difficulty;
+        this.difficulty = difficulty;
     }
 
     public String getTags() {
@@ -102,11 +102,11 @@ public class Tour {
         this.price = price;
     }
 
-    public Long getAuthorId() {
+    public String getAuthorId() {
         return authorId;
     }
 
-    public void setAuthorId(Long authorId) {
+    public void setAuthorId(String authorId) {
         this.authorId = authorId;
     }
 }
