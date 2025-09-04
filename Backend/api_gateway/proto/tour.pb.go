@@ -4,7 +4,7 @@
 // 	protoc        v6.32.0
 // source: tour.proto
 
-package tour
+package proto
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -365,8 +365,8 @@ const file_tour_proto_rawDesc = "" +
 	"\x0fTourGrpcService\x12?\n" +
 	"\n" +
 	"CreateTour\x12\x17.tour.CreateTourRequest\x1a\x18.tour.CreateTourResponse\x12N\n" +
-	"\x0fGetAllToursById\x12\x1c.tour.GetAllToursByIdRequest\x1a\x1d.tour.GetAllToursByIdResponseB]\n" +
-	"\x15com.example.tour.grpcP\x01ZBgithub.com/pavlovicisidora/soa-team7/Backend/APIGateway/proto/tourb\x06proto3"
+	"\x0fGetAllToursById\x12\x1c.tour.GetAllToursByIdRequest\x1a\x1d.tour.GetAllToursByIdResponseBX\n" +
+	"\x15com.example.tour.grpcP\x01Z=github.com/pavlovicisidora/soa-team7/Backend/APIGateway/protob\x06proto3"
 
 var (
 	file_tour_proto_rawDescOnce sync.Once

@@ -4,7 +4,7 @@
 // - protoc             v6.32.0
 // source: tour.proto
 
-package tour
+package proto
 
 import (
 	context "context"

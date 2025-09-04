@@ -13,7 +13,7 @@ import java.util.List;
 @GrpcService
 public class TourGrpcServiceImpl extends TourGrpcServiceGrpc.TourGrpcServiceImplBase {
     @Autowired
-    private TourService tourService; // Vaša postojeća poslovna logika
+    private TourService tourService;
 
     @Override
     public void createTour(CreateTourRequest request, StreamObserver<CreateTourResponse> responseObserver) {
