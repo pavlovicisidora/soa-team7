@@ -11,6 +11,7 @@ import (
 	"github.com/pavlovicisidora/soa-team7/Backend/APIGateway/handler"
 	"github.com/pavlovicisidora/soa-team7/Backend/APIGateway/middleware"
 	blog_proto "github.com/pavlovicisidora/soa-team7/Backend/Blog/proto"
+	follower_proto "github.com/pavlovicisidora/soa-team7/Backend/Follower/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -25,6 +26,11 @@ func main() {
 		stakeholdersServiceAddress = "localhost:8081"
 	}
 
+	followerServiceAddress := os.Getenv("FOLLOWER_SERVICE_ADDRESS")
+	if followerServiceAddress == "" {
+		followerServiceAddress = "localhost:8084" // Port na kom radi vaš Follower servis
+	}
+
 	conn, err := grpc.NewClient(blogServiceAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("Failed to connect to blog service: %v", err)
@@ -36,6 +42,18 @@ func main() {
 
 	commentClient := blog_proto.NewCommentServiceClient(conn)
 	commentHandler := handler.NewCommentHandler(commentClient)
+
+
+	followerConn, err := grpc.NewClient(followerServiceAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("Failed to connect to follower service: %v", err)
+	}
+	defer followerConn.Close()
+
+	followerClient := follower_proto.NewFollowerServiceClient(followerConn)
+	followerHandler := handler.NewFollowerHandler(followerClient)
+
+
 
 	stakeholdersURL, err := url.Parse("http://" + stakeholdersServiceAddress)
 	if err != nil {
@@ -52,6 +70,7 @@ func main() {
 	apiRouter.PathPrefix("/blogs").Handler(http.StripPrefix("/api", blogHandler))
 	apiRouter.PathPrefix("/comments").Handler(http.StripPrefix("/api", commentHandler))
 	apiRouter.PathPrefix("/stakeholders").Handler(http.StripPrefix("/api", stakeholdersProxy))
+	apiRouter.PathPrefix("/follow").Handler(http.StripPrefix("/api", followerHandler))
 
 	port := os.Getenv("PORT")
 	if port == "" {
