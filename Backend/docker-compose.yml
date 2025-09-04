@@ -1,4 +1,3 @@
-version: "3.7"
 
 services:
   api_gateway:
@@ -54,6 +53,26 @@ services:
       mongo:
         condition: service_healthy
 
+  tour_server:
+    build:
+      context: .
+      dockerfile: ./Tour/Dockerfile
+    restart: always
+    container_name: "tour"
+    hostname: "tour-server"
+    ports:
+      - "8083:8083"
+    environment:
+      - PORT=8083
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=tour_db
+      - DB_USER=tour_db
+      - DB_PASSWORD=tour_db123
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   mongo:
     image: mongo
     restart: always
@@ -88,6 +107,24 @@ services:
     volumes:
       - mongo_express_data:/data/db
 
+  postgres:
+    image: postgres:15
+    container_name: "postgres"
+    restart: always
+    ports:
+      - "9201:5432"
+    environment:
+      POSTGRES_DB: tour_db
+      POSTGRES_USER: tour_db
+      POSTGRES_PASSWORD: tour_db123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tour_db"]
+      interval: 10s
+      retries: 5
+
 volumes:
   mongo_store:
   mongo_express_data:
+  postgres_data:
