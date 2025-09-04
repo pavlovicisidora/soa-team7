@@ -10,6 +10,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/pavlovicisidora/soa-team7/Backend/APIGateway/handler"
 	"github.com/pavlovicisidora/soa-team7/Backend/APIGateway/middleware"
+	tour_proto "github.com/pavlovicisidora/soa-team7/Backend/APIGateway/proto"
 	blog_proto "github.com/pavlovicisidora/soa-team7/Backend/Blog/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -25,14 +26,34 @@ func main() {
 		stakeholdersServiceAddress = "localhost:8081"
 	}
 
+	tourServiceAddress := os.Getenv("TOUR_SERVICE_ADDRESS")
+	if tourServiceAddress == "" {
+		tourServiceAddress = "localhost:9090"
+	}
+
 	conn, err := grpc.NewClient(blogServiceAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("Failed to connect to blog service: %v", err)
 	}
 	defer conn.Close()
 
+	connTour, err := grpc.NewClient(tourServiceAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("Failed to connect to tour service: %v", err)
+	}
+	defer connTour.Close()
+
 	blogClient := blog_proto.NewBlogServiceClient(conn)
 	blogHandler := handler.NewBlogHandler(blogClient)
+
+	commentClient := blog_proto.NewCommentServiceClient(conn)
+	commentHandler := handler.NewCommentHandler(commentClient)
+
+	tourClient := tour_proto.NewTourGrpcServiceClient(connTour)
+	tourHandler := handler.NewTourHandler(tourClient)
+
+	keyPointClient := tour_proto.NewKeyPointGrpcServiceClient(connTour)
+	keyPointHandler := handler.NewKeyPointHandler(keyPointClient)
 
 	stakeholdersURL, err := url.Parse("http://" + stakeholdersServiceAddress)
 	if err != nil {
@@ -47,8 +68,10 @@ func main() {
 	apiRouter.Use(middleware.AuthMiddleware)
 
 	apiRouter.PathPrefix("/blogs").Handler(http.StripPrefix("/api", blogHandler))
+	apiRouter.PathPrefix("/comments").Handler(http.StripPrefix("/api", commentHandler))
 	apiRouter.PathPrefix("/stakeholders").Handler(http.StripPrefix("/api", stakeholdersProxy))
-
+	apiRouter.PathPrefix("/tours").Handler(http.StripPrefix("/api", tourHandler))
+	apiRouter.PathPrefix("/keypoints").Handler(http.StripPrefix("/api", keyPointHandler))
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"

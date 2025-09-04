@@ -25,3 +25,18 @@ replay_pid*
 
 .env
 
+# Maven build artefacts
+target/
+**/target/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+out/
+
+# VS Code
+.vscode/
+
+# OS fajlovi
+.DS_Store
+Thumbs.db

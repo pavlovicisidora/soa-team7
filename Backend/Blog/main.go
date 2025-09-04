@@ -49,16 +49,29 @@ func main() {
 	if dbName == "" {
 		dbName = "blog_db"
 	}
-	collectionName := os.Getenv("MONGO_COLLECTION_NAME")
-	if collectionName == "" {
-		collectionName = "blog"
+	blogCollectionName  := os.Getenv("MONGO_COLLECTION_NAME")
+	if blogCollectionName  == "" {
+		blogCollectionName  = "blog"
 	}
 
-	collection := client.Database(dbName).Collection(collectionName)
+	blogCollection  := client.Database(dbName).Collection(blogCollectionName)
 
-	blogRepo := repo.NewBlogRepository(collection)
+	blogRepo := repo.NewBlogRepository(blogCollection )
 	blogService := service.NewBlogService(blogRepo)
 	blogHandler := handler.NewBlogHandler(blogService)
+
+
+	commentCollectionName := os.Getenv("COMMENT_COLLECTION_NAME")
+	if commentCollectionName == "" {
+		commentCollectionName = "comments"
+	}
+
+	commentCollection := client.Database(dbName).Collection(commentCollectionName)
+	commentRepo := repo.NewCommentRepository(commentCollection)
+	commentService := service.NewCommentService(commentRepo)
+	commentHandler := handler.NewCommentHandler(commentService)
+
+
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -72,6 +85,7 @@ func main() {
 
 	grpcServer := grpc.NewServer()
 	pb.RegisterBlogServiceServer(grpcServer, blogHandler)
+	pb.RegisterCommentServiceServer(grpcServer, commentHandler)
 
 	log.Printf("gRPC server listening at %v", lis.Addr())
 	if err := grpcServer.Serve(lis); err != nil {
