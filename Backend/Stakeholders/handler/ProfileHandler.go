@@ -8,7 +8,6 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/pavlovicisidora/soa-team7/auth"
 	"github.com/pavlovicisidora/soa-team7/service"
-	"github.com/pavlovicisidora/soa-team7/auth"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
