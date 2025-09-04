@@ -11,7 +11,9 @@ import java.util.List;
 public class KeyPointService {
     @Autowired
     KeyPointRepository keyPointRepository;
-    public List<KeyPoint> createKeyPoint(List<KeyPoint> keyPoints){
+    public List<KeyPoint> createKeyPoints(List<KeyPoint> keyPoints){
         return keyPointRepository.saveAll(keyPoints);
     }
+    public KeyPoint createKeyPoint(KeyPoint keyPoint){return keyPointRepository.save(keyPoint);}
+    public List<KeyPoint> findByTourId(Integer id){return keyPointRepository.findByTourId(id);}
 }

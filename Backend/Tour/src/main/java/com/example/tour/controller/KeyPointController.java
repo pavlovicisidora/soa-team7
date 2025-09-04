@@ -20,7 +20,7 @@ public class KeyPointController {
     KeyPointService keyPointService;
     @PostMapping("/create")
     public ResponseEntity<List<KeyPoint>> create(@RequestBody List<KeyPoint> keyPoints){
-        List<KeyPoint> keyPointsData = keyPointService.createKeyPoint(keyPoints);
+        List<KeyPoint> keyPointsData = keyPointService.createKeyPoints(keyPoints);
         return new ResponseEntity<>(keyPointsData, HttpStatus.OK);
     }
 }

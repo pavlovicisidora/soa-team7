@@ -30,13 +30,13 @@ func NewTourHandler(client tour_proto.TourGrpcServiceClient) *TourHandler {
 func (h *TourHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	router := mux.NewRouter()
 
-	router.HandleFunc("/tours", h.CreateTourHandler).Methods("POST")
+	router.HandleFunc("/tours", h.CreateTour).Methods("POST")
 	router.HandleFunc("/tours", h.GetAllToursById).Methods("GET")
 
 	router.ServeHTTP(w, r)
 }
 
-func (h *TourHandler) CreateTourHandler(w http.ResponseWriter, r *http.Request) {
+func (h *TourHandler) CreateTour(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(middleware.UserKey).(string)
 	if !ok || userID == "" {
 		http.Error(w, "User ID not found in context", http.StatusUnauthorized)
