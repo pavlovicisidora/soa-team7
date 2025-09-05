@@ -69,6 +69,9 @@ func main() {
 	keyPointClient := tour_proto.NewKeyPointGrpcServiceClient(connTour)
 	keyPointHandler := handler.NewKeyPointHandler(keyPointClient)
 
+	reviewClient := tour_proto.NewReviewGrpcServiceClient(connTour)
+	reviewHandler := handler.NewReviewHandler(reviewClient)
+
 	stakeholdersURL, err := url.Parse("http://" + stakeholdersServiceAddress)
 	if err != nil {
 		log.Fatalf("Failed to parse stakeholders service URL: %v", err)
@@ -89,6 +92,7 @@ func main() {
 
 	apiRouter.PathPrefix("/tours").Handler(http.StripPrefix("/api", tourHandler))
 	apiRouter.PathPrefix("/keypoints").Handler(http.StripPrefix("/api", keyPointHandler))
+	apiRouter.PathPrefix("/reviews").Handler(http.StripPrefix("/api", reviewHandler))
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
