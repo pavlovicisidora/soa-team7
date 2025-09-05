@@ -29,8 +29,9 @@ func main() {
 
 	followerServiceAddress := os.Getenv("FOLLOWER_SERVICE_ADDRESS")
 	if followerServiceAddress == "" {
-		followerServiceAddress = "localhost:8084" // Port na kom radi vaš Follower servis
+		followerServiceAddress = "localhost:8084"
 	}
+
 	tourServiceAddress := os.Getenv("TOUR_SERVICE_ADDRESS")
 	if tourServiceAddress == "" {
 		tourServiceAddress = "localhost:9090"
@@ -93,6 +94,7 @@ func main() {
 	apiRouter.PathPrefix("/tours").Handler(http.StripPrefix("/api", tourHandler))
 	apiRouter.PathPrefix("/keypoints").Handler(http.StripPrefix("/api", keyPointHandler))
 	apiRouter.PathPrefix("/reviews").Handler(http.StripPrefix("/api", reviewHandler))
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"

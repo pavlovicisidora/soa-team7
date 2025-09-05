@@ -46,11 +46,13 @@ func (h *KeyPointHandler) CreateKeyPoint(w http.ResponseWriter, r *http.Request)
 		http.Error(w, "User ID not found in context", http.StatusUnauthorized)
 		return
 	}
+
 	role := r.Context().Value("userRole").(string)
 	if role != "VODIC" {
 		http.Error(w, "Forbidden: only VODIC can create keypoints.", http.StatusForbidden)
 		return
 	}
+
 	var reqBody CreateKeyPointRequest
 	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
@@ -75,8 +77,10 @@ func (h *KeyPointHandler) CreateKeyPoint(w http.ResponseWriter, r *http.Request)
 
 	resp, err := h.client.CreateKeyPoint(ctx, grpcRequest)
 	if err != nil {
+
 		log.Printf("Failed to create keypoint via gRPC: %v", err)
 		http.Error(w, "Failed to create keypoint", http.StatusInternalServerError)
+
 		return
 	}
 
@@ -94,6 +98,7 @@ func (h *KeyPointHandler) GetKeyPointsTour(w http.ResponseWriter, r *http.Reques
 		http.Error(w, "User ID not found in context", http.StatusUnauthorized)
 		return
 	}
+
 	role := r.Context().Value("userRole").(string)
 	if role != "VODIC" {
 		http.Error(w, "Forbidden: only VODIC can see keypoints.", http.StatusForbidden)
@@ -108,8 +113,10 @@ func (h *KeyPointHandler) GetKeyPointsTour(w http.ResponseWriter, r *http.Reques
 	}
 	resp, err := h.client.GetKeyPointsForTour(ctx, &tour_proto.GetKeyPointsForTourRequest{TourId: int32(tourID)})
 	if err != nil {
+
 		log.Printf("Failed to get all keypoints: %v", err)
 		http.Error(w, "Failed to get all keypoints", http.StatusInternalServerError)
+
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
