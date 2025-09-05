@@ -141,7 +141,21 @@ func (handler *UserHandler) BlockUser(writer http.ResponseWriter, req *http.Requ
 }
 
 func (handler *UserHandler) FindAllInfo(writer http.ResponseWriter, req *http.Request) {
-	users, err := handler.UserService.FindAllInfo(req.Context())
+	tokenStr := req.Header.Get("Authorization") // "Bearer <token>"
+	tokenStr = strings.TrimPrefix(tokenStr, "Bearer ")
+
+	claims, err := auth.VerifyJWT(tokenStr)
+	if err != nil {
+		http.Error(writer, "Unathorized"+err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	if claims.Role != "ADMIN" {
+		http.Error(writer, "Forbidden: only ADMIN can see users information", http.StatusForbidden)
+		return
+	}
+	id := claims.UserID
+	users, err := handler.UserService.FindAllInfo(req.Context(), id)
 	if err != nil {
 		http.Error(writer, "Error while collecting all users", http.StatusInternalServerError)
 		return

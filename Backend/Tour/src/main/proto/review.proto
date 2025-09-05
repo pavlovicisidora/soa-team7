@@ -1,0 +1,44 @@
+syntax = "proto3";
+import "google/protobuf/timestamp.proto";
+option java_multiple_files = true;
+option java_outer_classname = "ReviewProto";
+option java_package = "com.example.tour.grpc";
+option go_package = "github.com/pavlovicisidora/soa-team7/Backend/APIGateway/proto";
+package tour;
+
+service ReviewGrpcService{
+  rpc CreateReview(CreateReviewRequest) returns (ReviewResponse);
+  rpc GetReviewsForTour(GetReviewForTourRequest) returns (ReviewsResponse);
+}
+
+message Review{
+  int32 id = 1;
+  int32 rating = 2;
+  string comment = 3;
+  string tourist_id = 4;
+  string visitDate = 5;
+  google.protobuf.Timestamp createdDate = 6;
+  repeated string images = 7;
+  int32 tour_id = 8;
+}
+
+message CreateReviewRequest{
+  int32 rating = 1;
+  string comment = 2;
+  string tourist_id = 3;
+  string visitDate = 4;
+  repeated string images = 5;
+  int32 tour_id = 6;
+}
+
+message GetReviewForTourRequest{
+  int32 tour_id =1;
+}
+
+message ReviewResponse{
+  Review review = 1;
+}
+
+message ReviewsResponse{
+  repeated  Review reviews = 1;
+}
