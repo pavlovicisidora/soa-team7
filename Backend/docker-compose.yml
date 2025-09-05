@@ -12,10 +12,12 @@ services:
       - PORT=8080
       - BLOG_SERVICE_ADDRESS=blog_server:8082 
       - STAKEHOLDERS_SERVICE_ADDRESS=stakeholders-server:8081
+      - TOUR_SERVICE_ADDRESS=tour-server:9090
       - JWT_SECRET_KEY=tvoja-super-tajna-rec 
     depends_on:
       - blog_server
       - stakeholders_server
+      - tour_server
 
   stakeholders_server:
     build:
