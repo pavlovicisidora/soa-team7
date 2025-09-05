@@ -1,4 +1,3 @@
-
 services:
   api_gateway:
     build:
@@ -13,11 +12,13 @@ services:
       - BLOG_SERVICE_ADDRESS=blog_server:8082 
       - STAKEHOLDERS_SERVICE_ADDRESS=stakeholders-server:8081
       - TOUR_SERVICE_ADDRESS=tour-server:9090
+      - FOLLOWER_SERVICE_ADDRESS=follower_server:8084 # Dodato
       - JWT_SECRET_KEY=tvoja-super-tajna-rec 
     depends_on:
       - blog_server
       - stakeholders_server
       - tour_server
+      - follower_server 
 
   stakeholders_server:
     build:
@@ -75,6 +76,47 @@ services:
       postgres:
         condition: service_healthy
 
+  follower_server:
+    build:
+      context: .
+      dockerfile: ./Follower/Dockerfile
+    restart: always
+    container_name: "follower"
+    hostname: "follower-server"
+    ports:
+      - "8084:8084"
+    environment:
+      - PORT=8084
+      - NEO4J_URI=bolt://neo4j:7687 # Adresa Neo4j Bolt protokola
+      - NEO4J_USERNAME=neo4j
+      - NEO4J_PASSWORD=neo4j_password 
+    depends_on:
+      neo4j: 
+        condition: service_healthy
+        
+  neo4j:
+    image: neo4j:5
+    container_name: "neo4j"
+    restart: always
+    ports:
+      - "7474:7474"     # Neo4j Browser (GUI)
+      - "7687:7687"     # Bolt protokol
+    environment:
+      - NEO4J_AUTH=neo4j/neo4j_password
+      - NEO4J_dbms_security_auth__enabled=true
+      # (opciono) uključi APOC core:
+      - NEO4J_PLUGINS=["apoc"]
+      - NEO4J_apoc_export_file_enabled=true
+      - NEO4J_apoc_import_file_enabled=true
+      - NEO4J_apoc_import_file_use__neo4j__config=true
+    healthcheck:
+      test: ["CMD", "cypher-shell", "-u", "neo4j", "-p", "neo4j_password", "RETURN 1;"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    volumes:
+      - neo4j_data:/data
+
   mongo:
     image: mongo
     restart: always
@@ -130,3 +172,5 @@ volumes:
   mongo_store:
   mongo_express_data:
   postgres_data:
+  neo4j_data: 
+  neo4j_plugins: 

@@ -6,7 +6,7 @@ RUN go mod init temp-build-module
 COPY go.work go.work.sum ./
 COPY Stakeholders/go.mod Stakeholders/go.sum ./Stakeholders/
 COPY Blog/go.mod Blog/go.sum ./Blog/
-
+COPY Follower/go.mod Follower/go.sum ./Follower/
 COPY api_gateway/go.mod api_gateway/go.sum ./api_gateway/
 
 RUN go get -d ./...

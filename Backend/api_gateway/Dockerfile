@@ -7,11 +7,13 @@ COPY go.work go.work.sum ./
 COPY api_gateway/go.mod api_gateway/go.sum ./api_gateway/
 COPY Blog/go.mod Blog/go.sum ./Blog/
 COPY Stakeholders/go.mod Stakeholders/go.sum ./Stakeholders/
+COPY Follower/go.mod Follower/go.sum ./Follower/
 
 RUN go get -d ./...
 
 COPY api_gateway/ ./api_gateway/
 COPY Blog/ ./Blog/ 
+COPY Follower/ ./Follower/
 
 WORKDIR /app/api_gateway
 

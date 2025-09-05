@@ -29,7 +29,7 @@ func main() {
 
 	followerServiceAddress := os.Getenv("FOLLOWER_SERVICE_ADDRESS")
 	if followerServiceAddress == "" {
-		followerServiceAddress = "localhost:8084" // Port na kom radi vaš Follower servis
+		followerServiceAddress = "localhost:8084"
 	}
 
 	tourServiceAddress := os.Getenv("TOUR_SERVICE_ADDRESS")
