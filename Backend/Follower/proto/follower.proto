@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+option go_package = "github.com/pavlovicisidora/soa-team7/Backend/Follower/proto";
+
+package follower;
+
+
+service FollowerService {
+
+  rpc FollowUser(FollowUserRequest) returns (FollowUserResponse) {}
+  rpc UnfollowUser(UnfollowUserRequest) returns (UnfollowUserResponse) {}
+  rpc GetFollowing(GetFollowingRequest) returns (GetFollowingResponse) {}
+  rpc GetFollowers(GetFollowersRequest) returns (GetFollowersResponse) {}
+  rpc GetFollowRecommendations(GetFollowRecommendationsRequest) returns (GetFollowRecommendationsResponse) {}
+
+}
+
+
+message User {
+  string user_id = 1;
+}
+
+
+message FollowUserRequest {
+  string follower_id = 1; // ID korisnika koji inicira praćenje (ulogovani korisnik).
+  string followed_id = 2; // ID korisnika koji treba biti zapraćen.
+}
+message FollowUserResponse {
+  
+}
+
+
+
+message UnfollowUserRequest {
+  string follower_id = 1; // ID korisnika koji otpraćuje.
+  string followed_id = 2; // ID korisnika koji biva otpraćen.
+}
+message UnfollowUserResponse {
+  
+}
+
+
+message GetFollowingRequest {
+  string user_id = 1; // ID korisnika za kojeg tražimo listu praćenja.
+}
+message GetFollowingResponse {
+  repeated User users = 1; // Lista korisnika koje on prati.
+}
+
+
+message GetFollowersRequest {
+  string user_id = 1; // ID korisnika za kojeg tražimo pratioce.
+}
+message GetFollowersResponse {
+  repeated User users = 1; // Lista korisnika koji njega prate.
+}
+
+
+message GetFollowRecommendationsRequest {
+  string user_id = 1; // ID korisnika za kojeg tražimo preporuke.
+}
+message GetFollowRecommendationsResponse {
+  repeated User users = 1; // Lista preporučenih korisnika.
+}

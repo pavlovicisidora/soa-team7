@@ -43,6 +43,12 @@ func (h *TourHandler) CreateTour(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	role := r.Context().Value("userRole").(string)
+	if role != "VODIC" {
+		http.Error(w, "Forbidden: only VODIC can create tour.", http.StatusForbidden)
+		return
+	}
+
 	var reqBody CreateTourRequest
 	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
@@ -78,6 +84,13 @@ func (h *TourHandler) GetAllToursById(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "User ID not found in context", http.StatusUnauthorized)
 		return
 	}
+
+	role := r.Context().Value("userRole").(string)
+	if role != "VODIC" {
+		http.Error(w, "Forbidden: only VODIC can see tours.", http.StatusForbidden)
+		return
+	}
+
 	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
 	defer cancel()
 	resp, err := h.client.GetAllToursById(ctx, &tour_proto.GetAllToursByIdRequest{AuthorId: userID})
