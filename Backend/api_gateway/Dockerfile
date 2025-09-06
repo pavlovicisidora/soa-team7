@@ -22,5 +22,6 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o /app/api-gateway .
 FROM alpine:latest
 WORKDIR /
 COPY --from=builder /app/api-gateway /usr/bin/api-gateway
+RUN mkdir /uploads
 EXPOSE 8080
 ENTRYPOINT ["/usr/bin/api-gateway"]

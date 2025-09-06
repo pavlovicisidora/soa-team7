@@ -80,6 +80,11 @@ func main() {
 	stakeholdersProxy := httputil.NewSingleHostReverseProxy(stakeholdersURL)
 
 	router := mux.NewRouter()
+	fs := http.FileServer(http.Dir("./uploads/"))
+	router.PathPrefix("/uploads/").Handler(http.StripPrefix("/uploads/", fs))
+
+	publicApiRouter := router.PathPrefix("/api").Subrouter()
+	publicApiRouter.HandleFunc("/images/upload", handler.UploadImageHandler).Methods("POST")
 
 	apiRouter := router.PathPrefix("/api").Subrouter()
 
