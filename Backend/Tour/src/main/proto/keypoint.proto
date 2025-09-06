@@ -9,6 +9,8 @@ package tour;
 service KeyPointGrpcService {
   rpc CreateKeyPoint(CreateKeyPointRequest) returns (CreateKeyPointResponse);
   rpc GetKeyPointsForTour(GetKeyPointsForTourRequest) returns (GetKeyPointsForTourResponse);
+  rpc UpdateKeyPoint(UpdateKeyPointRequest) returns (UpdateKeyPointResponse);
+  rpc DeleteKeyPoint(DeleteKeyPointRequest) returns (DeleteKeyPointResponse);
 }
 
 message KeyPoint {
@@ -37,4 +39,21 @@ message GetKeyPointsForTourRequest {
 }
 message GetKeyPointsForTourResponse {
   repeated KeyPoint key_points = 1;
+}
+message UpdateKeyPointRequest{
+  int32 id = 1;
+  string name = 2;
+  string description = 3;
+  double latitude = 4;
+  double longitude = 5;
+  string image_url = 6;
+}
+message  UpdateKeyPointResponse{
+  KeyPoint keypoint = 1;
+}
+
+message DeleteKeyPointRequest {
+  int32 id = 1;
+}
+message DeleteKeyPointResponse {
 }

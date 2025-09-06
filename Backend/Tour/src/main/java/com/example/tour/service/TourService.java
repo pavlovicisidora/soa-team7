@@ -17,4 +17,12 @@ public class TourService {
     }
     public List<Tour> findAllToursById(String id){return tourRepository.findToursForAuthor(id);}
     public Tour findById(Integer id){return tourRepository.findById(id).get();}
+    public Tour updateTour(Tour tour){ return tourRepository.save(tour); }
+    public boolean deleteTour(Integer id){
+        if (tourRepository.existsById(id)) {
+            tourRepository.deleteById(id);
+            return true;
+        } else {
+            return false;
+    }}
 }
