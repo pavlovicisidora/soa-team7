@@ -1,4 +1,4 @@
-module github.com/pavlovicisidora/soa-team7
+module github.com/pavlovicisidora/soa-team7/Backend/Stakeholders
 
 go 1.24.5
 

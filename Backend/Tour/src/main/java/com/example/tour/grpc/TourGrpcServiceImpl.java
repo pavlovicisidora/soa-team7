@@ -6,6 +6,8 @@ import io.grpc.stub.StreamObserver;
 import com.example.tour.model.Tour;
 import com.example.tour.service.TourService;
 import net.devh.boot.grpc.server.service.GrpcService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -14,7 +16,6 @@ import java.util.List;
 public class TourGrpcServiceImpl extends TourGrpcServiceGrpc.TourGrpcServiceImplBase {
     @Autowired
     private TourService tourService;
-
     @Override
     public void createTour(CreateTourRequest request, StreamObserver<CreateTourResponse> responseObserver) {
 
@@ -22,7 +23,7 @@ public class TourGrpcServiceImpl extends TourGrpcServiceGrpc.TourGrpcServiceImpl
         tourToCreate.setName(request.getName());
         tourToCreate.setDescription(request.getDescription());
         tourToCreate.setDifficulty(request.getDifficulty());
-        tourToCreate.setTags(request.getTags());
+        tourToCreate.setTags(request.getTagsList());
         tourToCreate.setAuthorId(request.getAuthorId());
 
         Tour createdTour = tourService.createTour(tourToCreate);
@@ -32,7 +33,7 @@ public class TourGrpcServiceImpl extends TourGrpcServiceGrpc.TourGrpcServiceImpl
                 .setName(createdTour.getName())
                 .setDescription(createdTour.getDescription())
                 .setDifficulty(createdTour.getDifficulty())
-                .setTags(createdTour.getTags())
+                .addAllTags(createdTour.getTags())
                 .setStatus(createdTour.getStatus().name())
                 .setPrice(createdTour.getPrice())
                 .setAuthorId(createdTour.getAuthorId())
@@ -54,7 +55,7 @@ public class TourGrpcServiceImpl extends TourGrpcServiceGrpc.TourGrpcServiceImpl
                     .setName(tour.getName())
                     .setDescription(tour.getDescription())
                     .setDifficulty(tour.getDifficulty())
-                    .setTags(tour.getTags())
+                    .addAllTags(tour.getTags())
                     .setStatus(tour.getStatus().name())
                     .setPrice(tour.getPrice())
                     .setAuthorId(tour.getAuthorId())

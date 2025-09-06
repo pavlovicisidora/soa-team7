@@ -3,8 +3,8 @@ package service
 import (
 	"context"
 
-	"github.com/pavlovicisidora/soa-team7/model"
-	"github.com/pavlovicisidora/soa-team7/repo"
+	"github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/model"
+	"github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/repo"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -20,7 +20,6 @@ func (s *ProfileService) GetUserProfile(ctx context.Context, userID primitive.Ob
 	}
 	return &user.Profile, nil
 }
-
 
 func (s *ProfileService) UpdateUserProfileFields(ctx context.Context, userID primitive.ObjectID, updates map[string]interface{}) error {
 	return s.UserRepo.UpdateUserProfileFields(ctx, userID, updates)

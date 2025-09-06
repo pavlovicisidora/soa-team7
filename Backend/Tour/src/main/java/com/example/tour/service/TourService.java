@@ -15,6 +15,6 @@ public class TourService {
     public Tour createTour(Tour tour){
         return tourRepository.save(tour);
     }
-    public List<Tour> findAllToursById(String id){return tourRepository.findAllToursById(id);}
+    public List<Tour> findAllToursById(String id){return tourRepository.findToursForAuthor(id);}
     public Tour findById(Integer id){return tourRepository.findById(id).get();}
 }

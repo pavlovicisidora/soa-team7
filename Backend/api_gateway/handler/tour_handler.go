@@ -13,10 +13,10 @@ import (
 )
 
 type CreateTourRequest struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Difficulty  string `json:"difficulty"`
-	Tags        string `json:"tags"`
+	Name        string   `json:"name"`
+	Description string   `json:"description"`
+	Difficulty  string   `json:"difficulty"`
+	Tags        []string `json:"tags"`
 }
 
 type TourHandler struct {
