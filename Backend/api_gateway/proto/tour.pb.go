@@ -27,7 +27,7 @@ type Tour struct {
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
 	Difficulty    string                 `protobuf:"bytes,4,opt,name=difficulty,proto3" json:"difficulty,omitempty"`
-	Tags          string                 `protobuf:"bytes,5,opt,name=tags,proto3" json:"tags,omitempty"`
+	Tags          []string               `protobuf:"bytes,5,rep,name=tags,proto3" json:"tags,omitempty"`
 	Status        string                 `protobuf:"bytes,6,opt,name=status,proto3" json:"status,omitempty"`
 	Price         float64                `protobuf:"fixed64,7,opt,name=price,proto3" json:"price,omitempty"`
 	AuthorId      string                 `protobuf:"bytes,8,opt,name=author_id,json=authorId,proto3" json:"author_id,omitempty"`
@@ -93,11 +93,11 @@ func (x *Tour) GetDifficulty() string {
 	return ""
 }
 
-func (x *Tour) GetTags() string {
+func (x *Tour) GetTags() []string {
 	if x != nil {
 		return x.Tags
 	}
-	return ""
+	return nil
 }
 
 func (x *Tour) GetStatus() string {
@@ -126,7 +126,7 @@ type CreateTourRequest struct {
 	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Description   string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
 	Difficulty    string                 `protobuf:"bytes,3,opt,name=difficulty,proto3" json:"difficulty,omitempty"`
-	Tags          string                 `protobuf:"bytes,4,opt,name=tags,proto3" json:"tags,omitempty"`
+	Tags          []string               `protobuf:"bytes,4,rep,name=tags,proto3" json:"tags,omitempty"`
 	AuthorId      string                 `protobuf:"bytes,5,opt,name=author_id,json=authorId,proto3" json:"author_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -183,11 +183,11 @@ func (x *CreateTourRequest) GetDifficulty() string {
 	return ""
 }
 
-func (x *CreateTourRequest) GetTags() string {
+func (x *CreateTourRequest) GetTags() []string {
 	if x != nil {
 		return x.Tags
 	}
-	return ""
+	return nil
 }
 
 func (x *CreateTourRequest) GetAuthorId() string {
@@ -342,7 +342,7 @@ const file_tour_proto_rawDesc = "" +
 	"\n" +
 	"difficulty\x18\x04 \x01(\tR\n" +
 	"difficulty\x12\x12\n" +
-	"\x04tags\x18\x05 \x01(\tR\x04tags\x12\x16\n" +
+	"\x04tags\x18\x05 \x03(\tR\x04tags\x12\x16\n" +
 	"\x06status\x18\x06 \x01(\tR\x06status\x12\x14\n" +
 	"\x05price\x18\a \x01(\x01R\x05price\x12\x1b\n" +
 	"\tauthor_id\x18\b \x01(\tR\bauthorId\"\x9a\x01\n" +
@@ -352,7 +352,7 @@ const file_tour_proto_rawDesc = "" +
 	"\n" +
 	"difficulty\x18\x03 \x01(\tR\n" +
 	"difficulty\x12\x12\n" +
-	"\x04tags\x18\x04 \x01(\tR\x04tags\x12\x1b\n" +
+	"\x04tags\x18\x04 \x03(\tR\x04tags\x12\x1b\n" +
 	"\tauthor_id\x18\x05 \x01(\tR\bauthorId\"4\n" +
 	"\x12CreateTourResponse\x12\x1e\n" +
 	"\x04tour\x18\x01 \x01(\v2\n" +

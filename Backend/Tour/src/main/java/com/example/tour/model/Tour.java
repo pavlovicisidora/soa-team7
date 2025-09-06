@@ -2,6 +2,8 @@ package com.example.tour.model;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 public class Tour {
     @Id
@@ -14,7 +16,7 @@ public class Tour {
     @Column(name="Difficulty",nullable = false)
     private String difficulty;
     @Column(name="tags")
-    private String tags;
+    private List<String> tags;
     @Column(name="status",nullable = false)
     private Status status;
     @Column(name="price",nullable = false)
@@ -35,7 +37,7 @@ public class Tour {
     public Tour() {
     }
 
-    public Tour(Integer id, String name, String description, String difficulty, String tags, Status status, Double price, String authorId) {
+    public Tour(Integer id, String name, String description, String difficulty, List<String> tags, Status status, Double price, String authorId) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -78,11 +80,11 @@ public class Tour {
         this.difficulty = difficulty;
     }
 
-    public String getTags() {
+    public List<String> getTags() {
         return tags;
     }
 
-    public void setTags(String tags) {
+    public void setTags(List<String> tags) {
         this.tags = tags;
     }
 

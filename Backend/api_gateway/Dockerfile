@@ -14,6 +14,7 @@ RUN go get -d ./...
 COPY api_gateway/ ./api_gateway/
 COPY Blog/ ./Blog/ 
 COPY Follower/ ./Follower/
+COPY Stakeholders/ ./Stakeholders/
 
 WORKDIR /app/api_gateway
 

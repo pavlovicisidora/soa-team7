@@ -4,8 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/pavlovicisidora/soa-team7/model"
-	"github.com/pavlovicisidora/soa-team7/repo"
+	"github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/model"
+	"github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/repo"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type UserService struct {
@@ -84,5 +85,13 @@ func (service *UserService) FindAllInfo(ctx context.Context, userID string) ([]m
 		return nil, err
 	}
 	return users, err
+
+}
+func (service *UserService) FindById(ctx context.Context, id primitive.ObjectID) (*model.User, error) {
+	user, err := service.UserRepository.FindUserById(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	return user, err
 
 }

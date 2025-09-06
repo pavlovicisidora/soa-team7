@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+option go_package = "github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/proto";
+
+option java_multiple_files = true;
+option java_outer_classname = "StakeholdersProto";
+option java_package = "com.example.stakeholders.grpc";
+
+package stakeholders;
+
+
+service StakeholderService {
+  rpc GetUserPublicInfo(GetUserPublicInfoRequest) returns (GetUserPublicInfoResponse);
+}
+
+message GetUserPublicInfoRequest {
+  string user_id = 1;
+}
+
+
+message GetUserPublicInfoResponse {
+  string user_id = 1;
+  string username = 2;
+  string name = 3;
+  string surname = 4;
+  string profile_pic_url = 5; // Koristimo URL za sliku
+}

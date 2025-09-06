@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/gorilla/mux"
-	"github.com/pavlovicisidora/soa-team7/auth"
-	"github.com/pavlovicisidora/soa-team7/service"
+	"github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/auth"
+	"github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/service"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
