@@ -53,9 +53,13 @@ export class BlogListComponent implements OnInit {
   }
 
   private updateBlogInList(updatedBlog: Blog): void {
-    const index = this.blogs.findIndex(b => b.id === updatedBlog.id);
-    if (index !== -1) {
-      this.blogs[index] = updatedBlog;
+  const index = this.blogs.findIndex(b => b.id === updatedBlog.id);
+  if (index !== -1) {
+    if (updatedBlog.created_at && updatedBlog.created_at.seconds) {
+      updatedBlog.created_at = new Date(updatedBlog.created_at.seconds * 1000);
     }
+    
+    this.blogs[index] = updatedBlog;
   }
+}
 }

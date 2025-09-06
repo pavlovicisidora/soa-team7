@@ -6,16 +6,15 @@
 <div *ngFor="let blog of blogs" class="blog-post">
   <h3>{{ blog.title }}</h3>
   <small>Author ID: {{ blog.user_id }}</small><br>
+  <small>Published: {{ blog.created_at | date: 'dd.MM.yyyy. HH:mm' }}</small> 
+  
+  <div class="blog-content" [innerHTML] = "blog.content"></div>
   
   <div class="image-gallery" *ngIf="blog.images && blog.images.length > 0">
     <div *ngFor="let image of blog.images" class="gallery-item">
       <img [src]="'http://localhost:8080' + image.url" alt="Blog image">
     </div>
   </div>
-  
-  <div class="blog-content" [innerHTML] = "blog.content"></div>
-  
-  <small>Published: {{ blog.created_at | date: 'dd.MM.yyyy. HH:mm' }}</small> 
   
   <div class="likes-section">
     <span>Likes: {{ blog.like_count }}</span>
