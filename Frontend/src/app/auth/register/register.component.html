@@ -1,0 +1,37 @@
+<div class="register-container">
+  <h2>Register</h2>
+  <form (ngSubmit)="register()">
+    <label>Username:</label>
+    <input type="text" [(ngModel)]="user.username" name="username" required />
+
+    <label>Password:</label>
+    <input type="password" [(ngModel)]="user.password" name="password" required />
+
+    <label>Email:</label>
+    <input type="email" [(ngModel)]="user.mail" name="mail" required />
+
+    <label>Role:</label>
+    <select [(ngModel)]="user.role" name="role">
+      <option value="VODIC">VODIC</option>
+      <option value="KORISNIK">KORISNIK</option>
+    </select>
+
+    <h3>Profile</h3>
+    <label>Name:</label>
+    <input type="text" [(ngModel)]="user.profile.name" name="name" />
+
+    <label>Surname:</label>
+    <input type="text" [(ngModel)]="user.profile.surname" name="surname" />
+
+    <label>Picture URL:</label>
+    <input type="text" [(ngModel)]="user.profile.picture" name="picture" />
+
+    <label>Bio:</label>
+    <textarea [(ngModel)]="user.profile.bio" name="bio"></textarea>
+
+    <label>Motto:</label>
+    <input type="text" [(ngModel)]="user.profile.motto" name="motto" />
+
+    <button type="submit">Register</button>
+  </form>
+</div>
