@@ -1,0 +1,97 @@
+<div class="tour-detail-container">
+  <div *ngIf="tour; else loading">
+
+    <section class="tour-details">
+      <h2>{{ tour.name }}</h2>
+      <p>{{ tour.description }}</p>
+      <div class="tour-meta">
+        <div class="meta-item">
+          <small>Difficulty</small>
+          <span>{{ tour.difficulty }}</span>
+        </div>
+        <div class="meta-item">
+          <small>Price</small>
+          <span>{{ tour.price | currency:'EUR' }}</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="reviews-section">
+      <h3>Reviews</h3>
+      <div *ngIf="reviews && reviews.length > 0; else noReviews">
+        <div *ngFor="let review of reviews" class="review-card">
+          <div class="review-header">
+            <span class="rating">Rating: {{ review.rating }}/5</span>
+            <span class="author">{{ review.touristName }}</span>
+          </div>
+          <p class="comment">{{ review.comment }}</p>
+            <div *ngIf="review.images && review.images.length > 0" class="review-images">
+                <img *ngFor="let imageUrl of review.images" [src]="imageUrl" alt="Review image">
+            </div>
+
+          <div class="dates">
+            Visited: {{ review.visitDate | date:'dd.MM.yyyy' }}
+            <span class="separator">|</span>
+            <span>Posted: {{ review.createdDate | date:'dd.MM.yyyy HH:mm' }}</span>
+          </div>
+        </div>
+      </div>
+      <ng-template #noReviews>
+        <p class="no-reviews-message">No reviews for this tour. Be the first!</p>
+      </ng-template>
+    </section>
+
+    <section class="review-form-section">
+      <h3>Leave a Review</h3>
+      <form [formGroup]="reviewForm" (ngSubmit)="submitReview()">
+        <div class="form-group">
+          <label for="rating">Rating</label>
+          <select formControlName="rating" id="rating">
+            <option value="5">5 - Excellent</option>
+            <option value="4">4 - Very Good</option>
+            <option value="3">3 - Good</option>
+            <option value="2">2 - Bad</option>
+            <option value="1">1 - Very Bad</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="visitDate">Visit Date</label>
+          <input type="date" id="visitDate" formControlName="visitingdate">
+        </div>
+
+        <div class="form-group">
+          <label for="comment">Your Comment</label>
+          <textarea formControlName="comment" id="comment" placeholder="Describe your experience..."></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="review-images">Add images (optional)</label>
+            <input type="file" id="review-images" multiple (change)="onFileSelected($event)" accept="image/*">
+            </div>
+
+            <!-- Prikaz odabranih fajlova za upload -->
+            <div *ngIf="selectedFiles.length > 0" class="selected-files">
+                <h4>Selected files for upload:</h4>
+                <ul>
+                    <li *ngFor="let file of selectedFiles; let i = index">
+                    {{ file.name }}
+                    <button type="button" (click)="removeFile(i)" class="remove-btn">&times;</button>
+                    </li>
+                </ul>
+            </div>
+
+            <button type="submit" [disabled]="reviewForm.invalid || isUploading">
+                <span *ngIf="!isUploading">Submit Review</span>
+                <span *ngIf="isUploading">Uploading...</span>
+            </button>
+
+      </form>
+    </section>
+
+  </div>
+
+  <ng-template #loading>
+    <p class="loading-message">Loading tour details...</p>
+  </ng-template>
+</div>

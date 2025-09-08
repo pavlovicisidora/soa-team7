@@ -1,0 +1,29 @@
+<div class="tour-list-container">
+  <h2>My Tours</h2>
+  <div *ngIf="tours.length > 0; else noTours">
+    <div class="tour-card" *ngFor="let tour of tours">
+      <div class="card-header">
+        <h3>{{ tour.name }}</h3>
+        <span class="difficulty difficulty-{{ tour.difficulty | lowercase }}">{{ tour.difficulty }}</span>
+      </div>
+      <div class="card-body">
+        <p>{{ tour.description }}</p>
+      </div>
+      <div class="card-footer">
+        <div class="tags">
+          <span *ngFor="let tag of tour.tags" class="tag">{{ tag }}</span>
+        </div>
+        <div class="status-price">
+          <span class="status status-{{ tour.status | lowercase }}">{{ tour.status }}</span>
+          <span class="price">{{ tour.price | currency:'EUR' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #noTours>
+    <div class="info-message">
+      <p>You currently have no created tours.</p>
+    </div>
+  </ng-template>
+</div>

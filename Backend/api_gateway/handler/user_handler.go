@@ -56,7 +56,7 @@ func (h *APIUserHandler) GetUserPublicInfoHandler(w http.ResponseWriter, r *http
 
 // LoginHandler omogućava login korisnika
 func (h *APIUserHandler) LoginHandler(w http.ResponseWriter, r *http.Request) {
-	var req pb.Login
+	var req pb.LoginRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -103,7 +103,7 @@ func (h *APIUserHandler) CreateUserHandler(w http.ResponseWriter, r *http.Reques
 	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
 	defer cancel()
 
-	resp, err := h.GrpcClient.CreateUser(ctx, &req)
+	resp, err := h.GrpcClient.Create(ctx, &req)
 	if err != nil {
 		log.Printf("Error creating user: %v", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)

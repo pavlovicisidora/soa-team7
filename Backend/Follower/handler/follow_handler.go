@@ -2,6 +2,8 @@ package handler
 
 import (
 	"context"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	// Prilagodite putanje vašoj strukturi projekta
 	"github.com/pavlovicisidora/soa-team7/Backend/Follower/model"
@@ -11,7 +13,7 @@ import (
 
 // toProtoUser je helper funkcija koja konvertuje naš interni model.Follow u pb.User.
 // U vašem primeru, model se zove Follow, ali predstavlja korisnika.
-func toProtoUser(user *model.Follow) *pb.User {
+func toProtoUser(user *model.User) *pb.User {
 	return &pb.User{
 		UserId: user.UserID,
 	}
@@ -45,72 +47,48 @@ func (h *FollowerHandler) FollowUser(ctx context.Context, req *pb.FollowUserRequ
 	// 3. Vrati prazan odgovor, jer je status OK dovoljan
 	return &pb.FollowUserResponse{}, nil
 }
-/*
-// UnfollowUser implementira RPC za otpraćivanje korisnika.
-func (h *FollowerHandler) UnfollowUser(ctx context.Context, req *pb.UnfollowUserRequest) (*pb.UnfollowUserResponse, error) {
-	followerId := req.GetFollowerId()
-	followedId := req.GetFollowedId()
 
-	// Pretpostavljamo da imate UnfollowUser metodu u servisu
-	err := h.followerService.UnfollowUser(ctx, followerId, followedId)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pb.UnfollowUserResponse{}, nil
-}
-
-// GetFollowing implementira RPC za dobijanje liste korisnika koje neko prati.
 func (h *FollowerHandler) GetFollowing(ctx context.Context, req *pb.GetFollowingRequest) (*pb.GetFollowingResponse, error) {
-	// 1. Izvuci ID korisnika iz zahteva
 	userId := req.GetUserId()
 
 	// 2. Pozovi servis da dobiješ listu modela
-	following, err := h.followerService.GetFollowing(ctx, userId)
+	followingUsers, err := h.followerService.GetFollowing(ctx, userId)
 	if err != nil {
 		return nil, err
 	}
 
 	// 3. Konvertuj listu modela u listu proto poruka
 	var protoUsers []*pb.User
-	for _, user := range following {
-		protoUsers = append(protoUsers, toProtoUser(&user))
+	for _, userModel := range followingUsers {
+		// Koristimo helper funkciju za čistu konverziju
+		protoUsers = append(protoUsers, toProtoUser(userModel))
 	}
 
 	// 4. Vrati odgovor
 	return &pb.GetFollowingResponse{Users: protoUsers}, nil
 }
 
-// GetFollowers implementira RPC za dobijanje liste korisnika koji nekog prate.
-func (h *FollowerHandler) GetFollowers(ctx context.Context, req *pb.GetFollowersRequest) (*pb.GetFollowersResponse, error) {
-	userId := req.GetUserId()
 
-	followers, err := h.followerService.GetFollowers(ctx, userId)
-	if err != nil {
-		return nil, err
-	}
-
-	var protoUsers []*pb.User
-	for _, user := range followers {
-		protoUsers = append(protoUsers, toProtoUser(&user))
-	}
-
-	return &pb.GetFollowersResponse{Users: protoUsers}, nil
-}
-
-// GetFollowRecommendations implementira RPC za dobijanje preporuka.
 func (h *FollowerHandler) GetFollowRecommendations(ctx context.Context, req *pb.GetFollowRecommendationsRequest) (*pb.GetFollowRecommendationsResponse, error) {
+	// 1. Dobijamo ID korisnika iz gRPC zahteva
 	userId := req.GetUserId()
+	if userId == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "User ID cannot be empty")
+	}
 
-	recommendations, err := h.followerService.GetFollowRecommendations(ctx, userId)
+	// 2. Pozivamo servisnu metodu da dobijemo preporuke
+	recommendedUsers, err := h.followerService.GetFollowRecommendations(ctx, userId)
 	if err != nil {
-		return nil, err
+		return nil, status.Errorf(codes.Internal, "Failed to get recommendations: %v", err)
 	}
 
+	// 3. Konvertujemo rezultat iz modela u proto objekte
 	var protoUsers []*pb.User
-	for _, user := range recommendations {
-		protoUsers = append(protoUsers, toProtoUser(&user))
+	for _, userModel := range recommendedUsers {
+		// U vašem slučaju helper toProtoUser već postoji i radi ovo, ali ovde je eksplicitno radi jasnoće.
+		protoUsers = append(protoUsers, toProtoUser(userModel))
 	}
 
+	// 4. Vraćamo odgovor
 	return &pb.GetFollowRecommendationsResponse{Users: protoUsers}, nil
-}*/
+}

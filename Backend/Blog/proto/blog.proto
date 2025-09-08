@@ -45,7 +45,9 @@ message GetBlogResponse {
   Blog blog = 1;
 }
 
-message GetAllBlogsRequest {}
+message GetAllBlogsRequest {
+   repeated string followed_user_ids = 1;
+}
 message GetAllBlogsResponse {
   repeated Blog blogs = 1;
 }

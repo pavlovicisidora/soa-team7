@@ -9,6 +9,8 @@ package tour;
 service TourGrpcService {
   rpc CreateTour(CreateTourRequest) returns (CreateTourResponse);
   rpc GetAllToursById(GetAllToursByIdRequest) returns (GetAllToursByIdResponse);
+  rpc GetAllTours(GetAllToursRequest) returns (GetAllToursResponse);
+  rpc GetTourById(GetTourByIdRequest) returns (GetTourByIdResponse);
 }
 
 message Tour {
@@ -37,4 +39,15 @@ message GetAllToursByIdRequest{
 }
 message GetAllToursByIdResponse{
   repeated Tour tours = 1;
+}
+
+message GetAllToursRequest{}
+message GetAllToursResponse{
+  repeated Tour tours = 1;
+}
+message GetTourByIdRequest{
+  int32 tour_id = 1;
+}
+message GetTourByIdResponse{
+  Tour tour = 1;
 }
