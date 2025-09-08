@@ -49,12 +49,6 @@ func main() {
 	}
 	defer connTour.Close()
 
-	blogClient := blog_proto.NewBlogServiceClient(conn)
-	blogHandler := handler.NewBlogHandler(blogClient)
-
-	commentClient := blog_proto.NewCommentServiceClient(conn)
-	commentHandler := handler.NewCommentHandler(commentClient)
-
 	followerConn, err := grpc.NewClient(followerServiceAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("Failed to connect to follower service: %v", err)
@@ -63,6 +57,12 @@ func main() {
 
 	followerClient := follower_proto.NewFollowerServiceClient(followerConn)
 	followerHandler := handler.NewFollowerHandler(followerClient)
+
+	blogClient := blog_proto.NewBlogServiceClient(conn)
+	blogHandler := handler.NewBlogHandler(blogClient, followerClient)
+
+	commentClient := blog_proto.NewCommentServiceClient(conn)
+	commentHandler := handler.NewCommentHandler(commentClient)
 
 	tourClient := tour_proto.NewTourGrpcServiceClient(connTour)
 	tourHandler := handler.NewTourHandler(tourClient)
@@ -94,7 +94,7 @@ func main() {
 	apiRouter.PathPrefix("/comments").Handler(http.StripPrefix("/api", commentHandler))
 	apiRouter.PathPrefix("/stakeholders").Handler(http.StripPrefix("/api", stakeholdersProxy))
 
-	apiRouter.PathPrefix("/follow").Handler(http.StripPrefix("/api", followerHandler))
+	apiRouter.PathPrefix("/follower").Handler(http.StripPrefix("/api", followerHandler))
 
 	apiRouter.PathPrefix("/tours").Handler(http.StripPrefix("/api", tourHandler))
 	apiRouter.PathPrefix("/keypoints").Handler(http.StripPrefix("/api", keyPointHandler))
