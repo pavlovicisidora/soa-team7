@@ -1,0 +1,50 @@
+<div class="register-container">
+  <h2>Register</h2>
+  
+  <form (ngSubmit)="registerUser()" #registerForm="ngForm">
+    <label>Username:</label>
+    <input type="text" [(ngModel)]="user.username" name="username" required />
+
+    <label>Password:</label>
+    <input type="password" [(ngModel)]="user.password" name="password" required />
+
+    <label>Email:</label>
+    <input type="email" [(ngModel)]="user.mail" name="mail" required />
+
+    <label>Role:</label>
+    <select [(ngModel)]="user.role" name="role" required>
+      <option value="VODIC">VODIC</option>
+      <option value="TURISTA">TURISTA</option>
+    </select>
+
+    <h3>Profile</h3>
+    <label>Name:</label>
+    <input type="text" [(ngModel)]="user.profile.name" name="name" />
+
+    <label>Surname:</label>
+    <input type="text" [(ngModel)]="user.profile.surname" name="surname" />
+
+    <div class="form-group">
+      <label for="imageUpload">Upload profile picture</label>
+      <input 
+        type="file" 
+        id="imageUpload" 
+        (change)="onFileSelected($event)" 
+        accept="image/png, image/jpeg">
+      <div *ngIf="isUploading">Uploading...</div>
+    </div>
+
+    <div *ngIf="user.profile.profilePic">
+      <h4>Profile Picture Preview:</h4>
+      <img [src]="user.profile.profilePic" width="100" alt="Profile picture">
+    </div>
+    
+    <label>Bio:</label>
+    <textarea [(ngModel)]="user.profile.bio" name="bio"></textarea>
+
+    <label>Motto:</label>
+    <input type="text" [(ngModel)]="user.profile.motto" name="motto" />
+
+    <button type="submit" [disabled]="!registerForm.form.valid">Register</button>
+  </form>
+</div>

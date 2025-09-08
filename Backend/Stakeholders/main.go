@@ -23,7 +23,7 @@ func startServer(userHandler *handler.UserHandler, profileHandler *handler.Profi
 
 	router.HandleFunc("/register", userHandler.Create).Methods("POST")
 
-	router.HandleFunc("/login", userHandler.Login).Methods("GET")
+	router.HandleFunc("/login", userHandler.Login).Methods("POST")
 
 	router.HandleFunc("/blockUser/{username}", userHandler.BlockUser).Methods("PUT")
 
