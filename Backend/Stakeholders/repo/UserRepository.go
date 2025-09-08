@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/pavlovicisidora/soa-team7/model"
+	"github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -178,6 +178,7 @@ func (r *UserRepository) FindUserById(ctx context.Context, id primitive.ObjectID
 
 	return &user, nil
 }
+
 /*
 func (r *UserRepository) UpdateUserProfileById(ctx context.Context, id primitive.ObjectID, profile model.Profile) error {
 	collection := r.client.Database(r.dbName).Collection(r.collectionName)

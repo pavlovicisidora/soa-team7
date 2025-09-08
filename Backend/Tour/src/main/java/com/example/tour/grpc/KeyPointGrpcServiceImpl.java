@@ -65,4 +65,52 @@ public class KeyPointGrpcServiceImpl extends KeyPointGrpcServiceGrpc.KeyPointGrp
         responseObserver.onNext(responseBuilder.build());
         responseObserver.onCompleted();
     }
+    @Override
+    public void updateKeyPoint(UpdateKeyPointRequest request, StreamObserver<UpdateKeyPointResponse> responseObserver) {
+        KeyPoint keyPointDetails = new KeyPoint();
+        keyPointDetails.setName(request.getName());
+        keyPointDetails.setDescription(request.getDescription());
+        keyPointDetails.setLatitude(request.getLatitude());
+        keyPointDetails.setLongitude(request.getLongitude());
+        keyPointDetails.setImageUrl(request.getImageUrl());
+
+        KeyPoint updatedKeyPoint = keyPointService.updateKeyPoint(request.getId(),keyPointDetails);
+
+        if (updatedKeyPoint != null) {
+            com.example.tour.grpc.KeyPoint grpcUpdatedKeyPoint = com.example.tour.grpc.KeyPoint.newBuilder()
+                    .setName(updatedKeyPoint.getName())
+                    .setDescription(updatedKeyPoint.getDescription())
+                    .setLatitude(updatedKeyPoint.getLatitude())
+                    .setLongitude(updatedKeyPoint.getLongitude())
+                    .setImageUrl(updatedKeyPoint.getImageUrl())
+                    .build();
+            UpdateKeyPointResponse response = UpdateKeyPointResponse.newBuilder()
+                    .setKeypoint(grpcUpdatedKeyPoint)
+                    .build();
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        } else {
+            responseObserver.onError(
+                    Status.NOT_FOUND
+                            .withDescription("KeyPoint with ID " + request.getId() + " not found.")
+                            .asRuntimeException()
+            );
+        }
+    }
+    @Override
+    public void deleteKeyPoint(DeleteKeyPointRequest request, StreamObserver<DeleteKeyPointResponse> responseObserver) {
+        boolean deleted = keyPointService.deleteKeyPoint(request.getId());
+
+        if (deleted) {
+            DeleteKeyPointResponse response = DeleteKeyPointResponse.newBuilder().build();
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        } else {
+            responseObserver.onError(
+                    Status.NOT_FOUND
+                            .withDescription("KeyPoint with ID " + request.getId() + " not found.")
+                            .asRuntimeException()
+            );
+        }
+    }
 }

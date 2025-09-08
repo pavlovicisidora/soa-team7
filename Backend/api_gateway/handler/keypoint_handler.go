@@ -11,9 +11,11 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/pavlovicisidora/soa-team7/Backend/APIGateway/middleware"
 	tour_proto "github.com/pavlovicisidora/soa-team7/Backend/APIGateway/proto"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
-type CreateKeyPointRequest struct {
+type KeyPointRequest struct {
 	Name        string  `json:"name"`
 	Description string  `json:"description"`
 	Latitude    float64 `json:"latitude"`
@@ -32,15 +34,17 @@ func NewKeyPointHandler(client tour_proto.KeyPointGrpcServiceClient) *KeyPointHa
 func (h *KeyPointHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	router := mux.NewRouter()
 
-	router.HandleFunc("/keypoints/{id}", h.CreateKeyPoint).Methods("POST")
-	router.HandleFunc("/keypoints/{id}", h.GetKeyPointsTour).Methods("GET")
+	router.HandleFunc("/keypoints/{tourId}", h.CreateKeyPoint).Methods("POST")
+	router.HandleFunc("/keypoints/{tourId}", h.GetKeyPointsTour).Methods("GET")
+	router.HandleFunc("/keypoints/{id}", h.UpdateKeyPoint).Methods("PUT")
+	router.HandleFunc("/keypoints/{id}", h.DeleteKeyPoint).Methods("DELETE")
 
 	router.ServeHTTP(w, r)
 }
 
 func (h *KeyPointHandler) CreateKeyPoint(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	id := vars["id"]
+	id := vars["tourId"]
 	userID, ok := r.Context().Value(middleware.UserKey).(string)
 	if !ok || userID == "" {
 		http.Error(w, "User ID not found in context", http.StatusUnauthorized)
@@ -53,7 +57,7 @@ func (h *KeyPointHandler) CreateKeyPoint(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	var reqBody CreateKeyPointRequest
+	var reqBody KeyPointRequest
 	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
@@ -91,13 +95,13 @@ func (h *KeyPointHandler) CreateKeyPoint(w http.ResponseWriter, r *http.Request)
 
 func (h *KeyPointHandler) GetKeyPointsTour(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	id := vars["id"]
-	userID, ok := r.Context().Value(middleware.UserKey).(string)
+	id := vars["tourId"]
+	// userID, ok := r.Context().Value(middleware.UserKey).(string)
 
-	if !ok || userID == "" {
-		http.Error(w, "User ID not found in context", http.StatusUnauthorized)
-		return
-	}
+	// if !ok || userID == "" {
+	// 	http.Error(w, "User ID not found in context", http.StatusUnauthorized)
+	// 	return
+	// }
 
 	role := r.Context().Value("userRole").(string)
 	if role != "VODIC" {
@@ -121,4 +125,96 @@ func (h *KeyPointHandler) GetKeyPointsTour(w http.ResponseWriter, r *http.Reques
 	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(resp.GetKeyPoints())
+}
+
+func (h *KeyPointHandler) UpdateKeyPoint(w http.ResponseWriter, r *http.Request) {
+	userID, ok := r.Context().Value(middleware.UserKey).(string)
+	if !ok || userID == "" {
+		http.Error(w, "User ID not found in context", http.StatusUnauthorized)
+		return
+	}
+	role := r.Context().Value("userRole").(string)
+	if role != "VODIC" {
+		http.Error(w, "Forbidden: only VODIC can update keypoints.", http.StatusForbidden)
+		return
+	}
+
+	vars := mux.Vars(r)
+	idStr := vars["id"]
+	keyPointID, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, "Invalid keypoint ID", http.StatusBadRequest)
+		return
+	}
+
+	var reqBody KeyPointRequest
+	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	grpcRequest := &tour_proto.UpdateKeyPointRequest{
+		Id:          int32(keyPointID),
+		Name:        reqBody.Name,
+		Description: reqBody.Description,
+		Latitude:    reqBody.Latitude,
+		Longitude:   reqBody.Longitude,
+		ImageUrl:    reqBody.ImageUrl,
+	}
+
+	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
+	defer cancel()
+
+	resp, err := h.client.UpdateKeyPoint(ctx, grpcRequest)
+	if err != nil {
+		if st, ok := status.FromError(err); ok && st.Code() == codes.NotFound {
+			http.Error(w, st.Message(), http.StatusNotFound)
+		} else {
+			log.Printf("Failed to update keypoint via gRPC: %v", err)
+			http.Error(w, "Failed to update keypoint", http.StatusInternalServerError)
+		}
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(resp.GetKeypoint())
+}
+func (h *KeyPointHandler) DeleteKeyPoint(w http.ResponseWriter, r *http.Request) {
+	userID, ok := r.Context().Value(middleware.UserKey).(string)
+	if !ok || userID == "" {
+		http.Error(w, "User ID not found in context", http.StatusUnauthorized)
+		return
+	}
+	role := r.Context().Value("userRole").(string)
+	if role != "VODIC" {
+		http.Error(w, "Forbidden: only VODIC can delete keypoints.", http.StatusForbidden)
+		return
+	}
+
+	vars := mux.Vars(r)
+	idStr := vars["id"]
+	keyPointID, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, "Invalid keypoint ID", http.StatusBadRequest)
+		return
+	}
+
+	grpcRequest := &tour_proto.DeleteKeyPointRequest{Id: int32(keyPointID)}
+
+	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
+	defer cancel()
+
+	_, err = h.client.DeleteKeyPoint(ctx, grpcRequest)
+	if err != nil {
+		if st, ok := status.FromError(err); ok && st.Code() == codes.NotFound {
+			http.Error(w, st.Message(), http.StatusNotFound)
+		} else {
+			log.Printf("Failed to delete keypoint via gRPC: %v", err)
+			http.Error(w, "Failed to delete keypoint", http.StatusInternalServerError)
+		}
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }

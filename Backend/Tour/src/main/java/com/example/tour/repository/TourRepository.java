@@ -9,5 +9,5 @@ import java.util.List;
 
 public interface TourRepository extends JpaRepository<Tour, Integer> {
     @Query("SELECT t FROM Tour t WHERE t.authorId=:authorId")
-    List<Tour> findAllToursById(@Param("authorId")String authorId);
+    List<Tour> findToursForAuthor(@Param("authorId") String authorId);
 }

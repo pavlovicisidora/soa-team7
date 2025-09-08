@@ -10,9 +10,9 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
-	"github.com/pavlovicisidora/soa-team7/handler"
-	"github.com/pavlovicisidora/soa-team7/repo"
-	"github.com/pavlovicisidora/soa-team7/service"
+	"github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/handler"
+	"github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/repo"
+	"github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/service"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -80,10 +80,10 @@ func main() {
 
 	userRepo := repo.NewUserRepository(client, dbName, collectionName)
 	userService := &service.UserService{UserRepository: userRepo}
-	userHandler := &handler.UserHandler{UserService: userService}
 
 	profileService := &service.ProfileService{UserRepo: userRepo}
 	profileHandler := &handler.ProfileHandler{ProfileService: profileService}
+	userHandler := &handler.UserHandler{UserService: userService, ProfileService: profileService}
 	router := mux.NewRouter().StrictSlash(true)
 
 	startServer(userHandler, profileHandler, router)

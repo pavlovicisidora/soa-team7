@@ -1,18 +1,26 @@
 package handler
 
 import (
+	"context"
 	"encoding/json"
+	"log"
 	"net/http"
 	"strings"
 
 	"github.com/gorilla/mux"
-	"github.com/pavlovicisidora/soa-team7/auth"
-	"github.com/pavlovicisidora/soa-team7/model"
-	"github.com/pavlovicisidora/soa-team7/service"
+	"github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/auth"
+	"github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/model"
+	pb "github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/proto"
+	"github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/service"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type UserHandler struct {
-	UserService *service.UserService
+	pb.UnimplementedStakeholderServiceServer
+	UserService    *service.UserService
+	ProfileService *service.ProfileService
 }
 
 func (handler *UserHandler) GetAllUsers(writer http.ResponseWriter, req *http.Request) {
@@ -168,4 +176,40 @@ func (handler *UserHandler) FindAllInfo(writer http.ResponseWriter, req *http.Re
 		http.Error(writer, "Error encoding JSON", http.StatusInternalServerError)
 		return
 	}
+}
+func (handler *UserHandler) GetUserPublicInfo(ctx context.Context, req *pb.GetUserPublicInfoRequest) (*pb.GetUserPublicInfoResponse, error) {
+	log.Printf("Received GetUserPublicInfo request for user ID: %s", req.GetUserId())
+
+	userIDStr := req.GetUserId()
+	if userIDStr == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "User ID cannot be empty")
+	}
+
+	objectID, err := primitive.ObjectIDFromHex(userIDStr)
+	if err != nil {
+		log.Printf("Invalid ObjectID format: %v", err)
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid User ID format")
+	}
+
+	user, err := handler.UserService.FindById(ctx, objectID)
+
+	if err != nil {
+		log.Printf("User not found for ID %s: %v", userIDStr, err)
+		return nil, status.Errorf(codes.NotFound, "User with id %s not found", userIDStr)
+	}
+	profile, err := handler.ProfileService.GetUserProfile(ctx, objectID)
+	if err != nil {
+		log.Printf("Profile not found for ID %s: %v", userIDStr, err)
+		return nil, status.Errorf(codes.NotFound, "User with id %s not found", userIDStr)
+	}
+
+	response := &pb.GetUserPublicInfoResponse{
+		UserId:        user.ID.Hex(),
+		Username:      user.Username,
+		Name:          profile.Name,
+		Surname:       profile.Surname,
+		ProfilePicUrl: profile.ProfilePic,
+	}
+
+	return response, nil
 }
