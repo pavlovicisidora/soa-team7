@@ -1,22 +1,11 @@
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Route, Router } from '@angular/router';
+import { Profile } from '../profile.model';
+import { User } from '../user.model';
+import { Editor } from 'ngx-editor';
+import { AuthService } from '../auth.service';
 
-interface Profile {
-  name: string;
-  surname: string;
-  picture: string;
-  bio: string;
-  motto: string;
-}
-
-interface User {
-  username: string;
-  password: string;
-  mail: string;
-  role: string;
-  blocked: boolean;
-  profile: Profile;
-}
 
 @Component({
   selector: 'app-register',
@@ -24,29 +13,68 @@ interface User {
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent {
+  editor: Editor;
+
+  profile: Profile = {
+    name: '',
+    surname: '',
+    profilePic: '',
+    bio: '',
+    motto: ''
+  };
   user: User = {
     username: '',
     password: '',
     mail: '',
-    role: 'VODIC',
+    role: '',
     blocked: false,
-    profile: {
-      name: '',
-      surname: '',
-      picture: '',
-      bio: '',
-      motto: ''
-    }
-  };
+    profile: this.profile,
+  }    
+  isUploading = false;
 
-  constructor(private http: HttpClient) {}
-
-  register() {
-    console.log('Registering user:', this.user);
-    this.http.post('http://localhost:8080/api/register', this.user)
-      .subscribe({
-        next: (res) => console.log('User registered successfully', res),
-        error: (err) => console.error('Error registering user', err)
-      });
+  constructor(private authService: AuthService, private router: Router) {
+     this.editor = new Editor();
   }
+
+  ngOnDestroy(): void {
+    this.editor.destroy();
+  }
+
+  registerUser():void{
+    if(this.isUploading){
+      alert('Please wait for uploading images to be done.');
+      return;
+    }
+    this.authService.registerUser(this.user).subscribe({
+      next: (createdUser) =>{
+        console.log('User successfully registered!',createdUser);
+        this.router.navigate(['/login'])
+      },
+      error: (err) => {
+        console.error('Error registrating user:', err);
+      }
+    });
+  }
+
+ onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+      this.isUploading = true;
+      
+      this.authService.uploadImage(file).subscribe({
+        next: (response: { filePath: string }) => {
+          console.log('Image successfully uploaded, URL path:', response.filePath);
+          this.profile.profilePic = response.filePath;  
+          this.isUploading = false;
+        },
+        error: (err) => {
+          console.error('Error uploading image:', err);
+          alert('Error occurred during image upload.');
+          this.isUploading = false;
+        }
+      });
+    }
+  }
+  
 }

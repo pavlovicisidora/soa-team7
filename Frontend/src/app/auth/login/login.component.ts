@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
+import { AuthService } from '../auth.service';
+import { LoginResponse } from '../loginResponse.model';
 
 @Component({
   selector: 'app-login',
@@ -10,24 +12,27 @@ export class LoginComponent {
   username: string = '';
   password: string = '';
 
-  constructor(private http: HttpClient) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
-  login() {
-    const payload = {
-      username: this.username,
-      password: this.password
-    };
+  login(): void {
+  this.authService.loginUser(this.username, this.password).subscribe({
+    next: (res: LoginResponse) => {
+      console.log('Login successful:', res);
 
-    console.log('Logging in:', payload);
+      // Sačuvaj token
+      this.authService.setToken(res.token);
 
-    this.http.post('http://localhost:8080/api/login', payload)
-      .subscribe({
-        next: (res) => {
-          console.log('Login successful', res);
-          // ovde možeš sačuvati token u localStorage/sessionStorage
-          // npr. localStorage.setItem('token', res['token']);
-        },
-        error: (err) => console.error('Login error', err)
-      });
-  }
+      // Sačuvaj username/role
+      localStorage.setItem('role', res.role);
+      localStorage.setItem('username', res.username);
+
+      // Redirect nakon logina
+      this.router.navigate(['/navbar']);
+    },
+    error: (err) => {
+      console.error('Login failed:', err);
+      alert('Invalid username or password.');
+    }
+  });
+}
 }
