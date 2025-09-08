@@ -7,6 +7,8 @@ import { RegisterComponent } from './auth/register/register.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { TourCreateComponent } from './feature-modules/tour/tour-create/tour-create.component';
 import { TourListComponent } from './feature-modules/tour/tour-list/tour-list.component';
+import { PublicTourListComponent } from './feature-modules/tour/public-tour-list/public-tour-list.component';
+import { TourDetailComponent } from './feature-modules/tour/tour-detail/tour-detail.component';
 
 const routes: Routes = [
   { path: 'blog-list', component: BlogListComponent },
@@ -15,8 +17,9 @@ const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'navbar', component: NavbarComponent},
   { path: 'create-tour', component: TourCreateComponent},
-  { path: 'tour-list', component: TourListComponent}, 
-
+  { path: 'tour-list', component: TourListComponent},
+  { path: 'public-tour-list', component: PublicTourListComponent},
+  { path: 'tours/:id', component: TourDetailComponent } 
 ];
 
 @NgModule({

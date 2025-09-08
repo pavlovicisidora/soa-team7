@@ -14,6 +14,7 @@ export interface TourCreationDto {
 })
 export class TourService {
   private apiUrl = "api/tours"
+  private uploadUrl = '/api/images/upload'; 
 
   constructor(private http : HttpClient) { }
   getToursByAuthor(): Observable<Tour[]>{
@@ -21,5 +22,16 @@ export class TourService {
   }
   createTour(tourData:TourCreationDto): Observable<Tour>{
     return this.http.post<Tour>(this.apiUrl,tourData);
+  }
+  getAllTours(): Observable<Tour[]> {
+    return this.http.get<Tour[]>(`${this.apiUrl}/all`);
+  }
+  getTourById(id: number): Observable<Tour> {
+    return this.http.get<Tour>(`${this.apiUrl}/${id}`);
+  }
+  uploadImage(file: File): Observable<{ filePath: string }> {
+  const formData = new FormData();
+  formData.append('image', file, file.name);
+  return this.http.post<{ filePath: string }>(this.uploadUrl, formData);
   }
 }
