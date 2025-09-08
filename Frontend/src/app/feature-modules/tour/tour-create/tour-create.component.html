@@ -1,0 +1,37 @@
+<div class="form-container">
+  <h2>Create New Tour</h2>
+  <form [formGroup]="tourForm" (ngSubmit)="onSubmit()">
+
+    <div class="form-group">
+      <label for="name">Tour Name</label>
+      <input id="name" type="text" formControlName="name">
+      <div *ngIf="tourForm.get('name')?.invalid && tourForm.get('name')?.touched" class="error">
+        Name is required.
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea id="description" formControlName="description" rows="5"></textarea>
+      <div *ngIf="tourForm.get('description')?.invalid && tourForm.get('description')?.touched" class="error">
+        Description is required.
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="difficulty">Difficulty</label>
+      <select id="difficulty" formControlName="difficulty">
+        <option value="easy">Easy</option>
+        <option value="medium">Medium</option>
+        <option value="hard">Hard</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="tags">Tags (comma-separated)</label>
+      <input id="tags" type="text" formControlName="tags" placeholder="e.g. hiking, nature, lake">
+    </div>
+
+    <button type="submit" [disabled]="!tourForm.valid">Create Tour</button>
+  </form>
+</div>
