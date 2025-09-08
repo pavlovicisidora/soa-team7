@@ -9,6 +9,7 @@ import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { JwtInterceptor } from './core/interceptors/jwt.interceptor';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { AuthModule } from "src/app/auth/auth.module";
+import { TourModule } from './feature-modules/tour/tour.module';
 
 @NgModule({
   declarations: [
@@ -22,8 +23,9 @@ import { AuthModule } from "src/app/auth/auth.module";
     RouterModule,
     HttpClientModule,
     BlogModule,
-    AuthModule
-  
+    AuthModule,
+    TourModule
+
 ],
   providers: [
     { 

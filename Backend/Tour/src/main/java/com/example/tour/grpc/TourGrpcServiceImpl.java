@@ -65,5 +65,43 @@ public class TourGrpcServiceImpl extends TourGrpcServiceGrpc.TourGrpcServiceImpl
         responseObserver.onNext(responseBuilder.build());
         responseObserver.onCompleted();
     }
+    @Override
+    public void getAllTours(GetAllToursRequest request, StreamObserver<GetAllToursResponse> responseObserver) {
 
+        List<Tour> tours = tourService.findAllTours();
+        GetAllToursResponse.Builder responseBuilder = GetAllToursResponse.newBuilder();
+        for (Tour tour : tours) {
+            com.example.tour.grpc.Tour grpcTour = com.example.tour.grpc.Tour.newBuilder()
+                    .setId(tour.getId())
+                    .setName(tour.getName())
+                    .setDescription(tour.getDescription())
+                    .setDifficulty(tour.getDifficulty())
+                    .addAllTags(tour.getTags())
+                    .setStatus(tour.getStatus().name())
+                    .setPrice(tour.getPrice())
+                    .setAuthorId(tour.getAuthorId())
+                    .build();
+            responseBuilder.addTours(grpcTour);
+        }
+        responseObserver.onNext(responseBuilder.build());
+        responseObserver.onCompleted();
+    }
+    @Override
+    public void getTourById(GetTourByIdRequest request, StreamObserver<GetTourByIdResponse> responseObserver) {
+
+        Tour tour = tourService.findById(request.getTourId());
+        com.example.tour.grpc.Tour grpcTour = com.example.tour.grpc.Tour.newBuilder()
+                .setId(tour.getId())
+                .setName(tour.getName())
+                .setDescription(tour.getDescription())
+                .setDifficulty(tour.getDifficulty())
+                .addAllTags(tour.getTags())
+                .setStatus(tour.getStatus().name())
+                .setPrice(tour.getPrice())
+                .setAuthorId(tour.getAuthorId())
+                .build();
+        GetTourByIdResponse response= GetTourByIdResponse.newBuilder().setTour(grpcTour).build();
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
 }

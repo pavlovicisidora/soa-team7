@@ -24,5 +24,7 @@ public class TourService {
             return true;
         } else {
             return false;
-    }}
+        }
+    }
+    public List<Tour> findAllTours(){return tourRepository.findAll();}
 }

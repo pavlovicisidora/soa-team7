@@ -1,0 +1,105 @@
+.tour-list-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+.tour-card {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+  transition: transform 0.2s ease-in-out;
+}
+
+.tour-card:hover {
+  transform: translateY(-5px);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background-color: #f7f7f7;
+  border-bottom: 1px solid #eee;
+}
+
+.card-header h3 {
+  margin: 0;
+  color: #0056b3;
+}
+
+.card-body {
+  padding: 1.5rem;
+  line-height: 1.6;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background-color: #f7f7f7;
+  border-top: 1px solid #eee;
+  font-size: 0.9rem;
+}
+
+.tags .tag {
+  background-color: #e0e0e0;
+  color: #555;
+  padding: 0.25rem 0.75rem;
+  border-radius: 15px;
+  margin-right: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.status-price {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.status {
+  font-weight: bold;
+  padding: 0.25rem 0.75rem;
+  border-radius: 5px;
+  color: white;
+}
+
+.status-draft { background-color: #868e96; }
+.status-published { background-color: #28a745; }
+.status-archived { background-color: #dc3545; }
+
+.price {
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.difficulty {
+  text-transform: capitalize;
+  font-weight: 500;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  color: #fff;
+}
+
+.difficulty-easy { background-color: #28a745; }
+.difficulty-medium { background-color: #ffc107; color: #333;}
+.difficulty-hard { background-color: #dc3545; }
+
+.info-message {
+  text-align: center;
+  padding: 2rem;
+  color: #777;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+}
