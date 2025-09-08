@@ -2,26 +2,63 @@ syntax = "proto3";
 
 option go_package = "github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/proto";
 
-option java_multiple_files = true;
-option java_outer_classname = "StakeholdersProto";
-option java_package = "com.example.stakeholders.grpc";
-
 package stakeholders;
-
 
 service StakeholderService {
   rpc GetUserPublicInfo(GetUserPublicInfoRequest) returns (GetUserPublicInfoResponse);
+  rpc GetAllUsers(GetAllUsersRequest) returns (GetAllUsersResponse);
+  rpc Create(CreateUserRequest) returns (CreateUserResponse);
+  rpc Login(LoginRequest) returns (LoginResponse);
+  rpc BlockUser(BlockUserRequest) returns (BlockUserResponse);
 }
 
 message GetUserPublicInfoRequest {
   string user_id = 1;
 }
 
-
 message GetUserPublicInfoResponse {
   string user_id = 1;
   string username = 2;
   string name = 3;
   string surname = 4;
-  string profile_pic_url = 5; // Koristimo URL za sliku
+  string profile_pic_url = 5;
+}
+
+message GetAllUsersRequest {}
+message GetAllUsersResponse {
+  repeated User users = 1;
+}
+
+message CreateUserRequest {
+  string username = 1;
+  string password = 2;
+  string mail = 3;
+  string role = 4;
+}
+
+message CreateUserResponse {
+  string user_id = 1;
+}
+
+message LoginRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  string token = 1;
+  string username = 2;
+  string role = 3;
+}
+
+message BlockUserRequest {
+  string username = 1;
+}
+
+message BlockUserResponse {}
+message User {
+  string user_id = 1;
+  string username = 2;
+  string role = 3;
+  bool blocked = 4;
 }

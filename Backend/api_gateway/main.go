@@ -3,8 +3,6 @@ package main
 import (
 	"log"
 	"net/http"
-	"net/http/httputil"
-	"net/url"
 	"os"
 
 	"github.com/gorilla/mux"
@@ -13,6 +11,7 @@ import (
 	tour_proto "github.com/pavlovicisidora/soa-team7/Backend/APIGateway/proto"
 	blog_proto "github.com/pavlovicisidora/soa-team7/Backend/Blog/proto"
 	follower_proto "github.com/pavlovicisidora/soa-team7/Backend/Follower/proto"
+	stakeholders_proto "github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -49,6 +48,12 @@ func main() {
 	}
 	defer connTour.Close()
 
+	connStakeholders, err := grpc.NewClient(stakeholdersServiceAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("Failed to connect to tour service: %v", err)
+	}
+	defer connStakeholders.Close()
+
 	blogClient := blog_proto.NewBlogServiceClient(conn)
 	blogHandler := handler.NewBlogHandler(blogClient)
 
@@ -73,11 +78,16 @@ func main() {
 	reviewClient := tour_proto.NewReviewGrpcServiceClient(connTour)
 	reviewHandler := handler.NewReviewHandler(reviewClient)
 
-	stakeholdersURL, err := url.Parse("http://" + stakeholdersServiceAddress)
-	if err != nil {
-		log.Fatalf("Failed to parse stakeholders service URL: %v", err)
-	}
-	stakeholdersProxy := httputil.NewSingleHostReverseProxy(stakeholdersURL)
+	//stakeholdersURL, err := url.Parse("http://" + stakeholdersServiceAddress)
+	//if err != nil {
+	//	log.Fatalf("Failed to parse stakeholders service URL: %v", err)
+	//}
+	//stakeholdersProxy := httputil.NewSingleHostReverseProxy(stakeholdersURL)
+
+	///NOVOO
+	stakeholdersClient := stakeholders_proto.NewStakeholderServiceClient(connStakeholders)
+	userHandler := handler.NewAPIUserHandler(stakeholdersClient)
+	////
 
 	router := mux.NewRouter()
 	fs := http.FileServer(http.Dir("./uploads/"))
@@ -92,7 +102,7 @@ func main() {
 
 	apiRouter.PathPrefix("/blogs").Handler(http.StripPrefix("/api", blogHandler))
 	apiRouter.PathPrefix("/comments").Handler(http.StripPrefix("/api", commentHandler))
-	apiRouter.PathPrefix("/stakeholders").Handler(http.StripPrefix("/api", stakeholdersProxy))
+	apiRouter.PathPrefix("/users").Handler(http.StripPrefix("/api", userHandler))
 
 	apiRouter.PathPrefix("/follow").Handler(http.StripPrefix("/api", followerHandler))
 
