@@ -27,7 +27,7 @@ export class LoginComponent {
       localStorage.setItem('username', res.username);
 
       // Redirect nakon logina
-      this.router.navigate(['/navbar']);
+      // this.router.navigate(['/navbar']);
     },
     error: (err) => {
       console.error('Login failed:', err);

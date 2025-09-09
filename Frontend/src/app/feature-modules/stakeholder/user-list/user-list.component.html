@@ -1,0 +1,41 @@
+<div class="user-list-container">
+  <h2>User Accounts</h2>
+
+  <!-- Prikazuje se ako postoji greška -->
+  <div *ngIf="errorMessage" class="error-message">
+    <p>{{ errorMessage }}</p>
+  </div>
+
+  <!-- Tabela se prikazuje samo ako nema greške i ako ima korisnika -->
+  <div *ngIf="!errorMessage && users.length > 0" class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th>User ID</th>
+          <th>Username</th>
+          <th>Role</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Prolazimo kroz svaki 'user' objekat u nizu 'users' -->
+        <tr *ngFor="let user of users">
+          <td>{{ user.userId }}</td>
+          <td>{{ user.username }}</td>
+          <td>{{ user.role }}</td>
+          <td>
+            <!-- Uslovno prikazujemo status na osnovu 'blocked' polja -->
+            <span [ngClass]="{'status-active': !user.blocked, 'status-blocked': user.blocked}">
+              {{ user.blocked ? 'Blocked' : 'Active' }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Prikazuje se ako nema greške, ali je lista korisnika prazna -->
+  <div *ngIf="!errorMessage && users.length === 0">
+    <p>No user accounts found.</p>
+  </div>
+</div>
