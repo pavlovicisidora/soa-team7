@@ -88,6 +88,7 @@ func main() {
 	///NOVOO
 	stakeholdersClient := stakeholders_proto.NewStakeholderServiceClient(connStakeholders)
 	userHandler := handler.NewAPIUserHandler(stakeholdersClient)
+	profileHandler := handler.NewProfileHandler(stakeholdersClient)
 	////
 
 	router := mux.NewRouter()
@@ -109,6 +110,7 @@ func main() {
 	apiRouter.PathPrefix("/tours").Handler(http.StripPrefix("/api", tourHandler))
 	apiRouter.PathPrefix("/keypoints").Handler(http.StripPrefix("/api", keyPointHandler))
 	apiRouter.PathPrefix("/reviews").Handler(http.StripPrefix("/api", reviewHandler))
+	apiRouter.PathPrefix("/profile").Handler(http.StripPrefix("/api", profileHandler))
 
 	port := os.Getenv("PORT")
 	if port == "" {

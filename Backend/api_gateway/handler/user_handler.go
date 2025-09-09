@@ -109,8 +109,18 @@ func (h *APIUserHandler) CreateUserHandler(w http.ResponseWriter, r *http.Reques
 	json.NewEncoder(w).Encode(resp)
 }
 
-// GetAllUsersHandler vraća sve korisnike (zaštićeno JWT)
 func (h *APIUserHandler) GetAllUsersHandler(w http.ResponseWriter, r *http.Request) {
+	userRole, ok := r.Context().Value("userRole").(string)
+	if !ok || userRole == "" {
+		http.Error(w, "Could not retrieve user role from context", http.StatusInternalServerError)
+		return
+	}
+
+	if userRole != "ADMIN" {
+		http.Error(w, "Forbidden: an admin role is required to access this resource", http.StatusForbidden)
+		return
+	}
+
 	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
 	defer cancel()
 
