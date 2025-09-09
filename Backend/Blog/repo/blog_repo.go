@@ -37,12 +37,11 @@ func (r *blogRepository) CreateBlog(ctx context.Context, blog *model.Blog) (*pri
 }
 
 func (r *blogRepository) GetBlogs(ctx context.Context, authorIDs []string) ([]model.Blog, error) {
-	// Ako je lista ID-jeva prazna, nema potrebe za upitom, vraćamo prazan slice
+	
 	if len(authorIDs) == 0 {
 		return []model.Blog{}, nil
 	}
 
-	// Koristimo $in operator da nađemo sve blogove gde se user_id poklapa sa bilo kojim ID-jem iz liste
 	filter := bson.M{"user_id": bson.M{"$in": authorIDs}}
 
 	var blogs []model.Blog

@@ -10,6 +10,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/pavlovicisidora/soa-team7/Backend/APIGateway/middleware"
 	blog_proto "github.com/pavlovicisidora/soa-team7/Backend/Blog/proto"
+	follower_proto "github.com/pavlovicisidora/soa-team7/Backend/Follower/proto"
 )
 
 func (h *BlogHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -34,11 +35,15 @@ type Image struct {
 }
 
 type BlogHandler struct {
-	client blog_proto.BlogServiceClient
+	client         blog_proto.BlogServiceClient
+	followerClient follower_proto.FollowerServiceClient
 }
 
-func NewBlogHandler(client blog_proto.BlogServiceClient) *BlogHandler {
-	return &BlogHandler{client: client}
+func NewBlogHandler(client blog_proto.BlogServiceClient, followerClient follower_proto.FollowerServiceClient) *BlogHandler {
+	return &BlogHandler{
+		client:         client,
+		followerClient: followerClient,
+	}
 }
 
 func (h *BlogHandler) CreateBlogHandler(w http.ResponseWriter, r *http.Request) {
@@ -85,11 +90,38 @@ func (h *BlogHandler) CreateBlogHandler(w http.ResponseWriter, r *http.Request) 
 }
 
 func (h *BlogHandler) GetAllBlogsHandler(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
+
+	userID, ok := r.Context().Value(middleware.UserKey).(string)
+	if !ok || userID == "" {
+		http.Error(w, "User not authenticated", http.StatusUnauthorized)
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
+
 	defer cancel()
 
-	resp, err := h.client.GetAllBlogs(ctx, &blog_proto.GetAllBlogsRequest{})
+	followingResp, err := h.followerClient.GetFollowing(ctx, &follower_proto.GetFollowingRequest{UserId: userID})
 	if err != nil {
+		log.Printf("Failed to get following list from Follower service: %v", err)
+		http.Error(w, "Failed to get user's following list", http.StatusInternalServerError)
+		return
+	}
+
+	var followingUserIDs []string
+	for _, user := range followingResp.Users {
+		followingUserIDs = append(followingUserIDs, user.UserId)
+	}
+
+	followingUserIDs = append(followingUserIDs, userID)
+
+	grpcRequest := &blog_proto.GetAllBlogsRequest{
+		FollowedUserIds: followingUserIDs,
+	}
+
+	resp, err := h.client.GetAllBlogs(ctx, grpcRequest)
+	if err != nil {
+		log.Printf("Failed to get blogs from Blog service: %v", err)
 		http.Error(w, "Failed to get blogs", http.StatusInternalServerError)
 		return
 	}

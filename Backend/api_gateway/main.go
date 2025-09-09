@@ -72,7 +72,7 @@ func main() {
 	followerHandler := handler.NewFollowerHandler(followerClient)
 
 	blogClient := blog_proto.NewBlogServiceClient(conn)
-	blogHandler := handler.NewBlogHandler(blogClient)
+	blogHandler := handler.NewBlogHandler(blogClient, followerClient)
 
 	commentClient := blog_proto.NewCommentServiceClient(conn)
 	commentHandler := handler.NewCommentHandler(commentClient)
