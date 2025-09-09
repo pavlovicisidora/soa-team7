@@ -49,6 +49,13 @@ func main() {
 	}
 	defer connTour.Close()
 
+	stakeholdersGrpcAddress := "stakeholders-server:8089"
+	stakeholdersConn, err := grpc.NewClient(stakeholdersGrpcAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("Failed to connect to stakeholders gRPC service: %v", err)
+	}
+	defer stakeholdersConn.Close()
+
 	connStakeholders, err := grpc.NewClient(stakeholdersServiceAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("Failed to connect to tour service: %v", err)
@@ -65,7 +72,7 @@ func main() {
 	followerHandler := handler.NewFollowerHandler(followerClient)
 
 	blogClient := blog_proto.NewBlogServiceClient(conn)
-	blogHandler := handler.NewBlogHandler(blogClient)
+	blogHandler := handler.NewBlogHandler(blogClient, followerClient)
 
 	commentClient := blog_proto.NewCommentServiceClient(conn)
 	commentHandler := handler.NewCommentHandler(commentClient)
@@ -88,6 +95,7 @@ func main() {
 	///NOVOO
 	stakeholdersClient := stakeholders_proto.NewStakeholderServiceClient(connStakeholders)
 	userHandler := handler.NewAPIUserHandler(stakeholdersClient)
+	profileHandler := handler.NewProfileHandler(stakeholdersClient)
 	////
 
 	router := mux.NewRouter()
@@ -109,6 +117,7 @@ func main() {
 	apiRouter.PathPrefix("/tours").Handler(http.StripPrefix("/api", tourHandler))
 	apiRouter.PathPrefix("/keypoints").Handler(http.StripPrefix("/api", keyPointHandler))
 	apiRouter.PathPrefix("/reviews").Handler(http.StripPrefix("/api", reviewHandler))
+	apiRouter.PathPrefix("/profile").Handler(http.StripPrefix("/api", profileHandler))
 
 	port := os.Getenv("PORT")
 	if port == "" {

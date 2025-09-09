@@ -10,6 +10,7 @@ import { JwtInterceptor } from './core/interceptors/jwt.interceptor';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { AuthModule } from "src/app/auth/auth.module";
 import { TourModule } from './feature-modules/tour/tour.module';
+import { StakeholderModule } from './feature-modules/stakeholder/stakeholder.module';
 
 @NgModule({
   declarations: [
@@ -24,8 +25,9 @@ import { TourModule } from './feature-modules/tour/tour.module';
     HttpClientModule,
     BlogModule,
     AuthModule,
-    TourModule
-
+    TourModule,
+    StakeholderModule,
+    BlogModule,
 ],
   providers: [
     { 

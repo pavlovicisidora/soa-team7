@@ -8,19 +8,16 @@ import (
 	"github.com/pavlovicisidora/soa-team7/Backend/Follower/model"
 )
 
-// UserRepository definiše interfejs za operacije sa korisnicima u bazi.
 type FollowRepository interface {
 	FollowUser(ctx context.Context, followerId string, followedId string) error
 	GetFollowing(ctx context.Context, followerId string) ([]*model.User, error)
 	GetFollowRecommendations(ctx context.Context, userId string) ([]*model.User, error)
 }
 
-// neo4jUserRepository je implementacija interfejsa za Neo4j bazu.
 type neo4jFollowRepository struct {
 	driver neo4j.DriverWithContext
 }
 
-// NewNeo4jUserRepository kreira novu instancu repository-ja.
 func NewNeo4jFollowRepository(driver neo4j.DriverWithContext) FollowRepository {
 	return &neo4jFollowRepository{driver: driver}
 }
@@ -29,7 +26,6 @@ func (r *neo4jFollowRepository) FollowUser(ctx context.Context, followerId strin
 	session := r.driver.NewSession(ctx, neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
 	defer session.Close(ctx)
 
-	// Koristimo ExecuteWrite za transakcione operacije pisanja.
 	_, err := session.ExecuteWrite(ctx,
 		func(tx neo4j.ManagedTransaction) (interface{}, error) {
 			query := `
@@ -78,13 +74,12 @@ func (r *neo4jFollowRepository) GetFollowing(ctx context.Context, followerId str
 				return nil, err
 			}
 
-			// <-- LOGIKA IZRADE MODELA
-			var followingUsers []*model.User // Kreiramo slice pointera na model
+			var followingUsers []*model.User
 			for res.Next(ctx) {
 				record := res.Record()
 				id, ok := record.Get("followedUserId")
 				if ok {
-					// Za svaki rezultat, kreiramo instancu našeg modela
+
 					user := &model.User{
 						UserID: id.(string),
 					}
@@ -104,10 +99,9 @@ func (r *neo4jFollowRepository) GetFollowing(ctx context.Context, followerId str
 	}
 
 	if result == nil {
-		return []*model.User{}, nil // Vraćamo prazan slice umesto nil
+		return []*model.User{}, nil
 	}
 
-	// Kastujemo rezultat u odgovarajući tip
 	return result.([]*model.User), nil
 }
 

@@ -83,16 +83,16 @@ func (h *BlogHandler) GetBlog(ctx context.Context, req *pb.GetBlogRequest) (*pb.
 }
 
 func (h *BlogHandler) GetAllBlogs(ctx context.Context, req *pb.GetAllBlogsRequest) (*pb.GetAllBlogsResponse, error) {
-	// 1. Dobijamo listu ID-jeva iz gRPC zahteva
+	
 	followedUserIDs := req.GetFollowedUserIds()
 
-	// 2. Pozivamo servis sa dobijenom listom
+	
 	blogs, err := h.blogService.GetAllBlogs(ctx, followedUserIDs)
 	if err != nil {
 		return nil, err
 	}
 
-	// 3. Konvertujemo rezultat u proto poruke (ostatak koda je isti)
+	
 	var protoBlogs []*pb.Blog
 	for _, blog := range blogs {
 		protoBlogs = append(protoBlogs, toProtoBlog(&blog))

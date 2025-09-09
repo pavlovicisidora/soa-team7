@@ -197,3 +197,34 @@ func (s *StakeholderGRPCServer) BlockUser(ctx context.Context, req *pb.BlockUser
 	log.Printf("gRPC BlockUser successful for user: %s", username)
 	return &pb.BlockUserResponse{}, nil
 }
+
+func (h *StakeholderGRPCServer) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.GetUserResponse, error) {
+	userID, err := primitive.ObjectIDFromHex(req.GetUserId())
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid User ID format")
+	}
+
+	user, err := h.UserService.FindById(ctx, userID)
+	if err != nil {
+		return nil, status.Errorf(codes.NotFound, "User not found")
+	}
+
+	protoUser := &pb.UserPS{
+		Id:        user.ID.Hex(),
+		Username:  user.Username,
+		Mail:      user.Mail,
+		Role:      user.Role,
+		Latitude:  user.Latitude,
+		Longitude: user.Longitude,
+	}
+
+	return &pb.GetUserResponse{User: protoUser}, nil
+}
+
+func (h *StakeholderGRPCServer) UpdateUserPosition(ctx context.Context, req *pb.UpdateUserPositionRequest) (*pb.UpdateUserPositionResponse, error) {
+	err := h.UserService.UpdateUserPosition(ctx, req.GetUserId(), req.GetLat(), req.GetLong())
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Failed to update position: %v", err)
+	}
+	return &pb.UpdateUserPositionResponse{Status: "position updated"}, nil
+}
