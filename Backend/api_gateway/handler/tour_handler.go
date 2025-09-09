@@ -38,7 +38,6 @@ func (h *TourHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	router.ServeHTTP(w, r)
 }
-
 func (h *TourHandler) CreateTour(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(middleware.UserKey).(string)
 	if !ok || userID == "" {
