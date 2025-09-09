@@ -49,6 +49,13 @@ func main() {
 	}
 	defer connTour.Close()
 
+	stakeholdersGrpcAddress := "stakeholders-server:8089"
+	stakeholdersConn, err := grpc.NewClient(stakeholdersGrpcAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("Failed to connect to stakeholders gRPC service: %v", err)
+	}
+	defer stakeholdersConn.Close()
+
 	connStakeholders, err := grpc.NewClient(stakeholdersServiceAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("Failed to connect to tour service: %v", err)

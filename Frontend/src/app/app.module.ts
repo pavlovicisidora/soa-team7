@@ -26,8 +26,8 @@ import { StakeholderModule } from './feature-modules/stakeholder/stakeholder.mod
     BlogModule,
     AuthModule,
     TourModule,
-    StakeholderModule
-
+    StakeholderModule,
+    BlogModule,
 ],
   providers: [
     { 

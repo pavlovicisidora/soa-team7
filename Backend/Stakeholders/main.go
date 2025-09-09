@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
-	"github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/handler"  // REST i gRPC handleri sada
-	pb "github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/proto" // gRPC proto fajl
+	"github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/handler"
+	pb "github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/proto"
 	"github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/repo"
 	"github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/service"
 	"go.mongodb.org/mongo-driver/mongo"

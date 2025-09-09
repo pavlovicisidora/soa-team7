@@ -31,6 +31,8 @@ func (h *APIUserHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	router.HandleFunc("/users/public", h.GetUserPublicInfoHandler).Methods("GET")
 	router.HandleFunc("/users/login", h.LoginHandler).Methods("POST")
 	router.HandleFunc("/users/register", h.CreateUserHandler).Methods("POST")
+	router.HandleFunc("/users/user", h.GetUser).Methods("GET")
+	router.HandleFunc("/users/position", h.UpdateUserPosition).Methods("PUT")
 
 	// Zaštićene rute sa JWT middleware
 	protected := router.NewRoute().Subrouter()
@@ -155,4 +157,50 @@ func (h *APIUserHandler) BlockUserHandler(w http.ResponseWriter, r *http.Request
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(resp.ProtoReflect())
+}
+
+func (h *APIUserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
+	userID := r.Context().Value(middleware.UserKey).(string)
+
+	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
+	defer cancel()
+
+	resp, err := h.client.GetUser(ctx, &pb.GetUserRequest{UserId: userID})
+	if err != nil {
+		http.Error(w, "Failed to get profile via gRPC", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(resp.GetUser())
+}
+
+func (h *APIUserHandler) UpdateUserPosition(w http.ResponseWriter, r *http.Request) {
+	userID := r.Context().Value(middleware.UserKey).(string)
+
+	var reqBody struct {
+		Lat  float64 `json:"lat"`
+		Long float64 `json:"long"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
+	defer cancel()
+
+	_, err := h.client.UpdateUserPosition(ctx, &pb.UpdateUserPositionRequest{
+		UserId: userID,
+		Lat:    reqBody.Lat,
+		Long:   reqBody.Long,
+	})
+	if err != nil {
+		http.Error(w, "Failed to update position via gRPC", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"status": "position updated"})
 }

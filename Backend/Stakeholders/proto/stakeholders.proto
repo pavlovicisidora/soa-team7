@@ -12,6 +12,8 @@ service StakeholderService {
   rpc BlockUser(BlockUserRequest) returns (BlockUserResponse);
   rpc PatchProfile(PatchProfileRequest) returns (PatchProfileResponse);
   rpc GetUserProfileById(GetUserProfileByIdRequest) returns (GetUserProfileByIdResponse);
+  rpc GetUser(GetUserRequest) returns (GetUserResponse);
+  rpc UpdateUserPosition(UpdateUserPositionRequest) returns (UpdateUserPositionResponse);
 }
 
 message GetUserPublicInfoRequest {
@@ -84,4 +86,31 @@ message PatchProfileRequest {
   string motto = 6;
 }
 message PatchProfileResponse {
+}
+
+message GetUserRequest {
+  string user_id = 1;
+}
+// Position Simulator
+message UserPS {
+  string id = 1;
+  string username = 2;
+  string mail = 3;
+  string role = 4;
+  double latitude = 5;
+  double longitude = 6;
+}
+
+message GetUserResponse {
+  UserPS user = 1;
+}
+
+message UpdateUserPositionRequest {
+  string user_id = 1;
+  double lat = 2;
+  double long = 3;
+}
+
+message UpdateUserPositionResponse {
+  string status = 1;
 }

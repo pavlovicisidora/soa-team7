@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { BlogListComponent } from './feature-modules/blog/blog-list/blog-list.component';
 import { BlogCreateComponent } from './feature-modules/blog/blog-create/blog-create.component';
+import { PositionSimulatorComponent } from './feature-modules/stakeholder/position-simulator/position-simulator.component';
 import { LoginComponent } from './auth/login/login.component';
 import { RegisterComponent } from './auth/register/register.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
@@ -24,6 +25,7 @@ const routes: Routes = [
   { path: 'tours/:id', component: TourDetailComponent }, 
   { path: 'user-list', component: UserListComponent},
   { path: 'profile', component: ProfileComponent},
+  { path: 'position-simulator', component: PositionSimulatorComponent }
 ];
 
 @NgModule({
