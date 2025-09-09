@@ -9,6 +9,8 @@ import { TourCreateComponent } from './feature-modules/tour/tour-create/tour-cre
 import { TourListComponent } from './feature-modules/tour/tour-list/tour-list.component';
 import { PublicTourListComponent } from './feature-modules/tour/public-tour-list/public-tour-list.component';
 import { TourDetailComponent } from './feature-modules/tour/tour-detail/tour-detail.component';
+import { UserListComponent } from './feature-modules/stakeholder/user-list/user-list.component';
+import { ProfileComponent } from './feature-modules/stakeholder/profile/profile.component';
 
 const routes: Routes = [
   { path: 'blog-list', component: BlogListComponent },
@@ -19,7 +21,9 @@ const routes: Routes = [
   { path: 'create-tour', component: TourCreateComponent},
   { path: 'tour-list', component: TourListComponent},
   { path: 'public-tour-list', component: PublicTourListComponent},
-  { path: 'tours/:id', component: TourDetailComponent } 
+  { path: 'tours/:id', component: TourDetailComponent }, 
+  { path: 'user-list', component: UserListComponent},
+  { path: 'profile', component: ProfileComponent},
 ];
 
 @NgModule({

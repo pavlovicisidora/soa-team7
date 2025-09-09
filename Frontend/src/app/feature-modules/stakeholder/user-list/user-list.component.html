@@ -1,0 +1,34 @@
+<div class="user-list-container">
+  <h2>User Accounts</h2>
+
+  <div *ngIf="errorMessage" class="error-message">
+    <p>{{ errorMessage }}</p>
+  </div>
+
+  <div *ngIf="!errorMessage && users.length > 0" class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Role</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users">
+          <td>{{ user.username }}</td>
+          <td>{{ user.role }}</td>
+          <td>
+            <span [ngClass]="{'status-active': !user.blocked, 'status-blocked': user.blocked}">
+              {{ user.blocked ? 'Blocked' : 'Active' }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div *ngIf="!errorMessage && users.length === 0">
+    <p>No user accounts found.</p>
+  </div>
+</div>
