@@ -1,0 +1,34 @@
+<div class="profile-container">
+  <div *ngIf="profile; else statusDisplay" class="profile-card">
+    <div class="profile-header">
+      <img [src]="profile.profilePic || 'assets/default-avatar.png'" alt="Profile Picture" class="profile-picture">
+      <div class="profile-name">
+        <h2>{{ profile.name }} {{ profile.surname }}</h2>
+      </div>
+    </div>
+
+    <div class="profile-body">
+      <div class="profile-section">
+        <h3>Biography</h3>
+        <p>{{ profile.bio || 'No biography provided.' }}</p>
+      </div>
+
+      <div class="profile-section">
+        <h3>Motto</h3>
+        <blockquote class="motto">
+          "{{ profile.motto || 'No motto provided.' }}"
+        </blockquote>
+      </div>
+    </div>
+
+    <div class="profile-footer">
+      <button class="edit-button">Edit Profile</button>
+    </div>
+  </div>
+
+  <ng-template #statusDisplay>
+    <div class="status-message">
+      <p>{{ statusMessage }}</p>
+    </div>
+  </ng-template>
+</div>

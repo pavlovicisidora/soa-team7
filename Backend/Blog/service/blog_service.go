@@ -11,7 +11,7 @@ import (
 
 type BlogService interface {
 	CreateBlog(ctx context.Context, title, content string, images []model.Image, userID string) (*model.Blog, error)
-	GetAllBlogs(ctx context.Context) ([]model.Blog, error)
+	GetAllBlogs(ctx context.Context, authorIDs []string) ([]model.Blog, error)
 	GetBlogByID(ctx context.Context, id string) (*model.Blog, error)
 	LikeBlog(ctx context.Context, blogID, userID string) (*model.Blog, error)
 	UnlikeBlog(ctx context.Context, blogID, userID string) (*model.Blog, error)
@@ -45,8 +45,8 @@ func (s *blogService) CreateBlog(ctx context.Context, title, content string, ima
 	return newBlog, nil
 }
 
-func (s *blogService) GetAllBlogs(ctx context.Context) ([]model.Blog, error) {
-	return s.blogRepo.GetBlogs(ctx)
+func (s *blogService) GetAllBlogs(ctx context.Context, authorIDs []string) ([]model.Blog, error) {
+	return s.blogRepo.GetBlogs(ctx, authorIDs)
 }
 
 func (s *blogService) GetBlogByID(ctx context.Context, id string) (*model.Blog, error) {

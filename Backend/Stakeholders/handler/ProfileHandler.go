@@ -1,87 +1,88 @@
 package handler
 
 import (
-	"encoding/json"
-	"net/http"
-	"strings"
+	"context"
+	"log"
 
-	"github.com/gorilla/mux"
-	"github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/auth"
+	"github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/model"
+	pb "github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/proto"
 	"github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/service"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type ProfileHandler struct {
 	ProfileService *service.ProfileService
+	pb.UnimplementedStakeholderServiceServer
 }
 
-func (handler *ProfileHandler) FindByUserId(writer http.ResponseWriter, req *http.Request) {
-	tokenStr := req.Header.Get("Authorization") // "Bearer <token>"
-	tokenStr = strings.TrimPrefix(tokenStr, "Bearer ")
-
-	claims, err := auth.VerifyJWT(tokenStr)
-	if err != nil {
-		http.Error(writer, "Unathorized"+err.Error(), http.StatusUnauthorized)
-		return
+func toProtoProfile(profile *model.Profile) *pb.GetUserProfileByIdResponse {
+	if profile == nil {
+		return nil
 	}
-
-	if claims.Role != "TURISTA" && claims.Role != "VODIC" {
-		http.Error(writer, "Forbidden: only TURISTA AND VODIC can see user profile", http.StatusForbidden)
-		return
+	return &pb.GetUserProfileByIdResponse{
+		Name:          profile.Name,
+		Surname:       profile.Surname,
+		ProfilePicUrl: profile.ProfilePic,
+		Bio:           profile.Bio,
+		Motto:         profile.Motto,
 	}
-	userIdStr := mux.Vars(req)["userId"]
+}
+
+func (s *StakeholderGRPCServer) GetUserProfileById(ctx context.Context, req *pb.GetUserProfileByIdRequest) (*pb.GetUserProfileByIdResponse, error) {
+	log.Printf("gRPC GetUserProfileById request for user ID: %s", req.GetUserId())
+
+	userIdStr := req.GetUserId()
+	if userIdStr == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "User ID cannot be empty")
+	}
 	userId, err := primitive.ObjectIDFromHex(userIdStr)
 	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid user ID format")
+	}
 
-		http.Error(writer, "Invalid user ID format", http.StatusBadRequest)
-		return
-	}
-	profile, err := handler.ProfileService.GetUserProfile(req.Context(), userId)
+	profile, err := s.ProfileService.GetUserProfile(ctx, userId)
 	if err != nil {
-		http.Error(writer, "Profile not found", http.StatusNotFound)
-		return
+		log.Printf("Profile not found for ID %s: %v", userIdStr, err)
+		return nil, status.Errorf(codes.NotFound, "Profile not found for user ID: %s", userIdStr)
 	}
-	writer.Header().Set("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusOK)
-	json.NewEncoder(writer).Encode(profile)
+	return toProtoProfile(profile), nil
 }
+func (s *StakeholderGRPCServer) PatchProfile(ctx context.Context, req *pb.PatchProfileRequest) (*pb.PatchProfileResponse, error) {
+	log.Println("gRPC PatchProfile request received.")
 
-func (handler *ProfileHandler) PatchProfile(w http.ResponseWriter, r *http.Request) {
-	// 1. JWT iz headera
-	tokenStr := r.Header.Get("Authorization")
-	if tokenStr == "" {
-		http.Error(w, "Missing token", http.StatusUnauthorized)
-		return
-	}
-
-	tokenStr = strings.TrimPrefix(tokenStr, "Bearer ")
-
-	claims, err := auth.VerifyJWT(tokenStr)
+	userId, err := primitive.ObjectIDFromHex(req.GetUserId())
 	if err != nil {
-		http.Error(w, "Invalid token", http.StatusUnauthorized)
-		return
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid user ID in token")
 	}
 
-	// 2. Pretvori userID iz tokena u ObjectID
-	userId, err := primitive.ObjectIDFromHex(claims.UserID)
-	if err != nil {
-		http.Error(w, "Invalid user ID", http.StatusBadRequest)
-		return
+	updates := make(map[string]interface{})
+
+	if req.GetName() != "" {
+		updates["name"] = req.GetName()
+	}
+	if req.GetSurname() != "" {
+		updates["surname"] = req.GetSurname()
+	}
+	if req.GetProfilePicUrl() != "" {
+		updates["picture"] = req.GetProfilePicUrl()
+	}
+	if req.GetBio() != "" {
+		updates["bio"] = req.GetBio()
+	}
+	if req.GetMotto() != "" {
+		updates["motto"] = req.GetMotto()
 	}
 
-	// 3. Parsiraj samo polja koja korisnik želi da menja
-	var updates map[string]interface{}
-	if err := json.NewDecoder(r.Body).Decode(&updates); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
-		return
+	if len(updates) == 0 {
+		return nil, status.Errorf(codes.InvalidArgument, "No fields to update")
 	}
 
-	// 4. Pozovi servis za partial update
-	if err := handler.ProfileService.UpdateUserProfileFields(r.Context(), userId, updates); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+	if err := s.ProfileService.UpdateUserProfileFields(ctx, userId, updates); err != nil {
+		return nil, status.Errorf(codes.Internal, "Failed to update profile: %v", err)
 	}
 
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{"message": "Profile updated successfully"})
+	log.Printf("Successfully patched profile for user ID: %s", userId.Hex())
+	return &pb.PatchProfileResponse{}, nil
 }
