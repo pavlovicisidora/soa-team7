@@ -11,7 +11,6 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 import { AuthModule } from "src/app/auth/auth.module";
 import { TourModule } from './feature-modules/tour/tour.module';
 import { StakeholderModule } from './feature-modules/stakeholder/stakeholder.module';
-import { StakeholdersModule } from './feature-modules/stakeholders/stakeholders.module';
 
 @NgModule({
   declarations: [
@@ -29,7 +28,6 @@ import { StakeholdersModule } from './feature-modules/stakeholders/stakeholders.
     TourModule,
     StakeholderModule,
     BlogModule,
-    StakeholdersModule
 ],
   providers: [
     { 

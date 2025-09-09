@@ -1,7 +1,7 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import * as L from 'leaflet';
-import { StakeholdersService } from '../stakeholders.service';
 import { UserProfile } from '../user-profile.model';
+import { StakeholderService } from '../stakeholder.service';
 
 const iconRetinaUrl = 'assets/marker-icon-2x-blue.png';
 const iconUrl = 'assets/marker-icon-blue.png';
@@ -28,7 +28,7 @@ export class PositionSimulatorComponent implements AfterViewInit {
   private marker: any;
   public currentUser: UserProfile | null = null;
 
-  constructor(private stakeholderService: StakeholdersService) { }
+  constructor(private stakeholderService: StakeholderService) { }
 
   ngAfterViewInit(): void {
     this.initMap();
