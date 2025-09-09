@@ -3,46 +3,22 @@ package main
 import (
 	"context"
 	"log"
-	"net/http"
+	"net"
 	"os"
 	"time"
 
-	"github.com/gorilla/handlers"
-	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
-	"github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/handler"
+	"github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/handler"  // REST i gRPC handleri sada
+	pb "github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/proto" // gRPC proto fajl
 	"github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/repo"
 	"github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/service"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
-func startServer(userHandler *handler.UserHandler, profileHandler *handler.ProfileHandler, router *mux.Router) {
-
-	router.HandleFunc("/users", userHandler.GetAllUsers).Methods("GET")
-
-	router.HandleFunc("/register", userHandler.Create).Methods("POST")
-
-	router.HandleFunc("/login", userHandler.Login).Methods("POST")
-
-	router.HandleFunc("/blockUser/{username}", userHandler.BlockUser).Methods("PUT")
-
-	router.HandleFunc("/usersInfo/", userHandler.FindAllInfo).Methods("GET")
-	router.HandleFunc("/profiles/{userId}", profileHandler.FindByUserId).Methods("GET")
-	router.HandleFunc("/profile", profileHandler.PatchProfile).Methods("PATCH")
-	corsObj := handlers.CORS(
-		handlers.AllowedOrigins([]string{"http://localhost:4200"}),
-		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"}),
-		handlers.AllowedHeaders([]string{"Content-Type", "Authorization"}),
-	)
-
-	log.Println("Server starting on port :8081...")
-	log.Fatal(http.ListenAndServe(":8081", corsObj(router)))
-
-}
-
 func main() {
-
 	err := godotenv.Load()
 	if err != nil {
 		log.Println("Error loading .env file, using default values.")
@@ -80,11 +56,29 @@ func main() {
 
 	userRepo := repo.NewUserRepository(client, dbName, collectionName)
 	userService := &service.UserService{UserRepository: userRepo}
-
 	profileService := &service.ProfileService{UserRepo: userRepo}
-	profileHandler := &handler.ProfileHandler{ProfileService: profileService}
-	userHandler := &handler.UserHandler{UserService: userService, ProfileService: profileService}
-	router := mux.NewRouter().StrictSlash(true)
 
-	startServer(userHandler, profileHandler, router)
+	// --- Pokretanje gRPC servera ---
+	grpcPort := os.Getenv("GRPC_PORT")
+	if grpcPort == "" {
+		grpcPort = "8081"
+	}
+
+	lis, err := net.Listen("tcp", ":"+grpcPort)
+	if err != nil {
+		log.Fatalf("Failed to listen for gRPC: %v", err)
+	}
+
+	grpcServer := grpc.NewServer()
+
+	// Koristi novi gRPC handler
+	grpcStakeholderServer := handler.NewStakeholderGRPCServer(*userService, *profileService)
+	pb.RegisterStakeholderServiceServer(grpcServer, grpcStakeholderServer)
+
+	reflection.Register(grpcServer)
+
+	log.Printf("Stakeholders gRPC server starting on port :%s...", grpcPort)
+	if err := grpcServer.Serve(lis); err != nil {
+		log.Fatalf("Failed to serve gRPC: %v", err)
+	}
 }

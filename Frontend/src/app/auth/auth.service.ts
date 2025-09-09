@@ -15,11 +15,11 @@ export class AuthService{
     constructor(private http: HttpClient) { }
 
     loginUser(username: string, password: string): Observable<LoginResponse> {
-        return this.http.post<LoginResponse>('http://localhost:8081/login', { username, password });
+        return this.http.post<LoginResponse>('http://localhost:8080/api/users/login', { username, password });
     }
 
     registerUser(userData: User) :Observable<User>{
-        return this.http.post<User>('http://localhost:8081/register', userData);
+        return this.http.post<User>('http://localhost:8080/api/users/register', userData);
     }
 
 

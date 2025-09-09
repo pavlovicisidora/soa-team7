@@ -3,16 +3,16 @@ package main
 import (
 	"log"
 	"net/http"
-	"net/http/httputil"
-	"net/url"
 	"os"
 
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/pavlovicisidora/soa-team7/Backend/APIGateway/handler"
 	"github.com/pavlovicisidora/soa-team7/Backend/APIGateway/middleware"
 	tour_proto "github.com/pavlovicisidora/soa-team7/Backend/APIGateway/proto"
 	blog_proto "github.com/pavlovicisidora/soa-team7/Backend/Blog/proto"
 	follower_proto "github.com/pavlovicisidora/soa-team7/Backend/Follower/proto"
+	stakeholders_proto "github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -49,6 +49,12 @@ func main() {
 	}
 	defer connTour.Close()
 
+	connStakeholders, err := grpc.NewClient(stakeholdersServiceAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("Failed to connect to tour service: %v", err)
+	}
+	defer connStakeholders.Close()
+
 	followerConn, err := grpc.NewClient(followerServiceAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("Failed to connect to follower service: %v", err)
@@ -59,7 +65,7 @@ func main() {
 	followerHandler := handler.NewFollowerHandler(followerClient)
 
 	blogClient := blog_proto.NewBlogServiceClient(conn)
-	blogHandler := handler.NewBlogHandler(blogClient, followerClient)
+	blogHandler := handler.NewBlogHandler(blogClient)
 
 	commentClient := blog_proto.NewCommentServiceClient(conn)
 	commentHandler := handler.NewCommentHandler(commentClient)
@@ -73,11 +79,17 @@ func main() {
 	reviewClient := tour_proto.NewReviewGrpcServiceClient(connTour)
 	reviewHandler := handler.NewReviewHandler(reviewClient)
 
-	stakeholdersURL, err := url.Parse("http://" + stakeholdersServiceAddress)
-	if err != nil {
-		log.Fatalf("Failed to parse stakeholders service URL: %v", err)
-	}
-	stakeholdersProxy := httputil.NewSingleHostReverseProxy(stakeholdersURL)
+	//stakeholdersURL, err := url.Parse("http://" + stakeholdersServiceAddress)
+	//if err != nil {
+	//	log.Fatalf("Failed to parse stakeholders service URL: %v", err)
+	//}
+	//stakeholdersProxy := httputil.NewSingleHostReverseProxy(stakeholdersURL)
+
+	///NOVOO
+	stakeholdersClient := stakeholders_proto.NewStakeholderServiceClient(connStakeholders)
+	userHandler := handler.NewAPIUserHandler(stakeholdersClient)
+	profileHandler := handler.NewProfileHandler(stakeholdersClient)
+	////
 
 	router := mux.NewRouter()
 	fs := http.FileServer(http.Dir("./uploads/"))
@@ -85,20 +97,20 @@ func main() {
 
 	publicApiRouter := router.PathPrefix("/api").Subrouter()
 	publicApiRouter.HandleFunc("/images/upload", handler.UploadImageHandler).Methods("POST")
+	publicApiRouter.HandleFunc("/users/login", userHandler.LoginHandler).Methods("POST")
+	publicApiRouter.HandleFunc("/users/register", userHandler.CreateUserHandler).Methods("POST")
 
 	apiRouter := router.PathPrefix("/api").Subrouter()
-
 	apiRouter.Use(middleware.AuthMiddleware)
 
 	apiRouter.PathPrefix("/blogs").Handler(http.StripPrefix("/api", blogHandler))
 	apiRouter.PathPrefix("/comments").Handler(http.StripPrefix("/api", commentHandler))
-	apiRouter.PathPrefix("/stakeholders").Handler(http.StripPrefix("/api", stakeholdersProxy))
-
+	apiRouter.PathPrefix("/users").Handler(http.StripPrefix("/api", userHandler))
 	apiRouter.PathPrefix("/follower").Handler(http.StripPrefix("/api", followerHandler))
-
 	apiRouter.PathPrefix("/tours").Handler(http.StripPrefix("/api", tourHandler))
 	apiRouter.PathPrefix("/keypoints").Handler(http.StripPrefix("/api", keyPointHandler))
 	apiRouter.PathPrefix("/reviews").Handler(http.StripPrefix("/api", reviewHandler))
+	apiRouter.PathPrefix("/profile").Handler(http.StripPrefix("/api", profileHandler))
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -106,7 +118,14 @@ func main() {
 	}
 
 	log.Printf("API Gateway starting on port %s", port)
-	if err := http.ListenAndServe(":"+port, router); err != nil {
+	allowedOrigins := handlers.AllowedOrigins([]string{"http://localhost:4200"})
+	allowedMethods := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"})
+	allowedHeaders := handlers.AllowedHeaders([]string{"Content-Type", "Authorization"})
+
+	corsRouter := handlers.CORS(allowedOrigins, allowedMethods, allowedHeaders)(router)
+
+	log.Printf("API Gateway starting on port %s", port)
+	if err := http.ListenAndServe(":"+port, corsRouter); err != nil {
 		log.Fatalf("Failed to start API Gateway: %v", err)
 	}
 }

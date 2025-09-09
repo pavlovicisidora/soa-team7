@@ -19,7 +19,13 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	StakeholderService_GetUserPublicInfo_FullMethodName = "/stakeholders.StakeholderService/GetUserPublicInfo"
+	StakeholderService_GetUserPublicInfo_FullMethodName  = "/stakeholders.StakeholderService/GetUserPublicInfo"
+	StakeholderService_GetAllUsers_FullMethodName        = "/stakeholders.StakeholderService/GetAllUsers"
+	StakeholderService_Create_FullMethodName             = "/stakeholders.StakeholderService/Create"
+	StakeholderService_Login_FullMethodName              = "/stakeholders.StakeholderService/Login"
+	StakeholderService_BlockUser_FullMethodName          = "/stakeholders.StakeholderService/BlockUser"
+	StakeholderService_PatchProfile_FullMethodName       = "/stakeholders.StakeholderService/PatchProfile"
+	StakeholderService_GetUserProfileById_FullMethodName = "/stakeholders.StakeholderService/GetUserProfileById"
 )
 
 // StakeholderServiceClient is the client API for StakeholderService service.
@@ -27,6 +33,12 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type StakeholderServiceClient interface {
 	GetUserPublicInfo(ctx context.Context, in *GetUserPublicInfoRequest, opts ...grpc.CallOption) (*GetUserPublicInfoResponse, error)
+	GetAllUsers(ctx context.Context, in *GetAllUsersRequest, opts ...grpc.CallOption) (*GetAllUsersResponse, error)
+	Create(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error)
+	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
+	BlockUser(ctx context.Context, in *BlockUserRequest, opts ...grpc.CallOption) (*BlockUserResponse, error)
+	PatchProfile(ctx context.Context, in *PatchProfileRequest, opts ...grpc.CallOption) (*PatchProfileResponse, error)
+	GetUserProfileById(ctx context.Context, in *GetUserProfileByIdRequest, opts ...grpc.CallOption) (*GetUserProfileByIdResponse, error)
 }
 
 type stakeholderServiceClient struct {
@@ -47,11 +59,77 @@ func (c *stakeholderServiceClient) GetUserPublicInfo(ctx context.Context, in *Ge
 	return out, nil
 }
 
+func (c *stakeholderServiceClient) GetAllUsers(ctx context.Context, in *GetAllUsersRequest, opts ...grpc.CallOption) (*GetAllUsersResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetAllUsersResponse)
+	err := c.cc.Invoke(ctx, StakeholderService_GetAllUsers_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *stakeholderServiceClient) Create(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateUserResponse)
+	err := c.cc.Invoke(ctx, StakeholderService_Create_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *stakeholderServiceClient) Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LoginResponse)
+	err := c.cc.Invoke(ctx, StakeholderService_Login_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *stakeholderServiceClient) BlockUser(ctx context.Context, in *BlockUserRequest, opts ...grpc.CallOption) (*BlockUserResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BlockUserResponse)
+	err := c.cc.Invoke(ctx, StakeholderService_BlockUser_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *stakeholderServiceClient) PatchProfile(ctx context.Context, in *PatchProfileRequest, opts ...grpc.CallOption) (*PatchProfileResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PatchProfileResponse)
+	err := c.cc.Invoke(ctx, StakeholderService_PatchProfile_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *stakeholderServiceClient) GetUserProfileById(ctx context.Context, in *GetUserProfileByIdRequest, opts ...grpc.CallOption) (*GetUserProfileByIdResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetUserProfileByIdResponse)
+	err := c.cc.Invoke(ctx, StakeholderService_GetUserProfileById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // StakeholderServiceServer is the server API for StakeholderService service.
 // All implementations must embed UnimplementedStakeholderServiceServer
 // for forward compatibility.
 type StakeholderServiceServer interface {
 	GetUserPublicInfo(context.Context, *GetUserPublicInfoRequest) (*GetUserPublicInfoResponse, error)
+	GetAllUsers(context.Context, *GetAllUsersRequest) (*GetAllUsersResponse, error)
+	Create(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
+	Login(context.Context, *LoginRequest) (*LoginResponse, error)
+	BlockUser(context.Context, *BlockUserRequest) (*BlockUserResponse, error)
+	PatchProfile(context.Context, *PatchProfileRequest) (*PatchProfileResponse, error)
+	GetUserProfileById(context.Context, *GetUserProfileByIdRequest) (*GetUserProfileByIdResponse, error)
 	mustEmbedUnimplementedStakeholderServiceServer()
 }
 
@@ -64,6 +142,24 @@ type UnimplementedStakeholderServiceServer struct{}
 
 func (UnimplementedStakeholderServiceServer) GetUserPublicInfo(context.Context, *GetUserPublicInfoRequest) (*GetUserPublicInfoResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserPublicInfo not implemented")
+}
+func (UnimplementedStakeholderServiceServer) GetAllUsers(context.Context, *GetAllUsersRequest) (*GetAllUsersResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllUsers not implemented")
+}
+func (UnimplementedStakeholderServiceServer) Create(context.Context, *CreateUserRequest) (*CreateUserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
+}
+func (UnimplementedStakeholderServiceServer) Login(context.Context, *LoginRequest) (*LoginResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
+}
+func (UnimplementedStakeholderServiceServer) BlockUser(context.Context, *BlockUserRequest) (*BlockUserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method BlockUser not implemented")
+}
+func (UnimplementedStakeholderServiceServer) PatchProfile(context.Context, *PatchProfileRequest) (*PatchProfileResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PatchProfile not implemented")
+}
+func (UnimplementedStakeholderServiceServer) GetUserProfileById(context.Context, *GetUserProfileByIdRequest) (*GetUserProfileByIdResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserProfileById not implemented")
 }
 func (UnimplementedStakeholderServiceServer) mustEmbedUnimplementedStakeholderServiceServer() {}
 func (UnimplementedStakeholderServiceServer) testEmbeddedByValue()                            {}
@@ -104,6 +200,114 @@ func _StakeholderService_GetUserPublicInfo_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
+func _StakeholderService_GetAllUsers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAllUsersRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StakeholderServiceServer).GetAllUsers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: StakeholderService_GetAllUsers_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StakeholderServiceServer).GetAllUsers(ctx, req.(*GetAllUsersRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _StakeholderService_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StakeholderServiceServer).Create(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: StakeholderService_Create_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StakeholderServiceServer).Create(ctx, req.(*CreateUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _StakeholderService_Login_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LoginRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StakeholderServiceServer).Login(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: StakeholderService_Login_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StakeholderServiceServer).Login(ctx, req.(*LoginRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _StakeholderService_BlockUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BlockUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StakeholderServiceServer).BlockUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: StakeholderService_BlockUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StakeholderServiceServer).BlockUser(ctx, req.(*BlockUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _StakeholderService_PatchProfile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PatchProfileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StakeholderServiceServer).PatchProfile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: StakeholderService_PatchProfile_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StakeholderServiceServer).PatchProfile(ctx, req.(*PatchProfileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _StakeholderService_GetUserProfileById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserProfileByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StakeholderServiceServer).GetUserProfileById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: StakeholderService_GetUserProfileById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StakeholderServiceServer).GetUserProfileById(ctx, req.(*GetUserProfileByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // StakeholderService_ServiceDesc is the grpc.ServiceDesc for StakeholderService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -114,6 +318,30 @@ var StakeholderService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUserPublicInfo",
 			Handler:    _StakeholderService_GetUserPublicInfo_Handler,
+		},
+		{
+			MethodName: "GetAllUsers",
+			Handler:    _StakeholderService_GetAllUsers_Handler,
+		},
+		{
+			MethodName: "Create",
+			Handler:    _StakeholderService_Create_Handler,
+		},
+		{
+			MethodName: "Login",
+			Handler:    _StakeholderService_Login_Handler,
+		},
+		{
+			MethodName: "BlockUser",
+			Handler:    _StakeholderService_BlockUser_Handler,
+		},
+		{
+			MethodName: "PatchProfile",
+			Handler:    _StakeholderService_PatchProfile_Handler,
+		},
+		{
+			MethodName: "GetUserProfileById",
+			Handler:    _StakeholderService_GetUserProfileById_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
