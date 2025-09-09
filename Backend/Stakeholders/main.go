@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"time"
@@ -11,10 +12,12 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 	"github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/handler"
+	pb "github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/proto"
 	"github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/repo"
 	"github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/service"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"google.golang.org/grpc"
 )
 
 func startServer(userHandler *handler.UserHandler, profileHandler *handler.ProfileHandler, router *mux.Router) {
@@ -84,6 +87,22 @@ func main() {
 	profileService := &service.ProfileService{UserRepo: userRepo}
 	profileHandler := &handler.ProfileHandler{ProfileService: profileService}
 	userHandler := &handler.UserHandler{UserService: userService, ProfileService: profileService}
+
+	go func() {
+		lis, err := net.Listen("tcp", ":8089") // Koristimo drugi port jer imamo i http i grpc trenutno za stakeholders
+		if err != nil {
+			log.Fatalf("failed to listen for gRPC: %v", err)
+		}
+
+		grpcServer := grpc.NewServer()
+		pb.RegisterStakeholderServiceServer(grpcServer, userHandler)
+
+		log.Println("gRPC server listening at :8089")
+		if err := grpcServer.Serve(lis); err != nil {
+			log.Fatalf("failed to serve gRPC: %v", err)
+		}
+	}()
+
 	router := mux.NewRouter().StrictSlash(true)
 
 	startServer(userHandler, profileHandler, router)

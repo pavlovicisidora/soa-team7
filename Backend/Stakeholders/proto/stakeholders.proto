@@ -11,6 +11,8 @@ package stakeholders;
 
 service StakeholderService {
   rpc GetUserPublicInfo(GetUserPublicInfoRequest) returns (GetUserPublicInfoResponse);
+  rpc GetUser(GetUserRequest) returns (GetUserResponse);
+  rpc UpdateUserPosition(UpdateUserPositionRequest) returns (UpdateUserPositionResponse);
 }
 
 message GetUserPublicInfoRequest {
@@ -24,4 +26,31 @@ message GetUserPublicInfoResponse {
   string name = 3;
   string surname = 4;
   string profile_pic_url = 5; // Koristimo URL za sliku
+}
+
+message GetUserRequest {
+  string user_id = 1;
+}
+
+message User {
+  string id = 1;
+  string username = 2;
+  string mail = 3;
+  string role = 4;
+  double latitude = 5;
+  double longitude = 6;
+}
+
+message GetUserResponse {
+  User user = 1;
+}
+
+message UpdateUserPositionRequest {
+  string user_id = 1;
+  double lat = 2;
+  double long = 3;
+}
+
+message UpdateUserPositionResponse {
+  string status = 1;
 }

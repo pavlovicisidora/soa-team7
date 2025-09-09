@@ -9,6 +9,7 @@ import { RouterModule } from '@angular/router';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { JwtInterceptor } from './core/interceptors/jwt.interceptor';
 import { NavbarComponent } from './components/navbar/navbar.component';
+import { StakeholdersModule } from './feature-modules/stakeholders/stakeholders.module';
 
 @NgModule({
   declarations: [
@@ -21,7 +22,8 @@ import { NavbarComponent } from './components/navbar/navbar.component';
     AppRoutingModule,
     RouterModule,
     HttpClientModule,
-    BlogModule
+    BlogModule,
+    StakeholdersModule
 ],
   providers: [
     { 

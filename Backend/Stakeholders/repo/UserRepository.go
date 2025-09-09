@@ -221,3 +221,17 @@ func (r *UserRepository) UpdateUserProfileFields(ctx context.Context, id primiti
 
 	return nil
 }
+
+func (r *UserRepository) UpdateUserPosition(ctx context.Context, id primitive.ObjectID, lat, long float64) error {
+	collection := r.client.Database(r.dbName).Collection(r.collectionName)
+	filter := bson.M{"_id": id}
+	update := bson.M{"$set": bson.M{"latitude": lat, "longitude": long}}
+	result, err := collection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return err
+	}
+	if result.MatchedCount == 0 {
+		return fmt.Errorf("user with id %s not found", id.Hex())
+	}
+	return nil
+}

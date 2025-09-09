@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v6.32.0
-// source: stakeholders.proto
+// source: proto/stakeholders.proto
 
 package proto
 
@@ -19,7 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	StakeholderService_GetUserPublicInfo_FullMethodName = "/stakeholders.StakeholderService/GetUserPublicInfo"
+	StakeholderService_GetUserPublicInfo_FullMethodName  = "/stakeholders.StakeholderService/GetUserPublicInfo"
+	StakeholderService_GetUser_FullMethodName            = "/stakeholders.StakeholderService/GetUser"
+	StakeholderService_UpdateUserPosition_FullMethodName = "/stakeholders.StakeholderService/UpdateUserPosition"
 )
 
 // StakeholderServiceClient is the client API for StakeholderService service.
@@ -27,6 +29,8 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type StakeholderServiceClient interface {
 	GetUserPublicInfo(ctx context.Context, in *GetUserPublicInfoRequest, opts ...grpc.CallOption) (*GetUserPublicInfoResponse, error)
+	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserResponse, error)
+	UpdateUserPosition(ctx context.Context, in *UpdateUserPositionRequest, opts ...grpc.CallOption) (*UpdateUserPositionResponse, error)
 }
 
 type stakeholderServiceClient struct {
@@ -47,11 +51,33 @@ func (c *stakeholderServiceClient) GetUserPublicInfo(ctx context.Context, in *Ge
 	return out, nil
 }
 
+func (c *stakeholderServiceClient) GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetUserResponse)
+	err := c.cc.Invoke(ctx, StakeholderService_GetUser_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *stakeholderServiceClient) UpdateUserPosition(ctx context.Context, in *UpdateUserPositionRequest, opts ...grpc.CallOption) (*UpdateUserPositionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateUserPositionResponse)
+	err := c.cc.Invoke(ctx, StakeholderService_UpdateUserPosition_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // StakeholderServiceServer is the server API for StakeholderService service.
 // All implementations must embed UnimplementedStakeholderServiceServer
 // for forward compatibility.
 type StakeholderServiceServer interface {
 	GetUserPublicInfo(context.Context, *GetUserPublicInfoRequest) (*GetUserPublicInfoResponse, error)
+	GetUser(context.Context, *GetUserRequest) (*GetUserResponse, error)
+	UpdateUserPosition(context.Context, *UpdateUserPositionRequest) (*UpdateUserPositionResponse, error)
 	mustEmbedUnimplementedStakeholderServiceServer()
 }
 
@@ -64,6 +90,12 @@ type UnimplementedStakeholderServiceServer struct{}
 
 func (UnimplementedStakeholderServiceServer) GetUserPublicInfo(context.Context, *GetUserPublicInfoRequest) (*GetUserPublicInfoResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserPublicInfo not implemented")
+}
+func (UnimplementedStakeholderServiceServer) GetUser(context.Context, *GetUserRequest) (*GetUserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUser not implemented")
+}
+func (UnimplementedStakeholderServiceServer) UpdateUserPosition(context.Context, *UpdateUserPositionRequest) (*UpdateUserPositionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserPosition not implemented")
 }
 func (UnimplementedStakeholderServiceServer) mustEmbedUnimplementedStakeholderServiceServer() {}
 func (UnimplementedStakeholderServiceServer) testEmbeddedByValue()                            {}
@@ -104,6 +136,42 @@ func _StakeholderService_GetUserPublicInfo_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
+func _StakeholderService_GetUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StakeholderServiceServer).GetUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: StakeholderService_GetUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StakeholderServiceServer).GetUser(ctx, req.(*GetUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _StakeholderService_UpdateUserPosition_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateUserPositionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StakeholderServiceServer).UpdateUserPosition(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: StakeholderService_UpdateUserPosition_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StakeholderServiceServer).UpdateUserPosition(ctx, req.(*UpdateUserPositionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // StakeholderService_ServiceDesc is the grpc.ServiceDesc for StakeholderService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -115,7 +183,15 @@ var StakeholderService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "GetUserPublicInfo",
 			Handler:    _StakeholderService_GetUserPublicInfo_Handler,
 		},
+		{
+			MethodName: "GetUser",
+			Handler:    _StakeholderService_GetUser_Handler,
+		},
+		{
+			MethodName: "UpdateUserPosition",
+			Handler:    _StakeholderService_UpdateUserPosition_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "stakeholders.proto",
+	Metadata: "proto/stakeholders.proto",
 }

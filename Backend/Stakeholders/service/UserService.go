@@ -95,3 +95,11 @@ func (service *UserService) FindById(ctx context.Context, id primitive.ObjectID)
 	return user, err
 
 }
+
+func (service *UserService) UpdateUserPosition(ctx context.Context, userID string, lat, long float64) error {
+	userObjectID, err := primitive.ObjectIDFromHex(userID)
+	if err != nil {
+		return fmt.Errorf("invalid userID format: %v", err)
+	}
+	return service.UserRepository.UpdateUserPosition(ctx, userObjectID, lat, long)
+}
