@@ -1,7 +1,7 @@
 <div class="profile-container">
   <div *ngIf="profile; else statusDisplay" class="profile-card">
     <div class="profile-header">
-      <img [src]="profile.profilePic || 'assets/default-avatar.png'" alt="Profile Picture" class="profile-picture">
+      <img [src]="'http://localhost:8080' + profile.profilePic" alt="Profile Picture" class="profile-picture">
       <div class="profile-name">
         <h2>{{ profile.name }} {{ profile.surname }}</h2>
       </div>

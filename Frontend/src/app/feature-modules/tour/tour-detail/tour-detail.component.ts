@@ -41,12 +41,9 @@ export class TourDetailComponent implements OnInit{
         this.tour = tour;
         this.reviews = reviews.map(review => {
         const timestamp = review.createdDate as any; 
-        return {
-          ...review,
-          createdDate: new Date(timestamp.seconds * 1000) 
-        };
-      });
-      },
+        return { ...review,  createdDate: new Date(timestamp.seconds * 1000)  };
+      }).sort((a, b) => b.createdDate.getTime() - a.createdDate.getTime());
+    },
       error: (err) => {
         console.error("Error loading the tour and reviews:", err);
       }
@@ -90,12 +87,12 @@ export class TourDetailComponent implements OnInit{
     ).subscribe({
       next: (newReview) => {
         console.log('Review successfully added', newReview);
-        const timestamp = newReview.createdDate as any;
-        const transformedNewReview = {
-          ...newReview,
-          createdDate: new Date(timestamp.seconds * 1000)
-        };
-        this.reviews = [transformedNewReview, ...this.reviews];
+      
+
+        if (this.tour) {
+          this.loadTourAndReviews(this.tour.id); 
+        }
+
         this.isUploading = false;
         this.selectedFiles = [];
         this.reviewForm.reset({
@@ -104,11 +101,10 @@ export class TourDetailComponent implements OnInit{
           visitingdate: null
         });
       },
-      error: (err) => {
-        console.error('Error while adding the review', err)
-        this.isUploading = false;
-      }
-      
-    });
+    error: (err) => {
+      console.error('Error while adding the review', err)
+      this.isUploading = false;
+    }
+  });
   }
 }

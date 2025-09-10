@@ -229,3 +229,23 @@ button[type="submit"]:disabled {
   margin: 0 0.5rem; 
   color: #aaa;
 }}
+.avatar-image {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #ddd; 
+}
+.review-info {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.author {
+  font-weight: bold;
+}
+
+.rating {
+  font-size: 0.9em;
+  color: #666;
+}
