@@ -84,7 +84,6 @@ func main() {
 	keyPointHandler := handler.NewKeyPointHandler(keyPointClient)
 
 	reviewClient := tour_proto.NewReviewGrpcServiceClient(connTour)
-	reviewHandler := handler.NewReviewHandler(reviewClient)
 
 	//stakeholdersURL, err := url.Parse("http://" + stakeholdersServiceAddress)
 	//if err != nil {
@@ -96,6 +95,7 @@ func main() {
 	stakeholdersClient := stakeholders_proto.NewStakeholderServiceClient(connStakeholders)
 	userHandler := handler.NewAPIUserHandler(stakeholdersClient)
 	profileHandler := handler.NewProfileHandler(stakeholdersClient)
+	reviewHandler := handler.NewReviewHandler(reviewClient, stakeholdersClient)
 	////
 
 	router := mux.NewRouter()
