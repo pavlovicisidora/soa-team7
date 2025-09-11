@@ -6,6 +6,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { PublicTourListComponent } from './public-tour-list/public-tour-list.component';
 import { TourDetailComponent } from './tour-detail/tour-detail.component';
 import { RouterModule } from '@angular/router';
+import { KeypointManageComponent } from './keypoint-manage/keypoint-manage.component';
 
 
 
@@ -14,7 +15,8 @@ import { RouterModule } from '@angular/router';
     TourCreateComponent,
     TourListComponent,
     PublicTourListComponent,
-    TourDetailComponent
+    TourDetailComponent,
+    KeypointManageComponent
   ],
   imports: [
     CommonModule,

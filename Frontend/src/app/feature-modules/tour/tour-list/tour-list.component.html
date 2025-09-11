@@ -17,6 +17,8 @@
           <span class="status status-{{ tour.status | lowercase }}">{{ tour.status }}</span>
           <span class="price">{{ tour.price | currency:'EUR' }}</span>
         </div>
+        <!-- Novo dugme za Keypoints -->
+        <button class="keypoints-button" (click)="goToKeypoints(tour.id)">Keypoints</button>
       </div>
     </div>
   </div>

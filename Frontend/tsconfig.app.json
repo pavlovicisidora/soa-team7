@@ -3,7 +3,11 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./out-tsc/app",
-    "types": []
+    "types": [],
+    "typeRoots": [
+      "node_modules/@types",
+      "src/typings" // Dodajte ovu liniju
+    ]
   },
   "files": [
     "src/main.ts"
