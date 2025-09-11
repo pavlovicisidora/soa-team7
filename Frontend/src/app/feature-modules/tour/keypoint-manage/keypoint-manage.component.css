@@ -4,7 +4,7 @@
   padding: 20px;
   gap: 20px;
   font-family: Arial, sans-serif;
-  height: 100vh; /* Da zauzme celu visinu viewporta */
+  height: auto; /* Da zauzme celu visinu viewporta */
   box-sizing: border-box; /* Uključuje padding u ukupnu visinu */
 }
 
@@ -72,14 +72,6 @@ table th {
 
 .delete-button:hover {
   background-color: #c82333;
-}
-
-.map-container {
-  flex: 1; /* Zauzima preostali prostor vertikalno */
-  height: 50%; /* Visina mape do pola ekrana */
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  overflow: hidden; /* Osigurava da mapa ne prelazi granice kontejnera */
 }
 
 .keypoint-form-section {
@@ -156,7 +148,7 @@ table th {
 /* Leaflet Override styles */
 /* Podesavanja za Leaflet mapu i routing machine */
 .leaflet-container {
-    height: 100%; /* Da mapa zauzme celu visinu .map-container div-a */
+    height: 500px; /* Da mapa zauzme celu visinu .map-container div-a */
     width: 100%;
 }
 .leaflet-routing-container {

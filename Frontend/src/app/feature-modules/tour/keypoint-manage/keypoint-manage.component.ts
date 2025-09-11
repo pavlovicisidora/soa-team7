@@ -9,6 +9,20 @@ import { TourService } from '../tour.service'; // Pretpostavka da imate Keypoint
 import { Keypoint } from '../keypoint.model';
 import { ActivatedRoute } from '@angular/router';
 
+const iconRetinaUrl = 'assets/marker-icon-2x-blue.png';
+const iconUrl = 'assets/marker-icon-blue.png';
+const shadowUrl = 'assets/marker-shadow.png';
+const iconDefault = L.icon({
+  iconRetinaUrl,
+  iconUrl,
+  shadowUrl,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  tooltipAnchor: [16, -28],
+  shadowSize: [41, 41]
+});
+L.Marker.prototype.options.icon = iconDefault;
 
 @Component({
   selector: 'app-keypoint-manage',
@@ -17,9 +31,9 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class KeypointManageComponent implements OnInit, OnDestroy {
   private tourId: number | undefined; // Ulazni parametar za ID ture
-  @ViewChild('mapContainer', { static: true }) mapContainer!: ElementRef;
 
-  private map: L.Map | undefined;
+  private map: any;
+  private marker: any;
   private markers: L.Marker[] = [];
   private routingControl: L.Routing.Control | undefined;
   private unsubscribe$: Subject<void> = new Subject<void>();
@@ -42,21 +56,24 @@ export class KeypointManageComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnInit(): void {
-    // Čitanje tourId iz URL parametra
-    this.route.paramMap.pipe(
-      takeUntil(this.unsubscribe$)
-    ).subscribe(params => {
-      const id = params.get('tourId');
-      if (id) {
-        this.tourId = +id; // Konvertuj string u number
-        this.initializeMap(); // Inicijalizacija mape nakon što dobijemo tourId
-        this.loadKeypointsForTour(this.tourId);
-      } else {
-        console.error('Tour ID not provided in route parameters.');
-        // Možete ovde preusmeriti korisnika ili prikazati poruku o grešci
-      }
-    });
+  ngAfterViewInit(): void{
+     //this.initializeMap();
+  }
+   ngOnInit(): void {
+    this.initializeMap();
+    this.route.paramMap
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(params => {
+        const id = params.get('tourId');
+        if (id) {
+          this.tourId = +id;
+          //this.initializeMap();
+          this.loadKeypointsForTour(this.tourId);
+          console.log("Tour ID:", this.tourId);
+        } else {
+          console.error('Tour ID not provided.');
+        }
+      });
   }
 
   ngOnDestroy(): void {
@@ -68,18 +85,43 @@ export class KeypointManageComponent implements OnInit, OnDestroy {
   }
 
   initializeMap(): void {
-    this.map = L.map(this.mapContainer.nativeElement).setView([44.7866, 20.4489], 10); // Centrirano na Beograd, zum 10
+    console.log("Inicijalizujem mapu...");
+    this.map = L.map('map', {
+          center: [44.7866, 20.4489],
+          zoom: 13
+        });
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+       maxZoom: 18,
+      attribution: '© OpenStreetMap'
     }).addTo(this.map);
 
+    console.log("Mapa inicijalizovana");
+
     this.map.on('click', (e: L.LeafletMouseEvent) => {
+      this.addMarker(e.latlng.lat, e.latlng.lng);
       this.keypointForm.patchValue({
         latitude: e.latlng.lat,
-        longitude: e.latlng.lng
+        longitude: e.latlng.lng,
       });
     });
+  }
+
+     private addMarker(lat: number, lng: number): void {
+      if(this.map != undefined){
+        if (this.marker) {
+          this.map.removeLayer(this.marker);
+        }
+        this.marker = L.marker([lat, lng])
+          .addTo(this.map)
+          .bindPopup(`Your selected location.`)
+          .openPopup();
+      }
+      }
+
+   // metoda za prikaz u html
+  public hasKeypoints(): boolean {
+    return this.keypoints && this.keypoints.length > 0;
   }
 
   loadKeypointsForTour(tourId: number): void {
@@ -88,8 +130,10 @@ export class KeypointManageComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (keypoints: Keypoint[]) => {
+          if (keypoints != null){
           this.keypoints = keypoints;
           this.updateMapAndRoute();
+          }
         },
         error: (err: any) => console.error('Error loading keypoints:', err)
       });
@@ -97,8 +141,12 @@ export class KeypointManageComponent implements OnInit, OnDestroy {
 
   updateMapAndRoute(): void {
     this.clearMarkersAndRoute();
+    if (this.keypoints.length != null){
+    if (this.keypoints && this.keypoints.length > 0) {
     this.keypoints.forEach(kp => this.addKeypointMarker(kp));
+    }
     this.drawRoute();
+  }
   }
 
   addKeypointMarker(keypoint: Keypoint): void {
@@ -112,6 +160,7 @@ export class KeypointManageComponent implements OnInit, OnDestroy {
       this.map!.removeControl(this.routingControl);
     }
 
+    if (this.keypoints.length != null){
     if (this.keypoints.length > 1) {
       const waypoints = this.keypoints.map(kp => L.latLng(kp.latitude, kp.longitude));
       this.routingControl = L.Routing.control({
@@ -125,6 +174,7 @@ export class KeypointManageComponent implements OnInit, OnDestroy {
         waypointIcon: false
       }).addTo(this.map!);
     }
+  }
   }
 
   clearMarkersAndRoute(): void {

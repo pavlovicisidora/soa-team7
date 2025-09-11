@@ -1,9 +1,8 @@
 <div class="keypoint-manage-container">
 
-
   <div class="keypoint-table-section">
     <h3>Postojeće ključne tačke</h3>
-    <table *ngIf="keypoints.length > 0; else noKeypoints">
+    <table *ngIf= hasKeypoints(); else noKeypoints>
       <thead>
         <tr>
           <th>Ime</th>
@@ -36,7 +35,8 @@
     </ng-template>
   </div>
 
-  <div #mapContainer class="map-container"></div>
+  <div id="map" style="height: 500px; width: 100%;"></div>
+
 
   <div class="keypoint-form-section">
     <h3>{{ editingKeypointId ? 'Izmeni ključnu tačku' : 'Dodaj novu ključnu tačku' }}</h3>

@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { catchError, Observable, of } from 'rxjs';
 import { Tour } from './tour.model';
 import { Keypoint } from './keypoint.model';
 
@@ -37,7 +37,13 @@ export class TourService {
   }
 
    getKeypointsByTourId(tourId: number): Observable<Keypoint[]> {
-    return this.http.get<Keypoint[]>(`http://localhost:8080/api/keypoints/${tourId}`);
+    return this.http.get<Keypoint[]>(`http://localhost:8080/api/keypoints/${tourId}`).pipe(
+      catchError(error => {
+        console.error('Error fetching keypoints:', error);
+        // U slučaju greške, vrati prazan niz umesto da propadne
+        return of([]);
+      })
+    );;
   }
 
   createKeypoint(keypoint: Omit<Keypoint, 'id'>): Observable<Keypoint> {
