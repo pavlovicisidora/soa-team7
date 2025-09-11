@@ -1,0 +1,156 @@
+.keypoint-manage-container {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  gap: 20px;
+  font-family: Arial, sans-serif;
+  height: auto; /* Da zauzme celu visinu viewporta */
+  box-sizing: border-box; /* Uključuje padding u ukupnu visinu */
+}
+
+h2, h3 {
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.keypoint-table-section {
+  flex: 0 0 auto; /* Neće se smanjivati ni širiti, zauzima svoj sadržaj */
+  max-height: 300px; /* Maksimalna visina tabele */
+  overflow-y: auto; /* Skrolbar ako je sadržaj veći */
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  background-color: #f9f9f9;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+table th, table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+table th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+.keypoint-image {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.edit-button, .delete-button {
+  padding: 8px 12px;
+  margin-right: 5px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.edit-button {
+  background-color: #007bff;
+  color: white;
+}
+
+.edit-button:hover {
+  background-color: #0056b3;
+}
+
+.delete-button {
+  background-color: #dc3545;
+  color: white;
+}
+
+.delete-button:hover {
+  background-color: #c82333;
+}
+
+.keypoint-form-section {
+  flex: 0 0 auto; /* Neće se smanjivati ni širiti */
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  background-color: #f9f9f9;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #555;
+}
+
+.form-group input[type="text"],
+.form-group textarea {
+  width: calc(100% - 20px); /* Oduzimamo padding */
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.form-group textarea {
+  resize: vertical; /* Omogućava vertikalno rastezanje */
+  min-height: 60px;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.save-button, .cancel-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-right: 10px;
+}
+
+.save-button {
+  background-color: #28a745;
+  color: white;
+}
+
+.save-button:hover {
+  background-color: #218838;
+}
+
+.save-button:disabled {
+  background-color: #94d3a2;
+  cursor: not-allowed;
+}
+
+.cancel-button {
+  background-color: #6c757d;
+  color: white;
+}
+
+.cancel-button:hover {
+  background-color: #5a6268;
+}
+
+/* Leaflet Override styles */
+/* Podesavanja za Leaflet mapu i routing machine */
+.leaflet-container {
+    height: 500px; /* Da mapa zauzme celu visinu .map-container div-a */
+    width: 100%;
+}
+.leaflet-routing-container {
+  display: none; /* Sakrijte panel sa rutama ako ne želite da se prikazuje */
+}
