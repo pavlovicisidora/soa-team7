@@ -1,0 +1,125 @@
+body, html {
+  margin: 0;
+  font-family: 'Open Sans', Arial, sans-serif;
+  background: #000;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  width: 100%;
+  background: #031926;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  z-index: 1000;
+}
+
+.navbar-links {
+  list-style: none;
+  display: flex;         /* flex layout */
+  flex-wrap: nowrap;     /* sve u jednom redu */
+  align-items: center;
+  gap: 10px;             /* razmak između linkova */
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+.navbar-item {
+  display: block;
+}
+
+.special-login {
+  margin-left: auto;      /* guranje Login u desni ugao */
+}
+
+.navbar-toggle {
+    display: none;
+  }
+
+.navbar-link {
+  color: #fff;
+  text-transform: uppercase;
+  text-decoration: none;
+  letter-spacing: 0.15em;
+  display: inline-block;
+  padding: 22px 20px;
+  position: relative;
+  transition: color 0.3s ease;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.navbar-link:after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 3px;
+  background: #fff;
+  transition: width 0.3s ease, left 0.3s ease;
+}
+
+.navbar-link:hover:after {
+  width: 100%;
+  left: 0;
+}
+
+@media screen and (max-width: 768px) {
+  .navbar-links {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 36px;
+    right: 0;
+    width: 100%;
+    background: #031926;
+    backdrop-filter: blur(10px);
+  }
+
+  .navbar-links.active {
+    display: flex;
+  }
+
+  .navbar-item {
+    display: block;
+    padding: 10px 0;
+  }
+
+  .navbar-toggle {
+    display: block;
+    font-size: 28px;
+    color: #fff;
+    cursor: pointer;
+  }
+}
+
+
+
+.login-link {
+  background: #031926;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 20px;
+  border: #3498db solid;
+  box-shadow: #2980b9 0px 0px 15px;
+  text-transform: uppercase;
+  text-decoration: none;
+  letter-spacing: 0.15em;
+  display: inline-block;
+  position: relative;
+  transition: color 0.3s ease;
+  font-size: 12px;
+  white-space: nowrap;
+  margin-right: 20px;
+}
+
+.login-link:hover {
+  background: #2980b9;
+  padding: 12px 24px;
+  margin-right: 16px;
+  border-radius: 22px;
+}

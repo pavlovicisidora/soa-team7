@@ -1,37 +1,21 @@
-<nav>
-  <ul>
-    <li>
-      <a routerLink="/blog-list">Blogs</a>
-    </li>
-    <li>
-      <a routerLink="/create-blog">Create new blog</a>
-    </li>
-    <li>
-      <a routerLink="/position-simulator">Position simulator</a>
-    </li>
-    <li>
-      <a routerLink="/login">Login</a>
-    </li>
-    <li>
-      <a routerLink="/register">Register</a>
-    </li>
-    <li>
-      <a routerLink="/create-tour">Create new tour</a>
-    </li>
-    <li>
-      <a routerLink="/tour-list">My Tours</a>
-    </li>
-    <li>
-      <a routerLink="/public-tour-list">Tours</a>
-    </li>
-    <li>
-      <a routerLink="/user-list">Users</a>
-    </li>
-    <li>
-      <a routerLink="/profile">Profile</a>
-    </li>
-    <li>
-      <a routerLink="/recommended-users">Recommended Users</a>
-    </li>
+<nav class="navbar">
+  <ul class="navbar-links" [class.active]="menuOpen">
+    <li class="navbar-item"><a class="navbar-link" routerLink="/blog-list">Blogs</a></li>
+    <li class="navbar-item"><a class="navbar-link" routerLink="/create-blog">Create Blog</a></li>
+    <li class="navbar-item"><a class="navbar-link" routerLink="/position-simulator">Simulator</a></li>
+    <li class="navbar-item"><a class="navbar-link" routerLink="/register">Register</a></li>
+    <li class="navbar-item"><a class="navbar-link" routerLink="/create-tour">Create Tour</a></li>
+    <li class="navbar-item"><a class="navbar-link" routerLink="/tour-list">My Tours</a></li>
+    <li class="navbar-item"><a class="navbar-link" routerLink="/public-tour-list">Tours</a></li>
+    <li class="navbar-item"><a class="navbar-link" routerLink="/user-list">Users</a></li>
+    <li class="navbar-item"><a class="navbar-link" routerLink="/profile">Profile</a></li>
+    <li class="navbar-item"><a class="navbar-link" routerLink="/recommended-users">Recommended</a></li>
   </ul>
+  
+  <ul class="navbar-links">
+    <li class="special-login"><a class="login-link" routerLink="/login">Log in</a></li>
+  </ul>
+
+  <!-- Hamburger dugme -->
+  <div class="navbar-toggle" (click)="toggleMenu()">☰</div>
 </nav>
