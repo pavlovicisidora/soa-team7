@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Blog } from '../blog.model';
+import { BlogComment } from '../blog-comment.model';
 import { BlogService } from '../blog.service';
 
 @Component({
@@ -9,7 +10,8 @@ import { BlogService } from '../blog.service';
 })
 export class BlogListComponent implements OnInit {
   blogs: Blog[] = []; 
-
+  newCommentTexts: { [blog_id: string]: string } = {};
+  commentsByBlog: { [blogId: string]: BlogComment[] } = {};
   constructor(private blogService: BlogService) { }
 
   ngOnInit(): void {
@@ -62,4 +64,46 @@ export class BlogListComponent implements OnInit {
     this.blogs[index] = updatedBlog;
   }
 }
+
+
+// ******************************
+  // Dodavanje komentara
+  // ******************************
+ submitComment(blog_id: string): void {
+  const text = this.newCommentTexts[blog_id];
+  if (!text || text.trim() === '') return;
+
+  this.blogService.addCommentOnBlog(blog_id, text.trim())
+    .subscribe((comment: BlogComment) => {
+      console.log('Komentar dodat:', comment);
+      this.newCommentTexts[blog_id] = '';
+
+      // Dodaj odmah u prikaz komentara
+      if (!this.commentsByBlog[blog_id]) {
+        this.commentsByBlog[blog_id] = [];
+      }
+      this.commentsByBlog[blog_id].push(comment);
+    }, error => {
+      console.error('Greška pri dodavanju komentara:', error);
+    });
+}
+
+
+  loadComments(blogId: string): void {
+  this.blogService.getCommentsForBlog(blogId).subscribe(
+    (comments: BlogComment[]) => {
+      // konvertuj created_at u Date
+      comments.forEach(c => {
+        if (c.created_at && c.created_at.seconds) {
+          c.created_at = new Date(c.created_at.seconds * 1000);
+        }
+      });
+      this.commentsByBlog[blogId] = comments;
+    },
+    (error) => {
+      console.error('Greška pri učitavanju komentara:', error);
+    }
+  );
+}
+
 }
