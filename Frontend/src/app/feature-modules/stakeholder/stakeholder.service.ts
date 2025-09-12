@@ -30,4 +30,14 @@ export class StakeholderService {
     return this.http.put(this.positionUrl, coords);
   }
 
+   updateProfile(profile: Profile): Observable<Profile> {
+    return this.http.patch<Profile>(`${this.apiProfileUrl}`, profile);
+  }
+
+  blockUser(username: string): Observable<any> {
+  return this.http.post(`${this.apiUsersUrl}/block?username=${username}`, {});
+}
+
+
+
 }

@@ -22,8 +22,32 @@
     </div>
 
     <div class="profile-footer">
-      <button class="edit-button">Edit Profile</button>
+      <button class="edit-button" (click)="toggleEdit()">
+        {{ showEditForm ? 'Cancel' : 'Edit Profile' }}
+      </button>
     </div>
+  </div>
+  <!-- Forma za edit -->
+  <div *ngIf="showEditForm" class="edit-form">
+    <form (ngSubmit)="saveProfile()">
+      <label> Name: </label>
+        <input type="text" [(ngModel)]="editableProfile.name" name="name"> <br>
+      
+
+      <label> Surname: </label>
+        <input type="text" [(ngModel)]="editableProfile.surname" name="surname"><br>
+      
+
+      <label> Bio: </label>
+        <textarea [(ngModel)]="editableProfile.bio" name="bio"></textarea><br>
+      
+
+      <label> Motto: </label>
+        <input type="text" [(ngModel)]="editableProfile.motto" name="motto"><br>
+      
+
+      <button type="submit">Save</button>
+    </form>
   </div>
 
   <ng-template #statusDisplay>

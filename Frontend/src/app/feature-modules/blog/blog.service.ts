@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Blog } from './blog.model';
+import { BlogComment } from './blog-comment.model';
 
 export interface CreateBlogDTO {
   title: string;
@@ -43,4 +44,14 @@ export class BlogService {
     formData.append('image', file, file.name);
     return this.http.post<{ filePath: string }>(this.uploadUrl, formData);
   }
+
+  addCommentOnBlog(blogId: string, text: string): Observable<BlogComment> {
+  return this.http.post<BlogComment>('/api/comments', { blog_id: blogId, text });
+}
+
+getCommentsForBlog(blogId: string): Observable<BlogComment[]> {
+  return this.http.get<BlogComment[]>(`/api/comments/${blogId}`);
+}
+
+
 }

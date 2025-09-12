@@ -12,6 +12,7 @@
           <th>Username</th>
           <th>Role</th>
           <th>Status</th>
+          <th>Action</th> <!-- kolona za dugme -->
         </tr>
       </thead>
       <tbody>
@@ -22,6 +23,14 @@
             <span [ngClass]="{'status-active': !user.blocked, 'status-blocked': user.blocked}">
               {{ user.blocked ? 'Blocked' : 'Active' }}
             </span>
+          </td>
+          <td>
+            <button 
+              (click)="blockUser(user)" 
+              [disabled]="user.blocked" 
+              class="btn-block">
+              Block
+            </button>
           </td>
         </tr>
       </tbody>

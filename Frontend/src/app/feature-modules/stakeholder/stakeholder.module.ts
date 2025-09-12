@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { UserListComponent } from './user-list/user-list.component';
 import { ProfileComponent } from './profile/profile.component';
 import { PositionSimulatorComponent } from './position-simulator/position-simulator.component';
-
+import { FormsModule } from '@angular/forms';
 
 
 @NgModule({
@@ -13,7 +13,8 @@ import { PositionSimulatorComponent } from './position-simulator/position-simula
     PositionSimulatorComponent
   ],
   imports: [
-    CommonModule
+    CommonModule,
+    FormsModule
   ],
   exports: [
     UserListComponent,

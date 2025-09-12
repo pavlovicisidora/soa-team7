@@ -31,4 +31,14 @@ export class UserListComponent implements OnInit {
       }
     });
   }
+
+  blockUser(user: UserAccount): void {
+    this.stakeholderService.blockUser(user.username).subscribe(
+      () => {
+        user.blocked = true; // odmah ažuriraj status u tabeli
+      },
+      (error) => console.error('Greška pri blokiranju korisnika', error)
+    );
+  }
+
 }

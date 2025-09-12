@@ -13,6 +13,7 @@ import { TourDetailComponent } from './feature-modules/tour/tour-detail/tour-det
 import { UserListComponent } from './feature-modules/stakeholder/user-list/user-list.component';
 import { ProfileComponent } from './feature-modules/stakeholder/profile/profile.component';
 import { KeypointManageComponent } from './feature-modules/tour/keypoint-manage/keypoint-manage.component';
+import { RecommendedUsersComponent } from './feature-modules/follower/recommended-users/recommended-users.component';
 
 const routes: Routes = [
   { path: 'blog-list', component: BlogListComponent },
@@ -27,7 +28,8 @@ const routes: Routes = [
   { path: 'user-list', component: UserListComponent},
   { path: 'profile', component: ProfileComponent},
   { path: 'position-simulator', component: PositionSimulatorComponent },
-  { path: 'keypoint-manage/:tourId', component: KeypointManageComponent }
+  { path: 'keypoint-manage/:tourId', component: KeypointManageComponent },
+  { path: 'recommended-users', component: RecommendedUsersComponent }
   
 ];
 

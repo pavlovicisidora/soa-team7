@@ -11,6 +11,9 @@ export class ProfileComponent {
 profile: Profile | null = null;
   statusMessage: string = 'Loading profile...';
 
+  showEditForm = false;
+  editableProfile!: Profile;
+
   constructor(private stakeholderService: StakeholderService) { }
 
   ngOnInit(): void {
@@ -33,6 +36,26 @@ profile: Profile | null = null;
           this.statusMessage = 'An error occurred while fetching your profile. Please try again later.';
         }
         this.profile = null;
+      }
+    });
+  }
+
+   toggleEdit() {
+    this.showEditForm = !this.showEditForm;
+    if (this.showEditForm && this.profile) {
+      this.editableProfile = { ...this.profile };
+    }
+  }
+
+  saveProfile() {
+    this.stakeholderService.updateProfile(this.editableProfile).subscribe({
+      next: (updated: Profile) => {
+        this.profile = updated;
+        this.showEditForm = false;
+        this.loadProfile();
+      },
+      error: (err) => {
+        console.error('Error updating profile', err);
       }
     });
   }
