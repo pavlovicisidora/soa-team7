@@ -1,0 +1,15 @@
+<div class="recommended-users">
+  <h2>Recommended Users</h2>
+
+  <div *ngIf="recommendedUsers.length === 0">
+    <p>No recommended users right now.</p>
+  </div>
+
+  <ul>
+  <li *ngFor="let user of recommendedUsers">
+    {{ user.user_id }}
+    <button (click)="follow(user.user_id)">Follow</button>
+  </li>
+</ul>
+
+</div>

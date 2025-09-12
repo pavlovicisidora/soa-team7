@@ -1,0 +1,20 @@
+<div class="tour-list-container">
+  <h2>Explore Our Tours</h2>
+  <div *ngIf="tours.length > 0; else noTours">
+    <div class="tour-card" *ngFor="let tour of tours">
+      <div class="card-content">
+        <h3>{{ tour.name }}</h3>
+        <p>{{ tour.description | slice:0:150 }}...</p>
+      </div>
+      <div class="card-action">
+        <a [routerLink]="['/tours', tour.id]" class="details-button">View Details</a>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #noTours>
+    <div class="info-message">
+      <p>No tours available at the moment.</p>
+    </div>
+  </ng-template>
+</div>

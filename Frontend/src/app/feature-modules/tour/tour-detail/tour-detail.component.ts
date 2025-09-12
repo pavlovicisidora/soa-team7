@@ -1,0 +1,110 @@
+import { Component, OnInit } from '@angular/core';
+import { Tour } from '../tour.model';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { TourService } from '../tour.service';
+import { ReviewCreationDto, ReviewService } from '../review.service';
+import { forkJoin, of, switchMap } from 'rxjs';
+import { Review } from '../review.model';
+import { Validators } from 'ngx-editor';
+
+@Component({
+  selector: 'app-tour-detail',
+  templateUrl: './tour-detail.component.html',
+  styleUrls: ['./tour-detail.component.css']
+})
+export class TourDetailComponent implements OnInit{
+  tour: Tour | undefined;
+  reviews: Review[] = [];
+  reviewForm!: FormGroup;
+   selectedFiles: File[] = [];
+  isUploading: boolean = false;
+
+  constructor(private route: ActivatedRoute, private tourService: TourService, private reviewService: ReviewService, private fb: FormBuilder){}
+  ngOnInit(): void {
+    const tourId = Number(this.route.snapshot.paramMap.get('id'))
+    if(tourId){
+      this.loadTourAndReviews(tourId);
+    }
+    this.reviewForm = this.fb.group({
+      rating: [5, [Validators.required]],
+      comment: ['', Validators.required],
+      visitingdate: [null, Validators.required] 
+    });
+  }
+  loadTourAndReviews(tourId: number): void {
+    forkJoin({
+      tour: this.tourService.getTourById(tourId),
+      reviews: this.reviewService.getReviewsForTour(tourId)
+    }).subscribe({
+      next: ({ tour, reviews }) => {
+        this.tour = tour;
+        this.reviews = reviews.map(review => {
+        const timestamp = review.createdDate as any; 
+        return { ...review,  createdDate: new Date(timestamp.seconds * 1000)  };
+      }).sort((a, b) => b.createdDate.getTime() - a.createdDate.getTime());
+    },
+      error: (err) => {
+        console.error("Error loading the tour and reviews:", err);
+      }
+    });
+  }
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files) {
+      this.selectedFiles.push(...Array.from(input.files));
+    }
+  }
+  removeFile(index: number): void {
+    this.selectedFiles.splice(index, 1);
+  }
+  submitReview(): void {
+    if (this.reviewForm.invalid || !this.tour) {
+      this.reviewForm.markAllAsTouched();
+      return;
+    }
+    this.isUploading = true;
+    const reviewData: ReviewCreationDto = {
+      ...this.reviewForm.value,
+      rating: Number(this.reviewForm.value.rating)
+    };
+    const uploadObservables = this.selectedFiles.map(file => this.tourService.uploadImage(file));
+    const imageUploads$ = uploadObservables.length > 0 ? forkJoin(uploadObservables) : of([]);
+    imageUploads$.pipe(
+      switchMap(uploadResults => {
+        const imageUrls = uploadResults.map(result => result.filePath);
+        const formValue = this.reviewForm.value;
+
+        const reviewData: ReviewCreationDto = {
+          rating: Number(formValue.rating),
+          comment: formValue.comment,
+          visitingdate: formValue.visitingdate,
+          images: imageUrls
+        };
+
+        return this.reviewService.createReview(this.tour!.id, reviewData);
+      })
+    ).subscribe({
+      next: (newReview) => {
+        console.log('Review successfully added', newReview);
+      
+
+        if (this.tour) {
+          this.loadTourAndReviews(this.tour.id); 
+        }
+
+        this.isUploading = false;
+        this.selectedFiles = [];
+        this.reviewForm.reset({
+          rating: 5,
+          comment: '',
+          visitingdate: null
+        });
+      },
+    error: (err) => {
+      console.error('Error while adding the review', err)
+      this.isUploading = false;
+    }
+  });
+  }
+}

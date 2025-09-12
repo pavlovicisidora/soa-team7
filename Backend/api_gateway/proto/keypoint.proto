@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_outer_classname = "KeyPointProto";
+option java_package = "com.example.tour.grpc";
+option go_package = "github.com/pavlovicisidora/soa-team7/Backend/APIGateway/proto";
+package tour;
+
+service KeyPointGrpcService {
+  rpc CreateKeyPoint(CreateKeyPointRequest) returns (CreateKeyPointResponse);
+  rpc GetKeyPointsForTour(GetKeyPointsForTourRequest) returns (GetKeyPointsForTourResponse);
+  rpc UpdateKeyPoint(UpdateKeyPointRequest) returns (UpdateKeyPointResponse);
+  rpc DeleteKeyPoint(DeleteKeyPointRequest) returns (DeleteKeyPointResponse);
+}
+
+message KeyPoint {
+  int32 id = 1;
+  string name = 2;
+  string description = 3;
+  double latitude = 4;
+  double longitude = 5;
+  string image_url = 6;
+  int32 tour_id = 7;
+}
+
+message CreateKeyPointRequest {
+  string name = 1;
+  string description = 2;
+  double latitude = 3;
+  double longitude = 4;
+  string image_url = 5;
+  int32 tour_id = 6;
+}
+message CreateKeyPointResponse{
+  KeyPoint keypoint = 1;
+}
+message GetKeyPointsForTourRequest {
+  int32 tour_id = 1;
+}
+message GetKeyPointsForTourResponse {
+  repeated KeyPoint key_points = 1;
+}
+message UpdateKeyPointRequest{
+  int32 id = 1;
+  string name = 2;
+  string description = 3;
+  double latitude = 4;
+  double longitude = 5;
+  string image_url = 6;
+}
+message  UpdateKeyPointResponse{
+  KeyPoint keypoint = 1;
+}
+
+message DeleteKeyPointRequest {
+  int32 id = 1;
+}
+message DeleteKeyPointResponse {
+}

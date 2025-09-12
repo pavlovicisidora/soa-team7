@@ -1,0 +1,58 @@
+<div class="profile-container">
+  <div *ngIf="profile; else statusDisplay" class="profile-card">
+    <div class="profile-header">
+      <img [src]="'http://localhost:8080' + profile.profilePic" alt="Profile Picture" class="profile-picture">
+      <div class="profile-name">
+        <h2>{{ profile.name }} {{ profile.surname }}</h2>
+      </div>
+    </div>
+
+    <div class="profile-body">
+      <div class="profile-section">
+        <h3>Biography</h3>
+        <p>{{ profile.bio || 'No biography provided.' }}</p>
+      </div>
+
+      <div class="profile-section">
+        <h3>Motto</h3>
+        <blockquote class="motto">
+          "{{ profile.motto || 'No motto provided.' }}"
+        </blockquote>
+      </div>
+    </div>
+
+    <div class="profile-footer">
+      <button class="edit-button" (click)="toggleEdit()">
+        {{ showEditForm ? 'Cancel' : 'Edit Profile' }}
+      </button>
+    </div>
+  </div>
+  <!-- Forma za edit -->
+  <div *ngIf="showEditForm" class="edit-form">
+    <form (ngSubmit)="saveProfile()">
+      <label> Name: </label>
+        <input type="text" [(ngModel)]="editableProfile.name" name="name"> <br>
+      
+
+      <label> Surname: </label>
+        <input type="text" [(ngModel)]="editableProfile.surname" name="surname"><br>
+      
+
+      <label> Bio: </label>
+        <textarea [(ngModel)]="editableProfile.bio" name="bio"></textarea><br>
+      
+
+      <label> Motto: </label>
+        <input type="text" [(ngModel)]="editableProfile.motto" name="motto"><br>
+      
+
+      <button type="submit">Save</button>
+    </form>
+  </div>
+
+  <ng-template #statusDisplay>
+    <div class="status-message">
+      <p>{{ statusMessage }}</p>
+    </div>
+  </ng-template>
+</div>

@@ -1,0 +1,85 @@
+<div class="keypoint-manage-container">
+
+  <div class="keypoint-table-section">
+    <h3>Postojeće ključne tačke</h3>
+    <table *ngIf= hasKeypoints(); else noKeypoints>
+      <thead>
+        <tr>
+          <th>Ime</th>
+          <th>Opis</th>
+          <th>Geografska dužina</th>
+          <th>Geografska širina</th>
+          <th>Slika</th>
+          <th>Akcije</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let kp of keypoints">
+          <td>{{ kp.name }}</td>
+          <td>{{ kp.description }}</td>
+          <td>{{ kp.longitude | number:'1.4-4' }}</td>
+          <td>{{ kp.latitude | number:'1.4-4' }}</td>
+          <td>
+            <img *ngIf="kp.image" [src]="kp.image" alt="Slika ključne tačke" class="keypoint-image">
+            <span *ngIf="!kp.image">Nema slike</span>
+          </td>
+          <td>
+            <button (click)="onEditKeypoint(kp)" class="edit-button">Izmeni</button>
+            <button (click)="onDeleteKeypoint(kp.id)" class="delete-button">Obriši</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <ng-template #noKeypoints>
+      <p>Nema unetih ključnih tačaka za ovu turu.</p>
+    </ng-template>
+  </div>
+
+  <div id="map" style="height: 500px; width: 100%;"></div>
+
+
+  <div class="keypoint-form-section">
+    <h3>{{ editingKeypointId ? 'Izmeni ključnu tačku' : 'Dodaj novu ključnu tačku' }}</h3>
+    <form [formGroup]="keypointForm" (ngSubmit)="onSaveKeypoint()">
+      <div class="form-group">
+        <label for="name">Ime:</label>
+        <input id="name" type="text" formControlName="name">
+        <div *ngIf="keypointForm.get('name')?.invalid && (keypointForm.get('name')?.dirty || keypointForm.get('name')?.touched)" class="error-message">
+          Ime je obavezno.
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Opis:</label>
+        <textarea id="description" formControlName="description"></textarea>
+        <div *ngIf="keypointForm.get('description')?.invalid && (keypointForm.get('description')?.dirty || keypointForm.get('description')?.touched)" class="error-message">
+          Opis je obavezan.
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="latitude">Geografska širina:</label>
+        <input id="latitude" type="text" formControlName="latitude" readonly>
+        <div *ngIf="keypointForm.get('latitude')?.invalid && (keypointForm.get('latitude')?.dirty || keypointForm.get('latitude')?.touched)" class="error-message">
+          Geografska širina je obavezna i mora biti broj.
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="longitude">Geografska dužina:</label>
+        <input id="longitude" type="text" formControlName="longitude" readonly>
+        <div *ngIf="keypointForm.get('longitude')?.invalid && (keypointForm.get('longitude')?.dirty || keypointForm.get('longitude')?.touched)" class="error-message">
+          Geografska dužina je obavezna i mora biti broj.
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="image">URL Slike:</label>
+        <input id="image" type="text" formControlName="image">
+      </div>
+
+      <button type="submit" [disabled]="keypointForm.invalid" class="save-button">{{ editingKeypointId ? 'Sačuvaj izmene' : 'Dodaj ključnu tačku' }}</button>
+      <button *ngIf="editingKeypointId" type="button" (click)="clearFormAndEditingState()" class="cancel-button">Odustani od izmene</button>
+    </form>
+  </div>
+</div>

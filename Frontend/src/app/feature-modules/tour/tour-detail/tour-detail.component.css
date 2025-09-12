@@ -1,0 +1,251 @@
+.tour-detail-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 1rem;
+  font-family: Arial, sans-serif;
+  color: #333;
+}
+
+
+.tour-details,
+.reviews-section,
+.review-form-section {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+
+h2, h3 {
+  color: #2c3e50;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 0.5rem;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+}
+
+h2 {
+  font-size: 2.5rem;
+}
+
+h3 {
+  font-size: 1.8rem;
+}
+
+.tour-details p {
+  line-height: 1.7;
+  font-size: 1.1rem;
+}
+
+.tour-meta {
+  display: flex;
+  gap: 2rem;
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 5px;
+}
+
+.meta-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.meta-item span {
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.meta-item small {
+  font-size: 0.9rem;
+  color: #777;
+}
+
+.review-card {
+  border: 1px solid #e9ecef;
+  border-radius: 5px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  background-color: #fdfdfd;
+}
+
+.review-card:last-child {
+  margin-bottom: 0;
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.review-header .rating {
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #3498db;
+}
+
+.review-header .author {
+  font-style: italic;
+  color: #555;
+}
+
+.review-card .comment {
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.review-card .dates {
+  font-size: 0.85rem;
+  color: #888;
+  text-align: right;
+}
+
+.no-reviews-message {
+  color: #777;
+  font-style: italic;
+}
+
+
+.review-form-section form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.form-group input[type="date"],
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-family: inherit;
+  box-sizing: border-box; 
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+
+button[type="submit"] {
+  padding: 0.8rem 1.5rem;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  align-self: flex-start;
+}
+
+button[type="submit"]:hover {
+  background-color: #218838;
+}
+
+button[type="submit"]:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+
+.loading-message {
+  text-align: center;
+  font-size: 1.5rem;
+  padding: 4rem;
+  color: #777;
+}
+.selected-files {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border: 1px dashed #ccc;
+  border-radius: 5px;
+}
+.selected-files ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+.selected-files li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #eee;
+}
+.remove-btn {
+  background: #ff4d4d;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  text-align: center;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.review-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+.review-images img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 5px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+.review-images img:hover {
+  transform: scale(1.1);
+
+.review-card .dates .separator {
+  margin: 0 0.5rem; 
+  color: #aaa;
+}}
+.avatar-image {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #ddd; 
+}
+.review-info {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.author {
+  font-weight: bold;
+}
+
+.rating {
+  font-size: 0.9em;
+  color: #666;
+}
