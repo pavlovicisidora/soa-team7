@@ -1,6 +1,13 @@
 <div class="tour-detail-container">
   <div *ngIf="tour; else loading">
 
+    <section class="tour-actions">
+      <button (click)="startTour()" [disabled]="isStartingTour">
+        <span *ngIf="!isStartingTour">Start tour</span>
+        <span *ngIf="isStartingTour">Starting...</span>
+      </button>
+    </section>
+
     <section class="tour-details">
       <h2>{{ tour.name }}</h2>
       <p>{{ tour.description }}</p>

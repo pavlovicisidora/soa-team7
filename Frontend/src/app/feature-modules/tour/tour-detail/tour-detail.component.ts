@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { Tour } from '../tour.model';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TourService } from '../tour.service';
 import { ReviewCreationDto, ReviewService } from '../review.service';
 import { forkJoin, of, switchMap } from 'rxjs';
 import { Review } from '../review.model';
 import { Validators } from 'ngx-editor';
+import { StakeholderService } from '../../stakeholder/stakeholder.service';
 
 @Component({
   selector: 'app-tour-detail',
@@ -19,8 +20,9 @@ export class TourDetailComponent implements OnInit{
   reviewForm!: FormGroup;
    selectedFiles: File[] = [];
   isUploading: boolean = false;
+  isStartingTour = false;
 
-  constructor(private route: ActivatedRoute, private tourService: TourService, private reviewService: ReviewService, private fb: FormBuilder){}
+  constructor(private route: ActivatedRoute, private tourService: TourService, private reviewService: ReviewService, private fb: FormBuilder, private stakeholderService: StakeholderService, private router: Router){}
   ngOnInit(): void {
     const tourId = Number(this.route.snapshot.paramMap.get('id'))
     if(tourId){
@@ -106,5 +108,42 @@ export class TourDetailComponent implements OnInit{
       this.isUploading = false;
     }
   });
+  }
+
+  startTour(): void {
+    if (!this.tour) return;
+    this.isStartingTour = true;
+
+    this.stakeholderService.getUser().subscribe({
+      next: (profile) => {
+        if (!profile.latitude || !profile.longitude) {
+          alert('Please set your position in Position Simulator.');
+          this.isStartingTour = false;
+          this.router.navigate(['/position-simulator']);
+          return;
+        }
+
+        const startLocation = {
+          latitude: profile.latitude,
+          longitude: profile.longitude
+        };
+
+        this.tourService.startTour(this.tour!.id, startLocation).subscribe({
+          next: (execution) => {
+            console.log('Successfully started the tour!', execution);
+            this.isStartingTour = false;
+            this.router.navigate(['/tour-execution', execution.id]);
+          },
+          error: (err) => {
+            console.error('Error starting tour:', err);
+            this.isStartingTour = false;
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Error fetching user`s position:', err);
+        this.isStartingTour = false;
+      }
+    });
   }
 }

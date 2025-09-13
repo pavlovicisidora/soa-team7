@@ -7,6 +7,7 @@ import { PublicTourListComponent } from './public-tour-list/public-tour-list.com
 import { TourDetailComponent } from './tour-detail/tour-detail.component';
 import { RouterModule } from '@angular/router';
 import { KeypointManageComponent } from './keypoint-manage/keypoint-manage.component';
+import { TourExecutionComponent } from './tour-execution/tour-execution.component';
 
 
 
@@ -16,7 +17,8 @@ import { KeypointManageComponent } from './keypoint-manage/keypoint-manage.compo
     TourListComponent,
     PublicTourListComponent,
     TourDetailComponent,
-    KeypointManageComponent
+    KeypointManageComponent,
+    TourExecutionComponent
   ],
   imports: [
     CommonModule,

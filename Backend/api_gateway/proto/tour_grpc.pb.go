@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v6.32.0
-// source: tour.proto
+// source: proto/tour.proto
 
 package proto
 
@@ -23,6 +23,9 @@ const (
 	TourGrpcService_GetAllToursById_FullMethodName = "/tour.TourGrpcService/GetAllToursById"
 	TourGrpcService_GetAllTours_FullMethodName     = "/tour.TourGrpcService/GetAllTours"
 	TourGrpcService_GetTourById_FullMethodName     = "/tour.TourGrpcService/GetTourById"
+	TourGrpcService_StartTour_FullMethodName       = "/tour.TourGrpcService/StartTour"
+	TourGrpcService_AbandonTour_FullMethodName     = "/tour.TourGrpcService/AbandonTour"
+	TourGrpcService_CompleteTour_FullMethodName    = "/tour.TourGrpcService/CompleteTour"
 )
 
 // TourGrpcServiceClient is the client API for TourGrpcService service.
@@ -33,6 +36,9 @@ type TourGrpcServiceClient interface {
 	GetAllToursById(ctx context.Context, in *GetAllToursByIdRequest, opts ...grpc.CallOption) (*GetAllToursByIdResponse, error)
 	GetAllTours(ctx context.Context, in *GetAllToursRequest, opts ...grpc.CallOption) (*GetAllToursResponse, error)
 	GetTourById(ctx context.Context, in *GetTourByIdRequest, opts ...grpc.CallOption) (*GetTourByIdResponse, error)
+	StartTour(ctx context.Context, in *StartTourRequest, opts ...grpc.CallOption) (*StartTourResponse, error)
+	AbandonTour(ctx context.Context, in *AbandonTourRequest, opts ...grpc.CallOption) (*AbandonTourResponse, error)
+	CompleteTour(ctx context.Context, in *CompleteTourRequest, opts ...grpc.CallOption) (*CompleteTourResponse, error)
 }
 
 type tourGrpcServiceClient struct {
@@ -83,6 +89,36 @@ func (c *tourGrpcServiceClient) GetTourById(ctx context.Context, in *GetTourById
 	return out, nil
 }
 
+func (c *tourGrpcServiceClient) StartTour(ctx context.Context, in *StartTourRequest, opts ...grpc.CallOption) (*StartTourResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(StartTourResponse)
+	err := c.cc.Invoke(ctx, TourGrpcService_StartTour_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *tourGrpcServiceClient) AbandonTour(ctx context.Context, in *AbandonTourRequest, opts ...grpc.CallOption) (*AbandonTourResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AbandonTourResponse)
+	err := c.cc.Invoke(ctx, TourGrpcService_AbandonTour_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *tourGrpcServiceClient) CompleteTour(ctx context.Context, in *CompleteTourRequest, opts ...grpc.CallOption) (*CompleteTourResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CompleteTourResponse)
+	err := c.cc.Invoke(ctx, TourGrpcService_CompleteTour_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TourGrpcServiceServer is the server API for TourGrpcService service.
 // All implementations must embed UnimplementedTourGrpcServiceServer
 // for forward compatibility.
@@ -91,6 +127,9 @@ type TourGrpcServiceServer interface {
 	GetAllToursById(context.Context, *GetAllToursByIdRequest) (*GetAllToursByIdResponse, error)
 	GetAllTours(context.Context, *GetAllToursRequest) (*GetAllToursResponse, error)
 	GetTourById(context.Context, *GetTourByIdRequest) (*GetTourByIdResponse, error)
+	StartTour(context.Context, *StartTourRequest) (*StartTourResponse, error)
+	AbandonTour(context.Context, *AbandonTourRequest) (*AbandonTourResponse, error)
+	CompleteTour(context.Context, *CompleteTourRequest) (*CompleteTourResponse, error)
 	mustEmbedUnimplementedTourGrpcServiceServer()
 }
 
@@ -112,6 +151,15 @@ func (UnimplementedTourGrpcServiceServer) GetAllTours(context.Context, *GetAllTo
 }
 func (UnimplementedTourGrpcServiceServer) GetTourById(context.Context, *GetTourByIdRequest) (*GetTourByIdResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTourById not implemented")
+}
+func (UnimplementedTourGrpcServiceServer) StartTour(context.Context, *StartTourRequest) (*StartTourResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StartTour not implemented")
+}
+func (UnimplementedTourGrpcServiceServer) AbandonTour(context.Context, *AbandonTourRequest) (*AbandonTourResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AbandonTour not implemented")
+}
+func (UnimplementedTourGrpcServiceServer) CompleteTour(context.Context, *CompleteTourRequest) (*CompleteTourResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CompleteTour not implemented")
 }
 func (UnimplementedTourGrpcServiceServer) mustEmbedUnimplementedTourGrpcServiceServer() {}
 func (UnimplementedTourGrpcServiceServer) testEmbeddedByValue()                         {}
@@ -206,6 +254,60 @@ func _TourGrpcService_GetTourById_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TourGrpcService_StartTour_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StartTourRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TourGrpcServiceServer).StartTour(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TourGrpcService_StartTour_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TourGrpcServiceServer).StartTour(ctx, req.(*StartTourRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TourGrpcService_AbandonTour_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AbandonTourRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TourGrpcServiceServer).AbandonTour(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TourGrpcService_AbandonTour_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TourGrpcServiceServer).AbandonTour(ctx, req.(*AbandonTourRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TourGrpcService_CompleteTour_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CompleteTourRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TourGrpcServiceServer).CompleteTour(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TourGrpcService_CompleteTour_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TourGrpcServiceServer).CompleteTour(ctx, req.(*CompleteTourRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TourGrpcService_ServiceDesc is the grpc.ServiceDesc for TourGrpcService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -229,7 +331,19 @@ var TourGrpcService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "GetTourById",
 			Handler:    _TourGrpcService_GetTourById_Handler,
 		},
+		{
+			MethodName: "StartTour",
+			Handler:    _TourGrpcService_StartTour_Handler,
+		},
+		{
+			MethodName: "AbandonTour",
+			Handler:    _TourGrpcService_AbandonTour_Handler,
+		},
+		{
+			MethodName: "CompleteTour",
+			Handler:    _TourGrpcService_CompleteTour_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "tour.proto",
+	Metadata: "proto/tour.proto",
 }

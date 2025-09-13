@@ -36,6 +36,10 @@ func (h *TourHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	router.HandleFunc("/tours/all", h.GetAllTours).Methods("GET")
 	router.HandleFunc("/tours/{id}", h.GetTourById).Methods("GET")
 
+	router.HandleFunc("/tours/{id}/start", h.StartTour).Methods("POST")
+	router.HandleFunc("/tours/execution/{execId}/abandon", h.AbandonTour).Methods("POST")
+	router.HandleFunc("/tours/execution/{execId}/complete", h.CompleteTour).Methods("POST")
+
 	router.ServeHTTP(w, r)
 }
 func (h *TourHandler) CreateTour(w http.ResponseWriter, r *http.Request) {
@@ -149,4 +153,76 @@ func (h *TourHandler) GetTourById(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(resp.GetTour())
+}
+
+func (h *TourHandler) StartTour(w http.ResponseWriter, r *http.Request) {
+	touristID := r.Context().Value(middleware.UserKey).(string)
+	tourIDStr := mux.Vars(r)["id"]
+	tourID, _ := strconv.ParseInt(tourIDStr, 10, 32)
+	var reqBody struct {
+		Latitude  float64 `json:"latitude"`
+		Longitude float64 `json:"longitude"`
+	}
+	json.NewDecoder(r.Body).Decode(&reqBody)
+
+	grpcRequest := &tour_proto.StartTourRequest{
+		TourId:    int32(tourID),
+		TouristId: touristID,
+		Latitude:  reqBody.Latitude,
+		Longitude: reqBody.Longitude,
+	}
+
+	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
+	defer cancel()
+
+	resp, err := h.client.StartTour(ctx, grpcRequest)
+	if err != nil {
+		log.Printf("Failed to start tour via gRPC: %v", err)
+		http.Error(w, "Failed to start tour", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(resp.GetTourExecution())
+}
+
+func (h *TourHandler) AbandonTour(w http.ResponseWriter, r *http.Request) {
+	execIDStr := mux.Vars(r)["execId"]
+	execID, _ := strconv.ParseInt(execIDStr, 10, 32)
+
+	grpcRequest := &tour_proto.AbandonTourRequest{TourExecutionId: int32(execID)}
+	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
+	defer cancel()
+
+	resp, err := h.client.AbandonTour(ctx, grpcRequest)
+	if err != nil {
+		log.Printf("Failed to abandon tour via gRPC: %v", err)
+		http.Error(w, "Failed to abandon tour", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(resp.GetTourExecution())
+}
+
+func (h *TourHandler) CompleteTour(w http.ResponseWriter, r *http.Request) {
+	execIDStr := mux.Vars(r)["execId"]
+	execID, _ := strconv.ParseInt(execIDStr, 10, 32)
+
+	grpcRequest := &tour_proto.CompleteTourRequest{TourExecutionId: int32(execID)}
+	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
+	defer cancel()
+
+	resp, err := h.client.CompleteTour(ctx, grpcRequest)
+	if err != nil {
+		log.Printf("Failed to complete tour via gRPC: %v", err)
+		http.Error(w, "Failed to complete tour", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(resp.GetTourExecution())
 }

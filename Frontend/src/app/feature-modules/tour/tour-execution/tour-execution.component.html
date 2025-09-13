@@ -1,0 +1,11 @@
+<div class="execution-container" *ngIf="executionId">
+  <h2>Active tour</h2>
+  <p>Session ID: <strong>{{ executionId }}</strong></p>
+  
+  <hr>
+
+  <div class="actions">
+    <button (click)="abandon()" class="abandon-btn">Abandon tour</button>
+    <button (click)="complete()" class="complete-btn">Complete tour</button>
+  </div>
+</div>

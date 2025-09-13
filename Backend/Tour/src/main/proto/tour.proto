@@ -11,6 +11,10 @@ service TourGrpcService {
   rpc GetAllToursById(GetAllToursByIdRequest) returns (GetAllToursByIdResponse);
   rpc GetAllTours(GetAllToursRequest) returns (GetAllToursResponse);
   rpc GetTourById(GetTourByIdRequest) returns (GetTourByIdResponse);
+  
+  rpc StartTour(StartTourRequest) returns (StartTourResponse);
+  rpc AbandonTour(AbandonTourRequest) returns (AbandonTourResponse);
+  rpc CompleteTour(CompleteTourRequest) returns (CompleteTourResponse);
 }
 
 message Tour {
@@ -50,4 +54,39 @@ message GetTourByIdRequest{
 }
 message GetTourByIdResponse{
   Tour tour = 1;
+}
+
+
+message TourExecution {
+  int32 id = 1;
+  int32 tour_id = 2;
+  string tourist_id = 3;
+  string status = 4;
+}
+
+message StartTourRequest {
+  int32 tour_id = 1;
+  string tourist_id = 2;
+  double latitude = 3;
+  double longitude = 4;
+}
+
+message StartTourResponse {
+  TourExecution tour_execution = 1;
+}
+
+message AbandonTourRequest {
+  int32 tour_execution_id = 1;
+}
+
+message AbandonTourResponse {
+  TourExecution tour_execution = 1;
+}
+
+message CompleteTourRequest {
+  int32 tour_execution_id = 1;
+}
+
+message CompleteTourResponse {
+  TourExecution tour_execution = 1;
 }
