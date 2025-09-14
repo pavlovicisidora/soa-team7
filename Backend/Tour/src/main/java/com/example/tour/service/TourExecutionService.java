@@ -1,8 +1,12 @@
 package com.example.tour.service;
 
+import com.example.tour.grpc.Tour;
+import com.example.tour.model.Status;
 import com.example.tour.model.TourExecution;
 import com.example.tour.model.TourExecutionStatus;
 import com.example.tour.repository.TourExecutionRepository;
+import com.example.tour.repository.TourRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
@@ -12,8 +16,16 @@ public class TourExecutionService {
 
     @Autowired
     private TourExecutionRepository tourExecutionRepository;
+    @Autowired
+    private TourRepository tourRepository;
 
     public TourExecution startTour(Integer tourId, String touristId) {
+        com.example.tour.model.Tour tourToStart = tourRepository.findById(tourId)
+                .orElseThrow(() -> new RuntimeException("Tour with id " + tourId + " not found"));
+        
+        if (tourToStart.getStatus() == Status.DRAFT) {
+            throw new IllegalStateException("Tour cannot be started because its status is not PUBLISHED or ARCHIVED. Current status: " + tourToStart.getStatus());
+        }
         TourExecution newExecution = new TourExecution();
         newExecution.setTourId(tourId);
         newExecution.setTouristId(touristId);
@@ -44,5 +56,10 @@ public class TourExecutionService {
         execution.setLastActivity(LocalDateTime.now());
         
         return tourExecutionRepository.save(execution);
+    }
+
+    public TourExecution getTourExecution(Integer executionId) {
+        return tourExecutionRepository.findById(executionId)
+                .orElseThrow(() -> new RuntimeException("TourExecution not found"));
     }
 }

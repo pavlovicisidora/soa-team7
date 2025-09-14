@@ -39,6 +39,7 @@ func (h *TourHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	router.HandleFunc("/tours/{id}/start", h.StartTour).Methods("POST")
 	router.HandleFunc("/tours/execution/{execId}/abandon", h.AbandonTour).Methods("POST")
 	router.HandleFunc("/tours/execution/{execId}/complete", h.CompleteTour).Methods("POST")
+	router.HandleFunc("/tours/execution/{execId}", h.GetTourExecution).Methods("GET")
 
 	router.ServeHTTP(w, r)
 }
@@ -225,4 +226,32 @@ func (h *TourHandler) CompleteTour(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(resp.GetTourExecution())
+}
+
+func (h *TourHandler) GetTourExecution(w http.ResponseWriter, r *http.Request) {
+	execIDStr := mux.Vars(r)["execId"]
+	execID, _ := strconv.ParseInt(execIDStr, 10, 32)
+
+	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
+	defer cancel()
+
+	resp, err := h.client.GetTourExecution(ctx, &tour_proto.GetTourExecutionRequest{TourExecutionId: int32(execID)})
+	if err != nil {
+		http.Error(w, "Failed to get tour execution", http.StatusInternalServerError)
+		return
+	}
+
+	responsePayload := map[string]interface{}{
+		"id":                resp.TourExecution.Id,
+		"tour_id":           resp.TourExecution.TourId,
+		"tourist_id":        resp.TourExecution.TouristId,
+		"status":            resp.TourExecution.Status,
+		"tour":              resp.Tour,
+		"start_time":        resp.TourExecution.StartTime,
+		"completition_time": resp.TourExecution.CompletionTime,
+		"last_activity":     resp.TourExecution.LastActivity,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(responsePayload)
 }

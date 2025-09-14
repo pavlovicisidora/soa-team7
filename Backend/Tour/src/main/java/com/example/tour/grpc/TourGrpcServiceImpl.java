@@ -4,11 +4,13 @@ import com.example.tour.grpc.TourGrpcServiceGrpc;
 import com.example.tour.model.Tour;
 import com.example.tour.model.TourExecution;
 import com.example.tour.service.TourService;
+import com.google.protobuf.Timestamp;
 import com.example.tour.service.TourExecutionService;
 import io.grpc.stub.StreamObserver;
 import net.devh.boot.grpc.server.service.GrpcService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.ZoneOffset;
 import java.util.List;
 
 @GrpcService
@@ -108,11 +110,21 @@ public class TourGrpcServiceImpl extends TourGrpcServiceGrpc.TourGrpcServiceImpl
 
 
     private com.example.tour.grpc.TourExecution toGrpcExecution(TourExecution execution) {
+        Timestamp startTime = Timestamp.newBuilder()
+                .setSeconds(execution.getStartTime().toEpochSecond(ZoneOffset.UTC))
+                .build();
+        
+        Timestamp lastActivity = Timestamp.newBuilder()
+                .setSeconds(execution.getLastActivity().toEpochSecond(ZoneOffset.UTC))
+                .build();
+
         return com.example.tour.grpc.TourExecution.newBuilder()
                 .setId(execution.getId())
                 .setTourId(execution.getTourId())
                 .setTouristId(execution.getTouristId())
                 .setStatus(execution.getStatus().name())
+                .setStartTime(startTime)
+                .setLastActivity(lastActivity)
                 .build();
     }
 
@@ -141,5 +153,36 @@ public class TourGrpcServiceImpl extends TourGrpcServiceGrpc.TourGrpcServiceImpl
         CompleteTourResponse response = CompleteTourResponse.newBuilder().setTourExecution(grpcExecution).build();
         responseObserver.onNext(response);
         responseObserver.onCompleted();
+    }
+
+    @Override
+    public void getTourExecution(GetTourExecutionRequest request, StreamObserver<GetTourExecutionResponse> responseObserver) {
+        TourExecution execution = tourExecutionService.getTourExecution(request.getTourExecutionId());
+        
+        Tour tour = tourService.findById(execution.getTourId());
+        
+        com.example.tour.grpc.TourExecution grpcExecution = toGrpcExecution(execution);
+        com.example.tour.grpc.Tour grpcTour = toGrpcTour(tour); 
+
+        GetTourExecutionResponse response = GetTourExecutionResponse.newBuilder()
+                .setTourExecution(grpcExecution)
+                .setTour(grpcTour)
+                .build();
+                
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    private com.example.tour.grpc.Tour toGrpcTour(Tour tour) {
+        return com.example.tour.grpc.Tour.newBuilder()
+            .setId(tour.getId())
+            .setName(tour.getName())
+            .setDescription(tour.getDescription())
+            .setDifficulty(tour.getDifficulty())
+            .addAllTags(tour.getTags())
+            .setStatus(tour.getStatus().name())
+            .setPrice(tour.getPrice())
+            .setAuthorId(tour.getAuthorId())
+            .build();
     }
 }
