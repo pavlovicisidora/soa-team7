@@ -14,6 +14,12 @@
           <span>{{ tour.price | currency:'EUR' }}</span>
         </div>
       </div>
+      <div *ngIf="tour.status != 'DRAFT'">
+        <button (click)="startTour()" [disabled]="isStartingTour">
+          <span *ngIf="!isStartingTour">Start tour</span>
+          <span *ngIf="isStartingTour">Starting...</span>
+        </button>
+      </div>
     </section>
 
     <section class="reviews-section">

@@ -1,8 +1,10 @@
 syntax = "proto3";
 
+import "google/protobuf/timestamp.proto";
+
 option java_multiple_files = true;
+option java_outer_classname = "TourProto";
 option java_package = "com.example.tour.grpc";
-option go_package = "github.com/pavlovicisidora/soa-team7/Backend/APIGateway/proto";
 
 package tour;
 
@@ -11,6 +13,11 @@ service TourGrpcService {
   rpc GetAllToursById(GetAllToursByIdRequest) returns (GetAllToursByIdResponse);
   rpc GetAllTours(GetAllToursRequest) returns (GetAllToursResponse);
   rpc GetTourById(GetTourByIdRequest) returns (GetTourByIdResponse);
+  
+  rpc StartTour(StartTourRequest) returns (StartTourResponse);
+  rpc AbandonTour(AbandonTourRequest) returns (AbandonTourResponse);
+  rpc CompleteTour(CompleteTourRequest) returns (CompleteTourResponse);
+  rpc GetTourExecution(GetTourExecutionRequest) returns (GetTourExecutionResponse);
 }
 
 message Tour {
@@ -40,6 +47,7 @@ message GetAllToursByIdRequest{
 message GetAllToursByIdResponse{
   repeated Tour tours = 1;
 }
+
 message GetAllToursRequest{}
 message GetAllToursResponse{
   repeated Tour tours = 1;
@@ -49,4 +57,51 @@ message GetTourByIdRequest{
 }
 message GetTourByIdResponse{
   Tour tour = 1;
+}
+
+
+message TourExecution {
+  int32 id = 1;
+  int32 tour_id = 2;
+  string tourist_id = 3;
+  string status = 4;
+  google.protobuf.Timestamp start_time = 5;
+  google.protobuf.Timestamp last_activity = 6;
+  google.protobuf.Timestamp completion_time = 7; 
+}
+
+message StartTourRequest {
+  int32 tour_id = 1;
+  string tourist_id = 2;
+  double latitude = 3;
+  double longitude = 4;
+}
+
+message StartTourResponse {
+  TourExecution tour_execution = 1;
+}
+
+message AbandonTourRequest {
+  int32 tour_execution_id = 1;
+}
+
+message AbandonTourResponse {
+  TourExecution tour_execution = 1;
+}
+
+message CompleteTourRequest {
+  int32 tour_execution_id = 1;
+}
+
+message CompleteTourResponse {
+  TourExecution tour_execution = 1;
+}
+
+message GetTourExecutionRequest {
+  int32 tour_execution_id = 1;
+}
+
+message GetTourExecutionResponse {
+  TourExecution tour_execution = 1;
+  Tour tour = 2; 
 }

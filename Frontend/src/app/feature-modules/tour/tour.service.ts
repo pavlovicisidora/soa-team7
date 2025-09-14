@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { catchError, Observable, of } from 'rxjs';
 import { Tour } from './tour.model';
 import { Keypoint } from './keypoint.model';
+import { TourExecution } from './tour-execution.model';
 
 export interface TourCreationDto {
   name: string;
@@ -56,5 +57,26 @@ export class TourService {
 
   deleteKeypoint(id: number): Observable<void> {
     return this.http.delete<void>(`http://localhost:8080/api/keypoints/${id}`);
+  }
+
+
+  startTour(tourId: number, startLocation: { latitude: number, longitude: number }): Observable<TourExecution> {
+    const body = {
+      latitude: startLocation.latitude,
+      longitude: startLocation.longitude
+    };
+    return this.http.post<TourExecution>(`/api/tours/${tourId}/start`, body);
+  }
+
+  abandonTour(executionId: number): Observable<TourExecution> {
+    return this.http.post<TourExecution>(`/api/tours/execution/${executionId}/abandon`, {});
+  }
+
+  completeTour(executionId: number): Observable<TourExecution> {
+    return this.http.post<TourExecution>(`/api/tours/execution/${executionId}/complete`, {});
+  }
+
+  getTourExecution(executionId: number): Observable<TourExecution> {
+    return this.http.get<TourExecution>(`/api/tours/execution/${executionId}`);
   }
 }
