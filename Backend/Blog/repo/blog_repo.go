@@ -2,6 +2,7 @@ package repo
 
 import (
 	"context"
+	"log"
 
 	"github.com/pavlovicisidora/soa-team7/Backend/Blog/model"
 	"go.mongodb.org/mongo-driver/bson"
@@ -15,6 +16,7 @@ type BlogRepository interface {
 	GetBlogByID(ctx context.Context, id primitive.ObjectID) (*model.Blog, error)
 	LikeBlog(ctx context.Context, blogID primitive.ObjectID, userID string) error
 	UnlikeBlog(ctx context.Context, blogID primitive.ObjectID, userID string) error
+	UpdateBlogsOnUserStatusChange(ctx context.Context, userID string, isBlocked bool) error
 }
 
 type blogRepository struct {
@@ -37,7 +39,7 @@ func (r *blogRepository) CreateBlog(ctx context.Context, blog *model.Blog) (*pri
 }
 
 func (r *blogRepository) GetBlogs(ctx context.Context, authorIDs []string) ([]model.Blog, error) {
-	
+
 	if len(authorIDs) == 0 {
 		return []model.Blog{}, nil
 	}
@@ -79,4 +81,15 @@ func (r *blogRepository) UnlikeBlog(ctx context.Context, blogID primitive.Object
 	update := bson.M{"$pull": bson.M{"liked_by": userID}}
 	_, err := r.collection.UpdateOne(ctx, filter, update)
 	return err
+}
+func (r *blogRepository) UpdateBlogsOnUserStatusChange(ctx context.Context, userID string, isBlocked bool) error {
+	filter := bson.M{"user_id": userID}
+	update := bson.M{"$set": bson.M{"author_blocked": isBlocked}}
+
+	_, err := r.collection.UpdateMany(ctx, filter, update)
+	if err != nil {
+		log.Printf("Error updating blogs for user %s: %v", userID, err)
+		return err
+	}
+	return nil
 }

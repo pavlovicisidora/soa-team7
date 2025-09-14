@@ -8,9 +8,11 @@ COPY Blog/go.mod Blog/go.sum ./Blog/
 COPY api_gateway/go.mod api_gateway/go.sum ./api_gateway/
 COPY Stakeholders/go.mod Stakeholders/go.sum ./Stakeholders/
 COPY Follower/go.mod Follower/go.sum ./Follower/
+COPY saga/go.mod ./saga/
 
 RUN go get -d ./...
 
+COPY saga/ ./saga/   
 COPY Blog/ ./Blog/
 
 WORKDIR /app/Blog

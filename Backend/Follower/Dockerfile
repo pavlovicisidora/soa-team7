@@ -8,9 +8,9 @@ COPY Follower/go.mod Follower/go.sum ./Follower/
 COPY api_gateway/go.mod api_gateway/go.sum ./api_gateway/
 COPY Stakeholders/go.mod Stakeholders/go.sum ./Stakeholders/
 COPY Blog/go.mod Blog/go.sum ./Blog/
-
+COPY saga/go.mod ./saga/
 RUN go get -d ./...
-
+COPY saga/ ./saga/ 
 COPY Follower/ ./Follower/
 
 WORKDIR /app/Follower

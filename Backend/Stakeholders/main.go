@@ -2,16 +2,19 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 	"net"
 	"os"
 	"time"
 
 	"github.com/joho/godotenv"
+	"github.com/nats-io/nats.go"
 	"github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/handler"
 	pb "github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/proto"
 	"github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/repo"
 	"github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/service"
+	"github.com/pavlovicisidora/soa-team7/Backend/saga"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"google.golang.org/grpc"
@@ -54,9 +57,37 @@ func main() {
 		collectionName = "stakeholders"
 	}
 
+	natsURI := os.Getenv("NATS_URI")
+	if natsURI == "" {
+		natsURI = nats.DefaultURL
+	}
+	nc, err := nats.Connect(natsURI)
+	if err != nil {
+		log.Fatalf("Failed to connect to NATS: %v", err)
+	}
+	defer nc.Close()
+	log.Println("Successfully connected to NATS.")
+
 	userRepo := repo.NewUserRepository(client, dbName, collectionName)
-	userService := &service.UserService{UserRepository: userRepo}
+	userService := &service.UserService{UserRepository: userRepo,
+		NatsConn: nc}
 	profileService := &service.ProfileService{UserRepo: userRepo}
+
+	_, err = nc.Subscribe(saga.UserBlockFailedSubject, func(m *nats.Msg) {
+		log.Printf("Received compensation event on subject: %s", m.Subject)
+		var event saga.UserBlockFailedEvent
+		if err := json.Unmarshal(m.Data, &event); err != nil {
+			log.Printf("Error unmarshalling compensation event: %v", err)
+			return
+		}
+
+		if err := userService.HandleBlockUserCompensation(context.Background(), event.UserID); err != nil {
+			log.Printf("Failed to handle block user compensation for user %s: %v", event.UserID, err)
+		}
+	})
+	if err != nil {
+		log.Fatalf("Failed to subscribe to NATS subject: %v", err)
+	}
 
 	// --- Pokretanje gRPC servera ---
 	grpcPort := os.Getenv("GRPC_PORT")
