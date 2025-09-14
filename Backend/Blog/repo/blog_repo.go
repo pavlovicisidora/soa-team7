@@ -44,7 +44,10 @@ func (r *blogRepository) GetBlogs(ctx context.Context, authorIDs []string) ([]mo
 		return []model.Blog{}, nil
 	}
 
-	filter := bson.M{"user_id": bson.M{"$in": authorIDs}}
+	filter := bson.M{
+		"user_id":        bson.M{"$in": authorIDs},
+		"author_blocked": bson.M{"$ne": true},
+	}
 
 	var blogs []model.Blog
 	cursor, err := r.collection.Find(ctx, filter)

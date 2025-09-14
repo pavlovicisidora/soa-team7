@@ -113,6 +113,8 @@ services:
     ports:
       - "4222:4222"
       - "8222:8222"
+    command: 
+      - "-js"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8222"]
       interval: 10s
