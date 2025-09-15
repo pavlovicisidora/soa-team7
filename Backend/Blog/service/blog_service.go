@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/nats-io/nats.go"
 	"github.com/pavlovicisidora/soa-team7/Backend/Blog/model"
 	"github.com/pavlovicisidora/soa-team7/Backend/Blog/repo"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -15,15 +16,18 @@ type BlogService interface {
 	GetBlogByID(ctx context.Context, id string) (*model.Blog, error)
 	LikeBlog(ctx context.Context, blogID, userID string) (*model.Blog, error)
 	UnlikeBlog(ctx context.Context, blogID, userID string) (*model.Blog, error)
+	HandleUserBlocked(ctx context.Context, userID string) error
 }
 
 type blogService struct {
 	blogRepo repo.BlogRepository
+	NatsConn *nats.Conn
 }
 
-func NewBlogService(blogRepo repo.BlogRepository) BlogService {
+func NewBlogService(blogRepo repo.BlogRepository, nc *nats.Conn) BlogService {
 	return &blogService{
 		blogRepo: blogRepo,
+		NatsConn: nc,
 	}
 }
 
@@ -78,4 +82,9 @@ func (s *blogService) UnlikeBlog(ctx context.Context, blogID, userID string) (*m
 		return nil, err
 	}
 	return s.blogRepo.GetBlogByID(ctx, objBlogID)
+}
+func (s *blogService) HandleUserBlocked(ctx context.Context, userID string) error {
+	// return fmt.Errorf("simulirana greška za testiranje SAGA rollback-a")
+	err := s.blogRepo.UpdateBlogsOnUserStatusChange(ctx, userID, true)
+	return err
 }

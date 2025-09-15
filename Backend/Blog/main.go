@@ -2,16 +2,19 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 	"net"
 	"os"
 	"time"
 
 	"github.com/joho/godotenv"
+	"github.com/nats-io/nats.go"
 	"github.com/pavlovicisidora/soa-team7/Backend/Blog/handler"
 	pb "github.com/pavlovicisidora/soa-team7/Backend/Blog/proto"
 	"github.com/pavlovicisidora/soa-team7/Backend/Blog/repo"
 	"github.com/pavlovicisidora/soa-team7/Backend/Blog/service"
+	"github.com/pavlovicisidora/soa-team7/Backend/saga"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"google.golang.org/grpc"
@@ -49,17 +52,53 @@ func main() {
 	if dbName == "" {
 		dbName = "blog_db"
 	}
-	blogCollectionName  := os.Getenv("MONGO_COLLECTION_NAME")
-	if blogCollectionName  == "" {
-		blogCollectionName  = "blog"
+	blogCollectionName := os.Getenv("MONGO_COLLECTION_NAME")
+	if blogCollectionName == "" {
+		blogCollectionName = "blog"
 	}
 
-	blogCollection  := client.Database(dbName).Collection(blogCollectionName)
+	natsURI := os.Getenv("NATS_URI")
+	if natsURI == "" {
+		natsURI = nats.DefaultURL
+	}
+	nc, err := nats.Connect(natsURI)
+	if err != nil {
+		log.Fatalf("Failed to connect to NATS: %v", err)
+	}
+	defer nc.Close()
+	log.Println("Successfully connected to NATS.")
 
-	blogRepo := repo.NewBlogRepository(blogCollection )
-	blogService := service.NewBlogService(blogRepo)
+	blogCollection := client.Database(dbName).Collection(blogCollectionName)
+
+	blogRepo := repo.NewBlogRepository(blogCollection)
+	blogService := service.NewBlogService(blogRepo, nc)
 	blogHandler := handler.NewBlogHandler(blogService)
 
+	_, err = nc.Subscribe(saga.UserBlockedSubject, func(m *nats.Msg) {
+		log.Printf("Received event on subject: %s", m.Subject)
+		var event saga.UserBlockedEvent
+		if err := json.Unmarshal(m.Data, &event); err != nil {
+			log.Printf("Error unmarshalling event: %v", err)
+			return
+		}
+		if err := blogService.HandleUserBlocked(context.Background(), event.UserID); err != nil {
+			log.Printf("SAGA failed in Blog service for user %s: %v. Publishing compensation event...", event.UserID, err)
+
+			compensationEvent := saga.UserBlockFailedEvent{
+				UserID: event.UserID,
+				Reason: err.Error(),
+			}
+			eventData, _ := json.Marshal(compensationEvent)
+			if pubErr := nc.Publish(saga.UserBlockFailedSubject, eventData); pubErr != nil {
+				log.Printf("CRITICAL: Failed to publish compensation event: %v", pubErr)
+			}
+		} else {
+			log.Printf("SAGA step successful in Blog service for user %s", event.UserID)
+		}
+	})
+	if err != nil {
+		log.Fatalf("Failed to subscribe to NATS subject: %v", err)
+	}
 
 	commentCollectionName := os.Getenv("COMMENT_COLLECTION_NAME")
 	if commentCollectionName == "" {
@@ -70,8 +109,6 @@ func main() {
 	commentRepo := repo.NewCommentRepository(commentCollection)
 	commentService := service.NewCommentService(commentRepo)
 	commentHandler := handler.NewCommentHandler(commentService)
-
-
 
 	port := os.Getenv("PORT")
 	if port == "" {

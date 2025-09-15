@@ -2,15 +2,20 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"log"
 
+	"github.com/nats-io/nats.go"
 	"github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/model"
 	"github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/repo"
+	"github.com/pavlovicisidora/soa-team7/Backend/saga"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type UserService struct {
 	UserRepository *repo.UserRepository
+	NatsConn       *nats.Conn
 }
 
 func (service *UserService) GetAllUsers(ctx context.Context) ([]model.User, error) {
@@ -77,6 +82,20 @@ func (service *UserService) BlockUser(ctx context.Context, username string) erro
 	if err != nil {
 		return fmt.Errorf("DB error: %v", err)
 	}
+
+	event := saga.UserBlockedEvent{
+		UserID: existingUser.ID.Hex(),
+	}
+	eventData, _ := json.Marshal(event)
+
+	log.Printf("Publishing event to subject: %s for UserID: %s", saga.UserBlockedSubject, event.UserID)
+	if err := service.NatsConn.Publish(saga.UserBlockedSubject, eventData); err != nil {
+		log.Printf("Failed to publish NATS event, compensating... Error: %v", err)
+		existingUser.Blocked = false
+		_ = service.UserRepository.UpdateUser(ctx, existingUser)
+		return fmt.Errorf("failed to publish saga event")
+	}
+
 	return nil
 }
 func (service *UserService) FindAllInfo(ctx context.Context, userID string) ([]model.User, error) {
@@ -102,4 +121,26 @@ func (service *UserService) UpdateUserPosition(ctx context.Context, userID strin
 		return fmt.Errorf("invalid userID format: %v", err)
 	}
 	return service.UserRepository.UpdateUserPosition(ctx, userObjectID, lat, long)
+}
+
+func (service *UserService) HandleBlockUserCompensation(ctx context.Context, userID string) error {
+	log.Printf("Executing compensation for UserID: %s", userID)
+	userObjectID, err := primitive.ObjectIDFromHex(userID)
+	if err != nil {
+		return fmt.Errorf("invalid userID format for compensation: %v", err)
+	}
+
+	user, err := service.UserRepository.FindUserById(ctx, userObjectID)
+	if err != nil {
+		return fmt.Errorf("could not find user for compensation: %v", err)
+	}
+
+	// Vraćanje stanja
+	user.Blocked = false
+	if err := service.UserRepository.UpdateUser(ctx, *user); err != nil {
+		return fmt.Errorf("failed to update user during compensation: %v", err)
+	}
+
+	log.Printf("Compensation successful for UserID: %s", userID)
+	return nil
 }

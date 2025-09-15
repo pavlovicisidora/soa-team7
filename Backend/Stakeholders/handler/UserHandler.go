@@ -76,9 +76,9 @@ func (s *StakeholderGRPCServer) Login(ctx context.Context, req *pb.LoginRequest)
 		return nil, status.Errorf(codes.Internal, "Login failed: %v", err)
 	}
 
-	if user.Blocked {
-		return nil, status.Errorf(codes.PermissionDenied, "Account is blocked")
-	}
+	// if user.Blocked {
+	// 	return nil, status.Errorf(codes.PermissionDenied, "Account is blocked")
+	// }
 
 	token, err := auth.GenerateJWT(user.ID.Hex(), user.Role)
 	if err != nil {

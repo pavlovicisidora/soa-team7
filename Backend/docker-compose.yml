@@ -36,8 +36,11 @@ services:
       - MONGO_URI=mongodb://root:pass@mongo:27017
       - MONGO_DB_NAME=stakeholders_db
       - MONGO_COLLECTION_NAME=stakeholders
+      - NATS_URI=nats://nats-server:4222
     depends_on:
       mongo:
+        condition: service_healthy
+      nats-server:
         condition: service_healthy
 
   blog_server:
@@ -54,8 +57,14 @@ services:
       - MONGO_URI=mongodb://root:pass@mongo:27017
       - MONGO_DB_NAME=blog_db
       - MONGO_COLLECTION_NAME=blog
+      - NATS_URI=nats://nats-server:4222
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
     depends_on:
       mongo:
+        condition: service_healthy
+      nats-server:
         condition: service_healthy
 
   tour_server:
@@ -95,6 +104,25 @@ services:
     depends_on:
       neo4j: 
         condition: service_healthy
+  nats-server:
+    build:
+      context: .
+      dockerfile: ./saga/Dockerfile
+    container_name: nats
+    restart: always
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    command: 
+      - "nats-server"
+      - "-js"
+      - "-m" 
+      - "8222"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8222"]
+      interval: 10s
+      timeout: 5s
+      retries: 5   
         
   neo4j:
     image: neo4j:5
