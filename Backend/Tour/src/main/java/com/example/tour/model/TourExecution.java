@@ -2,6 +2,8 @@ package com.example.tour.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class TourExecution {
@@ -27,7 +29,14 @@ public class TourExecution {
     @Column(nullable = false)
     private LocalDateTime lastActivity;
 
+    @ElementCollection
+    @CollectionTable(name = "executed_key_points", joinColumns = @JoinColumn(name = "tour_execution_id"))
+    private List<ExecutedKeyPoint> executedKeyPoints;
+
+    private int KPtoBeCompleted;
+
     public TourExecution() {
+        this.executedKeyPoints = new ArrayList<>();
     }
 
     public Integer getId() {
@@ -74,4 +83,20 @@ public class TourExecution {
     public void setStartTime(LocalDateTime startTime) { this.startTime = startTime; }
     public LocalDateTime getLastActivity() { return lastActivity; }
     public void setLastActivity(LocalDateTime lastActivity) { this.lastActivity = lastActivity; }
+
+    public List<ExecutedKeyPoint> getExecutedKeyPoints() {
+        return executedKeyPoints;
+    }
+
+    public void setExecutedKeyPoints(List<ExecutedKeyPoint> executedKeyPoints) {
+        this.executedKeyPoints = executedKeyPoints;
+    }
+
+    public int getKPtoBeCompleted() {
+        return KPtoBeCompleted;
+    }
+
+    public void setKPtoBeCompleted(int KPtoBeCompleted) {
+        this.KPtoBeCompleted = KPtoBeCompleted;
+    }
 }

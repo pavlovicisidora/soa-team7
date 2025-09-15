@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+option go_package = "github.com/pavlovicisidora/soa-team7/Backend/APIGateway/proto";
+
 import "google/protobuf/timestamp.proto";
 
 option java_multiple_files = true;
@@ -16,7 +18,7 @@ service TourGrpcService {
   
   rpc StartTour(StartTourRequest) returns (StartTourResponse);
   rpc AbandonTour(AbandonTourRequest) returns (AbandonTourResponse);
-  rpc CompleteTour(CompleteTourRequest) returns (CompleteTourResponse);
+  rpc CompleteKeyPoint(CompleteKeyPointRequest) returns (CompleteKeyPointResponse);
   rpc GetTourExecution(GetTourExecutionRequest) returns (GetTourExecutionResponse);
 }
 
@@ -89,13 +91,15 @@ message AbandonTourResponse {
   TourExecution tour_execution = 1;
 }
 
-message CompleteTourRequest {
+message CompleteKeyPointRequest{
   int32 tour_execution_id = 1;
+  int32 keypoint_execution_id = 2;
 }
 
-message CompleteTourResponse {
+message CompleteKeyPointResponse {
   TourExecution tour_execution = 1;
 }
+
 
 message GetTourExecutionRequest {
   int32 tour_execution_id = 1;
