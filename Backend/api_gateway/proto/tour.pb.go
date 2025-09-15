@@ -2,13 +2,14 @@
 // versions:
 // 	protoc-gen-go v1.36.8
 // 	protoc        v6.32.0
-// source: tour.proto
+// source: proto/tour.proto
 
 package proto
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -37,7 +38,7 @@ type Tour struct {
 
 func (x *Tour) Reset() {
 	*x = Tour{}
-	mi := &file_tour_proto_msgTypes[0]
+	mi := &file_proto_tour_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -49,7 +50,7 @@ func (x *Tour) String() string {
 func (*Tour) ProtoMessage() {}
 
 func (x *Tour) ProtoReflect() protoreflect.Message {
-	mi := &file_tour_proto_msgTypes[0]
+	mi := &file_proto_tour_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -62,7 +63,7 @@ func (x *Tour) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Tour.ProtoReflect.Descriptor instead.
 func (*Tour) Descriptor() ([]byte, []int) {
-	return file_tour_proto_rawDescGZIP(), []int{0}
+	return file_proto_tour_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *Tour) GetId() int32 {
@@ -134,7 +135,7 @@ type CreateTourRequest struct {
 
 func (x *CreateTourRequest) Reset() {
 	*x = CreateTourRequest{}
-	mi := &file_tour_proto_msgTypes[1]
+	mi := &file_proto_tour_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -146,7 +147,7 @@ func (x *CreateTourRequest) String() string {
 func (*CreateTourRequest) ProtoMessage() {}
 
 func (x *CreateTourRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_tour_proto_msgTypes[1]
+	mi := &file_proto_tour_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -159,7 +160,7 @@ func (x *CreateTourRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateTourRequest.ProtoReflect.Descriptor instead.
 func (*CreateTourRequest) Descriptor() ([]byte, []int) {
-	return file_tour_proto_rawDescGZIP(), []int{1}
+	return file_proto_tour_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *CreateTourRequest) GetName() string {
@@ -206,7 +207,7 @@ type CreateTourResponse struct {
 
 func (x *CreateTourResponse) Reset() {
 	*x = CreateTourResponse{}
-	mi := &file_tour_proto_msgTypes[2]
+	mi := &file_proto_tour_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -218,7 +219,7 @@ func (x *CreateTourResponse) String() string {
 func (*CreateTourResponse) ProtoMessage() {}
 
 func (x *CreateTourResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_tour_proto_msgTypes[2]
+	mi := &file_proto_tour_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -231,7 +232,7 @@ func (x *CreateTourResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateTourResponse.ProtoReflect.Descriptor instead.
 func (*CreateTourResponse) Descriptor() ([]byte, []int) {
-	return file_tour_proto_rawDescGZIP(), []int{2}
+	return file_proto_tour_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *CreateTourResponse) GetTour() *Tour {
@@ -250,7 +251,7 @@ type GetAllToursByIdRequest struct {
 
 func (x *GetAllToursByIdRequest) Reset() {
 	*x = GetAllToursByIdRequest{}
-	mi := &file_tour_proto_msgTypes[3]
+	mi := &file_proto_tour_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -262,7 +263,7 @@ func (x *GetAllToursByIdRequest) String() string {
 func (*GetAllToursByIdRequest) ProtoMessage() {}
 
 func (x *GetAllToursByIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_tour_proto_msgTypes[3]
+	mi := &file_proto_tour_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -275,7 +276,7 @@ func (x *GetAllToursByIdRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAllToursByIdRequest.ProtoReflect.Descriptor instead.
 func (*GetAllToursByIdRequest) Descriptor() ([]byte, []int) {
-	return file_tour_proto_rawDescGZIP(), []int{3}
+	return file_proto_tour_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *GetAllToursByIdRequest) GetAuthorId() string {
@@ -294,7 +295,7 @@ type GetAllToursByIdResponse struct {
 
 func (x *GetAllToursByIdResponse) Reset() {
 	*x = GetAllToursByIdResponse{}
-	mi := &file_tour_proto_msgTypes[4]
+	mi := &file_proto_tour_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -306,7 +307,7 @@ func (x *GetAllToursByIdResponse) String() string {
 func (*GetAllToursByIdResponse) ProtoMessage() {}
 
 func (x *GetAllToursByIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_tour_proto_msgTypes[4]
+	mi := &file_proto_tour_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -319,7 +320,7 @@ func (x *GetAllToursByIdResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAllToursByIdResponse.ProtoReflect.Descriptor instead.
 func (*GetAllToursByIdResponse) Descriptor() ([]byte, []int) {
-	return file_tour_proto_rawDescGZIP(), []int{4}
+	return file_proto_tour_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *GetAllToursByIdResponse) GetTours() []*Tour {
@@ -337,7 +338,7 @@ type GetAllToursRequest struct {
 
 func (x *GetAllToursRequest) Reset() {
 	*x = GetAllToursRequest{}
-	mi := &file_tour_proto_msgTypes[5]
+	mi := &file_proto_tour_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -349,7 +350,7 @@ func (x *GetAllToursRequest) String() string {
 func (*GetAllToursRequest) ProtoMessage() {}
 
 func (x *GetAllToursRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_tour_proto_msgTypes[5]
+	mi := &file_proto_tour_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -362,7 +363,7 @@ func (x *GetAllToursRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAllToursRequest.ProtoReflect.Descriptor instead.
 func (*GetAllToursRequest) Descriptor() ([]byte, []int) {
-	return file_tour_proto_rawDescGZIP(), []int{5}
+	return file_proto_tour_proto_rawDescGZIP(), []int{5}
 }
 
 type GetAllToursResponse struct {
@@ -374,7 +375,7 @@ type GetAllToursResponse struct {
 
 func (x *GetAllToursResponse) Reset() {
 	*x = GetAllToursResponse{}
-	mi := &file_tour_proto_msgTypes[6]
+	mi := &file_proto_tour_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -386,7 +387,7 @@ func (x *GetAllToursResponse) String() string {
 func (*GetAllToursResponse) ProtoMessage() {}
 
 func (x *GetAllToursResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_tour_proto_msgTypes[6]
+	mi := &file_proto_tour_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -399,7 +400,7 @@ func (x *GetAllToursResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAllToursResponse.ProtoReflect.Descriptor instead.
 func (*GetAllToursResponse) Descriptor() ([]byte, []int) {
-	return file_tour_proto_rawDescGZIP(), []int{6}
+	return file_proto_tour_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *GetAllToursResponse) GetTours() []*Tour {
@@ -418,7 +419,7 @@ type GetTourByIdRequest struct {
 
 func (x *GetTourByIdRequest) Reset() {
 	*x = GetTourByIdRequest{}
-	mi := &file_tour_proto_msgTypes[7]
+	mi := &file_proto_tour_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -430,7 +431,7 @@ func (x *GetTourByIdRequest) String() string {
 func (*GetTourByIdRequest) ProtoMessage() {}
 
 func (x *GetTourByIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_tour_proto_msgTypes[7]
+	mi := &file_proto_tour_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -443,7 +444,7 @@ func (x *GetTourByIdRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTourByIdRequest.ProtoReflect.Descriptor instead.
 func (*GetTourByIdRequest) Descriptor() ([]byte, []int) {
-	return file_tour_proto_rawDescGZIP(), []int{7}
+	return file_proto_tour_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *GetTourByIdRequest) GetTourId() int32 {
@@ -462,7 +463,7 @@ type GetTourByIdResponse struct {
 
 func (x *GetTourByIdResponse) Reset() {
 	*x = GetTourByIdResponse{}
-	mi := &file_tour_proto_msgTypes[8]
+	mi := &file_proto_tour_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -474,7 +475,7 @@ func (x *GetTourByIdResponse) String() string {
 func (*GetTourByIdResponse) ProtoMessage() {}
 
 func (x *GetTourByIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_tour_proto_msgTypes[8]
+	mi := &file_proto_tour_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -487,7 +488,7 @@ func (x *GetTourByIdResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTourByIdResponse.ProtoReflect.Descriptor instead.
 func (*GetTourByIdResponse) Descriptor() ([]byte, []int) {
-	return file_tour_proto_rawDescGZIP(), []int{8}
+	return file_proto_tour_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *GetTourByIdResponse) GetTour() *Tour {
@@ -497,12 +498,487 @@ func (x *GetTourByIdResponse) GetTour() *Tour {
 	return nil
 }
 
-var File_tour_proto protoreflect.FileDescriptor
+type TourExecution struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Id             int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	TourId         int32                  `protobuf:"varint,2,opt,name=tour_id,json=tourId,proto3" json:"tour_id,omitempty"`
+	TouristId      string                 `protobuf:"bytes,3,opt,name=tourist_id,json=touristId,proto3" json:"tourist_id,omitempty"`
+	Status         string                 `protobuf:"bytes,4,opt,name=status,proto3" json:"status,omitempty"`
+	StartTime      *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
+	LastActivity   *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=last_activity,json=lastActivity,proto3" json:"last_activity,omitempty"`
+	CompletionTime *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=completion_time,json=completionTime,proto3" json:"completion_time,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
 
-const file_tour_proto_rawDesc = "" +
+func (x *TourExecution) Reset() {
+	*x = TourExecution{}
+	mi := &file_proto_tour_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TourExecution) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TourExecution) ProtoMessage() {}
+
+func (x *TourExecution) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_tour_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TourExecution.ProtoReflect.Descriptor instead.
+func (*TourExecution) Descriptor() ([]byte, []int) {
+	return file_proto_tour_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *TourExecution) GetId() int32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *TourExecution) GetTourId() int32 {
+	if x != nil {
+		return x.TourId
+	}
+	return 0
+}
+
+func (x *TourExecution) GetTouristId() string {
+	if x != nil {
+		return x.TouristId
+	}
+	return ""
+}
+
+func (x *TourExecution) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *TourExecution) GetStartTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.StartTime
+	}
+	return nil
+}
+
+func (x *TourExecution) GetLastActivity() *timestamppb.Timestamp {
+	if x != nil {
+		return x.LastActivity
+	}
+	return nil
+}
+
+func (x *TourExecution) GetCompletionTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CompletionTime
+	}
+	return nil
+}
+
+type StartTourRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TourId        int32                  `protobuf:"varint,1,opt,name=tour_id,json=tourId,proto3" json:"tour_id,omitempty"`
+	TouristId     string                 `protobuf:"bytes,2,opt,name=tourist_id,json=touristId,proto3" json:"tourist_id,omitempty"`
+	Latitude      float64                `protobuf:"fixed64,3,opt,name=latitude,proto3" json:"latitude,omitempty"`
+	Longitude     float64                `protobuf:"fixed64,4,opt,name=longitude,proto3" json:"longitude,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StartTourRequest) Reset() {
+	*x = StartTourRequest{}
+	mi := &file_proto_tour_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StartTourRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StartTourRequest) ProtoMessage() {}
+
+func (x *StartTourRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_tour_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StartTourRequest.ProtoReflect.Descriptor instead.
+func (*StartTourRequest) Descriptor() ([]byte, []int) {
+	return file_proto_tour_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *StartTourRequest) GetTourId() int32 {
+	if x != nil {
+		return x.TourId
+	}
+	return 0
+}
+
+func (x *StartTourRequest) GetTouristId() string {
+	if x != nil {
+		return x.TouristId
+	}
+	return ""
+}
+
+func (x *StartTourRequest) GetLatitude() float64 {
+	if x != nil {
+		return x.Latitude
+	}
+	return 0
+}
+
+func (x *StartTourRequest) GetLongitude() float64 {
+	if x != nil {
+		return x.Longitude
+	}
+	return 0
+}
+
+type StartTourResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TourExecution *TourExecution         `protobuf:"bytes,1,opt,name=tour_execution,json=tourExecution,proto3" json:"tour_execution,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StartTourResponse) Reset() {
+	*x = StartTourResponse{}
+	mi := &file_proto_tour_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StartTourResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StartTourResponse) ProtoMessage() {}
+
+func (x *StartTourResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_tour_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StartTourResponse.ProtoReflect.Descriptor instead.
+func (*StartTourResponse) Descriptor() ([]byte, []int) {
+	return file_proto_tour_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *StartTourResponse) GetTourExecution() *TourExecution {
+	if x != nil {
+		return x.TourExecution
+	}
+	return nil
+}
+
+type AbandonTourRequest struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	TourExecutionId int32                  `protobuf:"varint,1,opt,name=tour_execution_id,json=tourExecutionId,proto3" json:"tour_execution_id,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *AbandonTourRequest) Reset() {
+	*x = AbandonTourRequest{}
+	mi := &file_proto_tour_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AbandonTourRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AbandonTourRequest) ProtoMessage() {}
+
+func (x *AbandonTourRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_tour_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AbandonTourRequest.ProtoReflect.Descriptor instead.
+func (*AbandonTourRequest) Descriptor() ([]byte, []int) {
+	return file_proto_tour_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *AbandonTourRequest) GetTourExecutionId() int32 {
+	if x != nil {
+		return x.TourExecutionId
+	}
+	return 0
+}
+
+type AbandonTourResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TourExecution *TourExecution         `protobuf:"bytes,1,opt,name=tour_execution,json=tourExecution,proto3" json:"tour_execution,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AbandonTourResponse) Reset() {
+	*x = AbandonTourResponse{}
+	mi := &file_proto_tour_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AbandonTourResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AbandonTourResponse) ProtoMessage() {}
+
+func (x *AbandonTourResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_tour_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AbandonTourResponse.ProtoReflect.Descriptor instead.
+func (*AbandonTourResponse) Descriptor() ([]byte, []int) {
+	return file_proto_tour_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *AbandonTourResponse) GetTourExecution() *TourExecution {
+	if x != nil {
+		return x.TourExecution
+	}
+	return nil
+}
+
+type CompleteTourRequest struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	TourExecutionId int32                  `protobuf:"varint,1,opt,name=tour_execution_id,json=tourExecutionId,proto3" json:"tour_execution_id,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *CompleteTourRequest) Reset() {
+	*x = CompleteTourRequest{}
+	mi := &file_proto_tour_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CompleteTourRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CompleteTourRequest) ProtoMessage() {}
+
+func (x *CompleteTourRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_tour_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CompleteTourRequest.ProtoReflect.Descriptor instead.
+func (*CompleteTourRequest) Descriptor() ([]byte, []int) {
+	return file_proto_tour_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *CompleteTourRequest) GetTourExecutionId() int32 {
+	if x != nil {
+		return x.TourExecutionId
+	}
+	return 0
+}
+
+type CompleteTourResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TourExecution *TourExecution         `protobuf:"bytes,1,opt,name=tour_execution,json=tourExecution,proto3" json:"tour_execution,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CompleteTourResponse) Reset() {
+	*x = CompleteTourResponse{}
+	mi := &file_proto_tour_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CompleteTourResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CompleteTourResponse) ProtoMessage() {}
+
+func (x *CompleteTourResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_tour_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CompleteTourResponse.ProtoReflect.Descriptor instead.
+func (*CompleteTourResponse) Descriptor() ([]byte, []int) {
+	return file_proto_tour_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *CompleteTourResponse) GetTourExecution() *TourExecution {
+	if x != nil {
+		return x.TourExecution
+	}
+	return nil
+}
+
+type GetTourExecutionRequest struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	TourExecutionId int32                  `protobuf:"varint,1,opt,name=tour_execution_id,json=tourExecutionId,proto3" json:"tour_execution_id,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *GetTourExecutionRequest) Reset() {
+	*x = GetTourExecutionRequest{}
+	mi := &file_proto_tour_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetTourExecutionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetTourExecutionRequest) ProtoMessage() {}
+
+func (x *GetTourExecutionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_tour_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetTourExecutionRequest.ProtoReflect.Descriptor instead.
+func (*GetTourExecutionRequest) Descriptor() ([]byte, []int) {
+	return file_proto_tour_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *GetTourExecutionRequest) GetTourExecutionId() int32 {
+	if x != nil {
+		return x.TourExecutionId
+	}
+	return 0
+}
+
+type GetTourExecutionResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TourExecution *TourExecution         `protobuf:"bytes,1,opt,name=tour_execution,json=tourExecution,proto3" json:"tour_execution,omitempty"`
+	Tour          *Tour                  `protobuf:"bytes,2,opt,name=tour,proto3" json:"tour,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetTourExecutionResponse) Reset() {
+	*x = GetTourExecutionResponse{}
+	mi := &file_proto_tour_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetTourExecutionResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetTourExecutionResponse) ProtoMessage() {}
+
+func (x *GetTourExecutionResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_tour_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetTourExecutionResponse.ProtoReflect.Descriptor instead.
+func (*GetTourExecutionResponse) Descriptor() ([]byte, []int) {
+	return file_proto_tour_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *GetTourExecutionResponse) GetTourExecution() *TourExecution {
+	if x != nil {
+		return x.TourExecution
+	}
+	return nil
+}
+
+func (x *GetTourExecutionResponse) GetTour() *Tour {
+	if x != nil {
+		return x.Tour
+	}
+	return nil
+}
+
+var File_proto_tour_proto protoreflect.FileDescriptor
+
+const file_proto_tour_proto_rawDesc = "" +
 	"\n" +
-	"\n" +
-	"tour.proto\x12\x04tour\"\xcb\x01\n" +
+	"\x10proto/tour.proto\x12\x04tour\x1a\x1fgoogle/protobuf/timestamp.proto\"\xcb\x01\n" +
 	"\x04Tour\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
@@ -538,79 +1014,141 @@ const file_tour_proto_rawDesc = "" +
 	"\atour_id\x18\x01 \x01(\x05R\x06tourId\"5\n" +
 	"\x13GetTourByIdResponse\x12\x1e\n" +
 	"\x04tour\x18\x01 \x01(\v2\n" +
-	".tour.TourR\x04tour2\xaa\x02\n" +
+	".tour.TourR\x04tour\"\xb0\x02\n" +
+	"\rTourExecution\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x17\n" +
+	"\atour_id\x18\x02 \x01(\x05R\x06tourId\x12\x1d\n" +
+	"\n" +
+	"tourist_id\x18\x03 \x01(\tR\ttouristId\x12\x16\n" +
+	"\x06status\x18\x04 \x01(\tR\x06status\x129\n" +
+	"\n" +
+	"start_time\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tstartTime\x12?\n" +
+	"\rlast_activity\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\flastActivity\x12C\n" +
+	"\x0fcompletion_time\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\x0ecompletionTime\"\x84\x01\n" +
+	"\x10StartTourRequest\x12\x17\n" +
+	"\atour_id\x18\x01 \x01(\x05R\x06tourId\x12\x1d\n" +
+	"\n" +
+	"tourist_id\x18\x02 \x01(\tR\ttouristId\x12\x1a\n" +
+	"\blatitude\x18\x03 \x01(\x01R\blatitude\x12\x1c\n" +
+	"\tlongitude\x18\x04 \x01(\x01R\tlongitude\"O\n" +
+	"\x11StartTourResponse\x12:\n" +
+	"\x0etour_execution\x18\x01 \x01(\v2\x13.tour.TourExecutionR\rtourExecution\"@\n" +
+	"\x12AbandonTourRequest\x12*\n" +
+	"\x11tour_execution_id\x18\x01 \x01(\x05R\x0ftourExecutionId\"Q\n" +
+	"\x13AbandonTourResponse\x12:\n" +
+	"\x0etour_execution\x18\x01 \x01(\v2\x13.tour.TourExecutionR\rtourExecution\"A\n" +
+	"\x13CompleteTourRequest\x12*\n" +
+	"\x11tour_execution_id\x18\x01 \x01(\x05R\x0ftourExecutionId\"R\n" +
+	"\x14CompleteTourResponse\x12:\n" +
+	"\x0etour_execution\x18\x01 \x01(\v2\x13.tour.TourExecutionR\rtourExecution\"E\n" +
+	"\x17GetTourExecutionRequest\x12*\n" +
+	"\x11tour_execution_id\x18\x01 \x01(\x05R\x0ftourExecutionId\"v\n" +
+	"\x18GetTourExecutionResponse\x12:\n" +
+	"\x0etour_execution\x18\x01 \x01(\v2\x13.tour.TourExecutionR\rtourExecution\x12\x1e\n" +
+	"\x04tour\x18\x02 \x01(\v2\n" +
+	".tour.TourR\x04tour2\xc6\x04\n" +
 	"\x0fTourGrpcService\x12?\n" +
 	"\n" +
 	"CreateTour\x12\x17.tour.CreateTourRequest\x1a\x18.tour.CreateTourResponse\x12N\n" +
 	"\x0fGetAllToursById\x12\x1c.tour.GetAllToursByIdRequest\x1a\x1d.tour.GetAllToursByIdResponse\x12B\n" +
 	"\vGetAllTours\x12\x18.tour.GetAllToursRequest\x1a\x19.tour.GetAllToursResponse\x12B\n" +
-	"\vGetTourById\x12\x18.tour.GetTourByIdRequest\x1a\x19.tour.GetTourByIdResponseBX\n" +
+	"\vGetTourById\x12\x18.tour.GetTourByIdRequest\x1a\x19.tour.GetTourByIdResponse\x12<\n" +
+	"\tStartTour\x12\x16.tour.StartTourRequest\x1a\x17.tour.StartTourResponse\x12B\n" +
+	"\vAbandonTour\x12\x18.tour.AbandonTourRequest\x1a\x19.tour.AbandonTourResponse\x12E\n" +
+	"\fCompleteTour\x12\x19.tour.CompleteTourRequest\x1a\x1a.tour.CompleteTourResponse\x12Q\n" +
+	"\x10GetTourExecution\x12\x1d.tour.GetTourExecutionRequest\x1a\x1e.tour.GetTourExecutionResponseBX\n" +
 	"\x15com.example.tour.grpcP\x01Z=github.com/pavlovicisidora/soa-team7/Backend/APIGateway/protob\x06proto3"
 
 var (
-	file_tour_proto_rawDescOnce sync.Once
-	file_tour_proto_rawDescData []byte
+	file_proto_tour_proto_rawDescOnce sync.Once
+	file_proto_tour_proto_rawDescData []byte
 )
 
-func file_tour_proto_rawDescGZIP() []byte {
-	file_tour_proto_rawDescOnce.Do(func() {
-		file_tour_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_tour_proto_rawDesc), len(file_tour_proto_rawDesc)))
+func file_proto_tour_proto_rawDescGZIP() []byte {
+	file_proto_tour_proto_rawDescOnce.Do(func() {
+		file_proto_tour_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_proto_tour_proto_rawDesc), len(file_proto_tour_proto_rawDesc)))
 	})
-	return file_tour_proto_rawDescData
+	return file_proto_tour_proto_rawDescData
 }
 
-var file_tour_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
-var file_tour_proto_goTypes = []any{
-	(*Tour)(nil),                    // 0: tour.Tour
-	(*CreateTourRequest)(nil),       // 1: tour.CreateTourRequest
-	(*CreateTourResponse)(nil),      // 2: tour.CreateTourResponse
-	(*GetAllToursByIdRequest)(nil),  // 3: tour.GetAllToursByIdRequest
-	(*GetAllToursByIdResponse)(nil), // 4: tour.GetAllToursByIdResponse
-	(*GetAllToursRequest)(nil),      // 5: tour.GetAllToursRequest
-	(*GetAllToursResponse)(nil),     // 6: tour.GetAllToursResponse
-	(*GetTourByIdRequest)(nil),      // 7: tour.GetTourByIdRequest
-	(*GetTourByIdResponse)(nil),     // 8: tour.GetTourByIdResponse
+var file_proto_tour_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
+var file_proto_tour_proto_goTypes = []any{
+	(*Tour)(nil),                     // 0: tour.Tour
+	(*CreateTourRequest)(nil),        // 1: tour.CreateTourRequest
+	(*CreateTourResponse)(nil),       // 2: tour.CreateTourResponse
+	(*GetAllToursByIdRequest)(nil),   // 3: tour.GetAllToursByIdRequest
+	(*GetAllToursByIdResponse)(nil),  // 4: tour.GetAllToursByIdResponse
+	(*GetAllToursRequest)(nil),       // 5: tour.GetAllToursRequest
+	(*GetAllToursResponse)(nil),      // 6: tour.GetAllToursResponse
+	(*GetTourByIdRequest)(nil),       // 7: tour.GetTourByIdRequest
+	(*GetTourByIdResponse)(nil),      // 8: tour.GetTourByIdResponse
+	(*TourExecution)(nil),            // 9: tour.TourExecution
+	(*StartTourRequest)(nil),         // 10: tour.StartTourRequest
+	(*StartTourResponse)(nil),        // 11: tour.StartTourResponse
+	(*AbandonTourRequest)(nil),       // 12: tour.AbandonTourRequest
+	(*AbandonTourResponse)(nil),      // 13: tour.AbandonTourResponse
+	(*CompleteTourRequest)(nil),      // 14: tour.CompleteTourRequest
+	(*CompleteTourResponse)(nil),     // 15: tour.CompleteTourResponse
+	(*GetTourExecutionRequest)(nil),  // 16: tour.GetTourExecutionRequest
+	(*GetTourExecutionResponse)(nil), // 17: tour.GetTourExecutionResponse
+	(*timestamppb.Timestamp)(nil),    // 18: google.protobuf.Timestamp
 }
-var file_tour_proto_depIdxs = []int32{
-	0, // 0: tour.CreateTourResponse.tour:type_name -> tour.Tour
-	0, // 1: tour.GetAllToursByIdResponse.tours:type_name -> tour.Tour
-	0, // 2: tour.GetAllToursResponse.tours:type_name -> tour.Tour
-	0, // 3: tour.GetTourByIdResponse.tour:type_name -> tour.Tour
-	1, // 4: tour.TourGrpcService.CreateTour:input_type -> tour.CreateTourRequest
-	3, // 5: tour.TourGrpcService.GetAllToursById:input_type -> tour.GetAllToursByIdRequest
-	5, // 6: tour.TourGrpcService.GetAllTours:input_type -> tour.GetAllToursRequest
-	7, // 7: tour.TourGrpcService.GetTourById:input_type -> tour.GetTourByIdRequest
-	2, // 8: tour.TourGrpcService.CreateTour:output_type -> tour.CreateTourResponse
-	4, // 9: tour.TourGrpcService.GetAllToursById:output_type -> tour.GetAllToursByIdResponse
-	6, // 10: tour.TourGrpcService.GetAllTours:output_type -> tour.GetAllToursResponse
-	8, // 11: tour.TourGrpcService.GetTourById:output_type -> tour.GetTourByIdResponse
-	8, // [8:12] is the sub-list for method output_type
-	4, // [4:8] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+var file_proto_tour_proto_depIdxs = []int32{
+	0,  // 0: tour.CreateTourResponse.tour:type_name -> tour.Tour
+	0,  // 1: tour.GetAllToursByIdResponse.tours:type_name -> tour.Tour
+	0,  // 2: tour.GetAllToursResponse.tours:type_name -> tour.Tour
+	0,  // 3: tour.GetTourByIdResponse.tour:type_name -> tour.Tour
+	18, // 4: tour.TourExecution.start_time:type_name -> google.protobuf.Timestamp
+	18, // 5: tour.TourExecution.last_activity:type_name -> google.protobuf.Timestamp
+	18, // 6: tour.TourExecution.completion_time:type_name -> google.protobuf.Timestamp
+	9,  // 7: tour.StartTourResponse.tour_execution:type_name -> tour.TourExecution
+	9,  // 8: tour.AbandonTourResponse.tour_execution:type_name -> tour.TourExecution
+	9,  // 9: tour.CompleteTourResponse.tour_execution:type_name -> tour.TourExecution
+	9,  // 10: tour.GetTourExecutionResponse.tour_execution:type_name -> tour.TourExecution
+	0,  // 11: tour.GetTourExecutionResponse.tour:type_name -> tour.Tour
+	1,  // 12: tour.TourGrpcService.CreateTour:input_type -> tour.CreateTourRequest
+	3,  // 13: tour.TourGrpcService.GetAllToursById:input_type -> tour.GetAllToursByIdRequest
+	5,  // 14: tour.TourGrpcService.GetAllTours:input_type -> tour.GetAllToursRequest
+	7,  // 15: tour.TourGrpcService.GetTourById:input_type -> tour.GetTourByIdRequest
+	10, // 16: tour.TourGrpcService.StartTour:input_type -> tour.StartTourRequest
+	12, // 17: tour.TourGrpcService.AbandonTour:input_type -> tour.AbandonTourRequest
+	14, // 18: tour.TourGrpcService.CompleteTour:input_type -> tour.CompleteTourRequest
+	16, // 19: tour.TourGrpcService.GetTourExecution:input_type -> tour.GetTourExecutionRequest
+	2,  // 20: tour.TourGrpcService.CreateTour:output_type -> tour.CreateTourResponse
+	4,  // 21: tour.TourGrpcService.GetAllToursById:output_type -> tour.GetAllToursByIdResponse
+	6,  // 22: tour.TourGrpcService.GetAllTours:output_type -> tour.GetAllToursResponse
+	8,  // 23: tour.TourGrpcService.GetTourById:output_type -> tour.GetTourByIdResponse
+	11, // 24: tour.TourGrpcService.StartTour:output_type -> tour.StartTourResponse
+	13, // 25: tour.TourGrpcService.AbandonTour:output_type -> tour.AbandonTourResponse
+	15, // 26: tour.TourGrpcService.CompleteTour:output_type -> tour.CompleteTourResponse
+	17, // 27: tour.TourGrpcService.GetTourExecution:output_type -> tour.GetTourExecutionResponse
+	20, // [20:28] is the sub-list for method output_type
+	12, // [12:20] is the sub-list for method input_type
+	12, // [12:12] is the sub-list for extension type_name
+	12, // [12:12] is the sub-list for extension extendee
+	0,  // [0:12] is the sub-list for field type_name
 }
 
-func init() { file_tour_proto_init() }
-func file_tour_proto_init() {
-	if File_tour_proto != nil {
+func init() { file_proto_tour_proto_init() }
+func file_proto_tour_proto_init() {
+	if File_proto_tour_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_tour_proto_rawDesc), len(file_tour_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_tour_proto_rawDesc), len(file_proto_tour_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   9,
+			NumMessages:   18,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_tour_proto_goTypes,
-		DependencyIndexes: file_tour_proto_depIdxs,
-		MessageInfos:      file_tour_proto_msgTypes,
+		GoTypes:           file_proto_tour_proto_goTypes,
+		DependencyIndexes: file_proto_tour_proto_depIdxs,
+		MessageInfos:      file_proto_tour_proto_msgTypes,
 	}.Build()
-	File_tour_proto = out.File
-	file_tour_proto_goTypes = nil
-	file_tour_proto_depIdxs = nil
+	File_proto_tour_proto = out.File
+	file_proto_tour_proto_goTypes = nil
+	file_proto_tour_proto_depIdxs = nil
 }
