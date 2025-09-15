@@ -84,6 +84,7 @@ func (s *blogService) UnlikeBlog(ctx context.Context, blogID, userID string) (*m
 	return s.blogRepo.GetBlogByID(ctx, objBlogID)
 }
 func (s *blogService) HandleUserBlocked(ctx context.Context, userID string) error {
+	// return fmt.Errorf("simulirana greška za testiranje SAGA rollback-a")
 	err := s.blogRepo.UpdateBlogsOnUserStatusChange(ctx, userID, true)
 	return err
 }

@@ -107,14 +107,17 @@ services:
   nats-server:
     build:
       context: .
-      dockerfile: ./saga/Dockerfile # <--- KLJUČNA IZMENA 1: Koristimo build
-    container_name: nats    # <--- Vraćamo ime servisa na nats-server i u container_name
+      dockerfile: ./saga/Dockerfile
+    container_name: nats
     restart: always
     ports:
       - "4222:4222"
       - "8222:8222"
     command: 
+      - "nats-server"
       - "-js"
+      - "-m" 
+      - "8222"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8222"]
       interval: 10s
