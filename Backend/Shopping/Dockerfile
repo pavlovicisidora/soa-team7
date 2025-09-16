@@ -11,9 +11,11 @@ COPY Stakeholders/go.mod Stakeholders/go.sum ./Stakeholders/
 COPY Follower/go.mod Follower/go.sum ./Follower/
 COPY saga/go.mod ./saga/
 COPY Tour/pom.xml ./Tour/ 
+COPY common/go.mod ./common/
 
 RUN go get -d ./...
 
+COPY common/ ./common/
 COPY Shopping/ ./Shopping/
 COPY saga/ ./saga/ 
 COPY api_gateway/ ./api_gateway/
