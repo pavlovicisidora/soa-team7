@@ -14,15 +14,31 @@ import (
 	pb "github.com/pavlovicisidora/soa-team7/Backend/Blog/proto"
 	"github.com/pavlovicisidora/soa-team7/Backend/Blog/repo"
 	"github.com/pavlovicisidora/soa-team7/Backend/Blog/service"
+	"github.com/pavlovicisidora/soa-team7/Backend/common/tracing"
 	"github.com/pavlovicisidora/soa-team7/Backend/saga"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
 )
 
 func main() {
+	jaegerAgentHost := os.Getenv("JAEGER_AGENT_HOST")
+	if jaegerAgentHost == "" {
+		jaegerAgentHost = "jaeger"
+	}
+	jaegerAgentPort := os.Getenv("JAEGER_AGENT_PORT")
+	if jaegerAgentPort == "" {
+		jaegerAgentPort = "6831"
+	}
 
-	err := godotenv.Load()
+	tracerCloser, err := tracing.InitTracer("blog-service", jaegerAgentHost, jaegerAgentPort)
+	if err != nil {
+		log.Fatalf("failed to initialize tracer: %v", err)
+	}
+	defer tracerCloser.Close()
+
+	err = godotenv.Load()
 	if err != nil {
 		log.Println("Error loading .env file, using default values.")
 	}
@@ -120,7 +136,11 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer(
+		grpc.UnaryInterceptor(otelgrpc.UnaryServerInterceptor()),
+		grpc.StreamInterceptor(otelgrpc.StreamServerInterceptor()),
+	)
+
 	pb.RegisterBlogServiceServer(grpcServer, blogHandler)
 	pb.RegisterCommentServiceServer(grpcServer, commentHandler)
 

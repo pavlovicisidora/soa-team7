@@ -11,6 +11,8 @@ import (
 	"github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/repo"
 	"github.com/pavlovicisidora/soa-team7/Backend/saga"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 )
 
 type UserService struct {
@@ -19,14 +21,26 @@ type UserService struct {
 }
 
 func (service *UserService) GetAllUsers(ctx context.Context) ([]model.User, error) {
+	tr := otel.Tracer("service")
+	ctx, span := tr.Start(ctx, "service.GetAllUsers")
+	defer span.End()
 	users, err := service.UserRepository.GetAllUsers(ctx)
 	if err != nil {
+		span.RecordError(err)
 		return nil, err
 	}
 	return users, err
 
 }
 func (service *UserService) Create(ctx context.Context, user *model.User) error {
+	tr := otel.Tracer("service")
+	ctx, span := tr.Start(ctx, "user.service.create")
+	defer span.End()
+
+	span.SetAttributes(
+		attribute.String("user.username", user.Username),
+		attribute.String("user.role", user.Role),
+	)
 	existingUser, err := service.UserRepository.FindByUsername(ctx, user.Username)
 	if err != nil {
 		return fmt.Errorf("DB error: %v", err)
@@ -47,15 +61,25 @@ func (service *UserService) Create(ctx context.Context, user *model.User) error 
 
 	err = service.UserRepository.CreateUser(ctx, user)
 	if err != nil {
+		span.RecordError(err)
 		return err
 	}
 	return nil
 }
 
 func (service *UserService) Login(ctx context.Context, username string, password string) (model.User, error) {
+	tr := otel.Tracer("service")
+	ctx, span := tr.Start(ctx, "user.service.login")
+	defer span.End()
+
+	span.SetAttributes(
+		attribute.String("user.username", username),
+	)
+
 	user, err := service.UserRepository.Login(ctx, username, password)
 
 	if err != nil {
+		span.RecordError(err)
 		return model.User{}, err
 	}
 	return user, err
@@ -63,8 +87,13 @@ func (service *UserService) Login(ctx context.Context, username string, password
 }
 
 func (service *UserService) BlockUser(ctx context.Context, username string) error {
+	tr := otel.Tracer("service")
+	ctx, span := tr.Start(ctx, "service.BlockUser")
+	defer span.End()
+	span.SetAttributes(attribute.String("user.username", username))
 	existingUser, err := service.UserRepository.FindByUsername(ctx, username)
 	if err != nil {
+		span.RecordError(err)
 		return fmt.Errorf("DB error: %v", err)
 	}
 
@@ -99,16 +128,26 @@ func (service *UserService) BlockUser(ctx context.Context, username string) erro
 	return nil
 }
 func (service *UserService) FindAllInfo(ctx context.Context, userID string) ([]model.User, error) {
+	tr := otel.Tracer("service")
+	ctx, span := tr.Start(ctx, "service.FindAllInfo")
+	defer span.End()
+	span.SetAttributes(attribute.String("user.id", userID))
 	users, err := service.UserRepository.FindAllInfo(ctx, userID)
 	if err != nil {
+		span.RecordError(err)
 		return nil, err
 	}
 	return users, err
 
 }
 func (service *UserService) FindById(ctx context.Context, id primitive.ObjectID) (*model.User, error) {
+	tr := otel.Tracer("service")
+	ctx, span := tr.Start(ctx, "service.FindById")
+	defer span.End()
+	span.SetAttributes(attribute.String("user.id", id.Hex()))
 	user, err := service.UserRepository.FindUserById(ctx, id)
 	if err != nil {
+		span.RecordError(err)
 		return nil, err
 	}
 	return user, err
@@ -116,8 +155,13 @@ func (service *UserService) FindById(ctx context.Context, id primitive.ObjectID)
 }
 
 func (service *UserService) UpdateUserPosition(ctx context.Context, userID string, lat, long float64) error {
+	tr := otel.Tracer("service")
+	ctx, span := tr.Start(ctx, "service.UpdateUserPosition")
+	defer span.End()
+	span.SetAttributes(attribute.String("user.id", userID))
 	userObjectID, err := primitive.ObjectIDFromHex(userID)
 	if err != nil {
+		span.RecordError(err)
 		return fmt.Errorf("invalid userID format: %v", err)
 	}
 	return service.UserRepository.UpdateUserPosition(ctx, userObjectID, lat, long)

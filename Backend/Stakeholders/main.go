@@ -14,15 +14,33 @@ import (
 	pb "github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/proto"
 	"github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/repo"
 	"github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/service"
+	"github.com/pavlovicisidora/soa-team7/Backend/common/tracing"
 	"github.com/pavlovicisidora/soa-team7/Backend/saga"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
 
 func main() {
-	err := godotenv.Load()
+	jaegerAgentHost := os.Getenv("JAEGER_AGENT_HOST")
+	if jaegerAgentHost == "" {
+		jaegerAgentHost = "jaeger" // Fallback na ime servisa
+	}
+	jaegerAgentPort := os.Getenv("JAEGER_AGENT_PORT")
+	if jaegerAgentPort == "" {
+		jaegerAgentPort = "6831" // Fallback na default port
+	}
+
+	// Pozivamo ažuriranu funkciju
+	tracerCloser, err := tracing.InitTracer("stakeholders-service", jaegerAgentHost, jaegerAgentPort)
+	if err != nil {
+		log.Fatalf("failed to initialize tracer: %v", err)
+	}
+	defer tracerCloser.Close()
+
+	err = godotenv.Load()
 	if err != nil {
 		log.Println("Error loading .env file, using default values.")
 	}
@@ -100,7 +118,10 @@ func main() {
 		log.Fatalf("Failed to listen for gRPC: %v", err)
 	}
 
-	grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer(
+		grpc.UnaryInterceptor(otelgrpc.UnaryServerInterceptor()),
+		grpc.StreamInterceptor(otelgrpc.StreamServerInterceptor()),
+	)
 
 	// Koristi novi gRPC handler
 	grpcStakeholderServer := handler.NewStakeholderGRPCServer(*userService, *profileService)
