@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class TourService {
@@ -16,7 +17,10 @@ public class TourService {
         return tourRepository.save(tour);
     }
     public List<Tour> findAllToursById(String id){return tourRepository.findToursForAuthor(id);}
-    public Tour findById(Integer id){return tourRepository.findById(id).get();}
+    public Tour findById(Integer id) {
+        return tourRepository.findById(id)
+            .orElseThrow(() -> new NoSuchElementException("Tour with id " + id + " not found"));
+    }
     public Tour updateTour(Tour tour){ return tourRepository.save(tour); }
     public boolean deleteTour(Integer id){
         if (tourRepository.existsById(id)) {
