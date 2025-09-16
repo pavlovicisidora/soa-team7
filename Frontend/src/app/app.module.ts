@@ -12,6 +12,7 @@ import { AuthModule } from "src/app/auth/auth.module";
 import { TourModule } from './feature-modules/tour/tour.module';
 import { StakeholderModule } from './feature-modules/stakeholder/stakeholder.module';
 import { FollowerModule } from './feature-modules/follower/follower.module';
+import { ShoppingModule } from './feature-modules/shopping/shopping.module';
 
 @NgModule({
   declarations: [
@@ -30,6 +31,7 @@ import { FollowerModule } from './feature-modules/follower/follower.module';
     StakeholderModule,
     BlogModule,
     FollowerModule,
+    ShoppingModule
 ],
   providers: [
     { 

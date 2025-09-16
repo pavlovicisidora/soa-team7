@@ -3,7 +3,10 @@ package main
 import (
 	"log"
 	"net/http"
+	"net/http/httputil"
+	"net/url"
 	"os"
+	"strings"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -35,6 +38,25 @@ func main() {
 	tourServiceAddress := os.Getenv("TOUR_SERVICE_ADDRESS")
 	if tourServiceAddress == "" {
 		tourServiceAddress = "localhost:9090"
+	}
+
+	shoppingServiceAddress := os.Getenv("SHOPPING_SERVICE_ADDRESS")
+	if shoppingServiceAddress == "" {
+		shoppingServiceAddress = "localhost:8085"
+	}
+	shoppingURL, _ := url.Parse("http://" + shoppingServiceAddress)
+	shoppingProxy := httputil.NewSingleHostReverseProxy(shoppingURL)
+	shoppingProxy.Director = func(req *http.Request) {
+		originalReq := req
+
+		req.URL.Scheme = shoppingURL.Scheme
+		req.URL.Host = shoppingURL.Host
+		req.URL.Path = originalReq.URL.Path
+
+		userID := originalReq.Context().Value(middleware.UserKey)
+		if userID != nil {
+			req.Header.Set("X-User-ID", userID.(string))
+		}
 	}
 
 	conn, err := grpc.NewClient(blogServiceAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
@@ -118,6 +140,10 @@ func main() {
 	apiRouter.PathPrefix("/keypoints").Handler(http.StripPrefix("/api", keyPointHandler))
 	apiRouter.PathPrefix("/reviews").Handler(http.StripPrefix("/api", reviewHandler))
 	apiRouter.PathPrefix("/profile").Handler(http.StripPrefix("/api", profileHandler))
+	apiRouter.PathPrefix("/shopping").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		r.URL.Path = strings.TrimPrefix(r.URL.Path, "/api/shopping")
+		shoppingProxy.ServeHTTP(w, r)
+	})
 
 	port := os.Getenv("PORT")
 	if port == "" {

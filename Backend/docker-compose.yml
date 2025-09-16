@@ -13,6 +13,7 @@ services:
       - STAKEHOLDERS_SERVICE_ADDRESS=stakeholders-server:8081
       - TOUR_SERVICE_ADDRESS=tour-server:9090
       - FOLLOWER_SERVICE_ADDRESS=follower_server:8084 # Dodato
+      - SHOPPING_SERVICE_ADDRESS=shopping_server:8085
       - JWT_SECRET_KEY=tvoja-super-tajna-rec 
     volumes:
       - ./api_gateway_uploads:/uploads
@@ -21,6 +22,7 @@ services:
       - stakeholders_server
       - tour_server
       - follower_server 
+      - shopping_server
 
   stakeholders_server:
     build:
@@ -103,6 +105,30 @@ services:
       - NEO4J_PASSWORD=neo4j_password 
     depends_on:
       neo4j: 
+        condition: service_healthy
+  shopping_server:
+    build:
+      context: .
+      dockerfile: ./Shopping/Dockerfile
+    restart: always
+    container_name: "shopping"
+    hostname: "shopping-server"
+    ports:
+      - "8085:8085"
+    environment:
+      - PORT=8085
+      - MONGO_URI=mongodb://root:pass@mongo:27017
+      - MONGO_DB_NAME=shopping_db
+      - MONGO_COLLECTION_NAME=shopping
+      - NATS_URI=nats://nats-server:4222
+      - TOUR_SERVICE_ADDRESS=tour-server:9090
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    depends_on:
+      mongo:
+        condition: service_healthy
+      nats-server:
         condition: service_healthy
   nats-server:
     build:

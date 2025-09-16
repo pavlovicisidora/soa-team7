@@ -6,4 +6,5 @@ use (
 	./Stakeholders
 	./api_gateway
 	./saga
+	./Shopping
 )
