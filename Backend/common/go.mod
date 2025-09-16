@@ -3,6 +3,7 @@ module github.com/pavlovicisidora/soa-team7/Backend/common
 go 1.25.0
 
 require (
+	go.opentelemetry.io/contrib/propagators/b3 v1.38.0
 	go.opentelemetry.io/otel v1.38.0
 	go.opentelemetry.io/otel/exporters/jaeger v1.17.0
 	go.opentelemetry.io/otel/sdk v1.38.0

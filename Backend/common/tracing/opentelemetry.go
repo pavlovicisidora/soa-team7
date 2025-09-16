@@ -13,10 +13,13 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.21.0"
 )
 
-func InitTracer(serviceName, jaegerEndpoint string) (io.Closer, error) {
-	log.Printf("Initializing tracing to Jaeger Collector at %s\n", jaegerEndpoint)
+func InitTracer(serviceName, agentHost, agentPort string) (io.Closer, error) {
+	log.Printf("Initializing tracing to Jaeger Agent at %s:%s\n", agentHost, agentPort)
 
-	exporter, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(jaegerEndpoint)))
+	exporter, err := jaeger.New(jaeger.WithAgentEndpoint(
+		jaeger.WithAgentHost(agentHost),
+		jaeger.WithAgentPort(agentPort),
+	))
 	if err != nil {
 		log.Fatalf("failed to create Jaeger exporter: %v", err)
 	}

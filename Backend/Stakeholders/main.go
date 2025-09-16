@@ -24,11 +24,17 @@ import (
 )
 
 func main() {
-	jaegerEndpoint := os.Getenv("JAEGER_ENDPOINT")
-	if jaegerEndpoint == "" {
-		log.Fatal("JAEGER_ENDPOINT environment variable not set")
+	jaegerAgentHost := os.Getenv("JAEGER_AGENT_HOST")
+	if jaegerAgentHost == "" {
+		jaegerAgentHost = "jaeger" // Fallback na ime servisa
 	}
-	tracerCloser, err := tracing.InitTracer("stakeholders-service", jaegerEndpoint)
+	jaegerAgentPort := os.Getenv("JAEGER_AGENT_PORT")
+	if jaegerAgentPort == "" {
+		jaegerAgentPort = "6831" // Fallback na default port
+	}
+
+	// Pozivamo ažuriranu funkciju
+	tracerCloser, err := tracing.InitTracer("stakeholders-service", jaegerAgentHost, jaegerAgentPort)
 	if err != nil {
 		log.Fatalf("failed to initialize tracer: %v", err)
 	}

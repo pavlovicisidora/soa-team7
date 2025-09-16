@@ -22,7 +22,8 @@ services:
       - FOLLOWER_SERVICE_ADDRESS=follower_server:8084 # Dodato
       - SHOPPING_SERVICE_ADDRESS=shopping_server:8085
       - JWT_SECRET_KEY=tvoja-super-tajna-rec 
-      - JAEGER_ENDPOINT=http://jaeger:14268/api/traces
+      - JAEGER_AGENT_HOST=jaeger
+      - JAEGER_AGENT_PORT=6831
     volumes:
       - ./api_gateway_uploads:/uploads
     depends_on:
@@ -54,7 +55,8 @@ services:
       - MONGO_DB_NAME=stakeholders_db
       - MONGO_COLLECTION_NAME=stakeholders
       - NATS_URI=nats://nats-server:4222
-      - JAEGER_ENDPOINT=http://jaeger:14268/api/traces
+      - JAEGER_AGENT_HOST=jaeger
+      - JAEGER_AGENT_PORT=6831
     depends_on:
       mongo:
         condition: service_healthy
@@ -83,7 +85,8 @@ services:
       - MONGO_DB_NAME=blog_db
       - MONGO_COLLECTION_NAME=blog
       - NATS_URI=nats://nats-server:4222
-      - JAEGER_ENDPOINT=http://jaeger:14268/api/traces
+      - JAEGER_AGENT_HOST=jaeger
+      - JAEGER_AGENT_PORT=6831
     cap_add:
       - NET_ADMIN
       - NET_RAW
@@ -116,6 +119,10 @@ services:
       - DB_NAME=tour_db
       - DB_USER=tour_db
       - DB_PASSWORD=tour_db123
+      - OTEL_SERVICE_NAME=tour-service
+      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://jaeger:4317
+      - OTEL_TRACES_EXPORTER=otlp
+      - OTEL_LOGS_EXPORTER=none
     depends_on:
       postgres:
         condition: service_healthy
@@ -141,7 +148,8 @@ services:
       - NEO4J_URI=bolt://neo4j:7687 # Adresa Neo4j Bolt protokola
       - NEO4J_USERNAME=neo4j
       - NEO4J_PASSWORD=neo4j_password 
-      - JAEGER_ENDPOINT=http://jaeger:14268/api/traces
+      - JAEGER_AGENT_HOST=jaeger
+      - JAEGER_AGENT_PORT=6831
     depends_on:
       neo4j: 
         condition: service_healthy

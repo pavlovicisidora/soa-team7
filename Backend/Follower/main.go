@@ -7,17 +7,33 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
+	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
 	"github.com/pavlovicisidora/soa-team7/Backend/Follower/handler"
 	pb "github.com/pavlovicisidora/soa-team7/Backend/Follower/proto"
 	"github.com/pavlovicisidora/soa-team7/Backend/Follower/repo"
 	"github.com/pavlovicisidora/soa-team7/Backend/Follower/service"
+	"github.com/pavlovicisidora/soa-team7/Backend/common/tracing"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
-	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
 )
 
 func main() {
+	jaegerAgentHost := os.Getenv("JAEGER_AGENT_HOST")
+	if jaegerAgentHost == "" {
+		jaegerAgentHost = "jaeger" // Fallback na ime servisa
+	}
+	jaegerAgentPort := os.Getenv("JAEGER_AGENT_PORT")
+	if jaegerAgentPort == "" {
+		jaegerAgentPort = "6831" // Fallback na default port
+	}
+
+	tracerCloser, err := tracing.InitTracer("follower-service", jaegerAgentHost, jaegerAgentPort)
+	if err != nil {
+		log.Fatalf("failed to initialize tracer: %v", err)
+	}
+	defer tracerCloser.Close()
 	// 1. Učitavanje .env fajla za konfiguraciju
-	err := godotenv.Load()
+	err = godotenv.Load()
 	if err != nil {
 		log.Println("Error loading .env file, using default values.")
 	}
@@ -25,7 +41,7 @@ func main() {
 	// 2. Konekcija na Neo4j (sva logika je ovde)
 	neo4jUri := os.Getenv("NEO4J_URI")
 	if neo4jUri == "" {
-		neo4jUri = "neo4j://localhost:7687" 
+		neo4jUri = "neo4j://localhost:7687"
 	}
 	neo4jUser := os.Getenv("NEO4J_USER")
 	if neo4jUser == "" {
@@ -42,7 +58,7 @@ func main() {
 		log.Fatalf("FATAL: Could not create Neo4j driver: %v", err)
 	}
 	defer driver.Close(context.Background())
-	
+
 	// Provera konekcije sa bazom
 	err = driver.VerifyConnectivity(context.Background())
 	if err != nil {
@@ -65,7 +81,10 @@ func main() {
 		log.Fatalf("failed to listen on port %s: %v", port, err)
 	}
 
-	grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer(
+		grpc.UnaryInterceptor(otelgrpc.UnaryServerInterceptor()),
+		grpc.StreamInterceptor(otelgrpc.StreamServerInterceptor()),
+	)
 	pb.RegisterFollowerServiceServer(grpcServer, followerHandler)
 
 	log.Printf("Follower gRPC server listening at %v", lis.Addr())

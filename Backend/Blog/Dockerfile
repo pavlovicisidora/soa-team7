@@ -13,7 +13,7 @@ COPY saga/go.mod ./saga/
 COPY common/go.mod ./common/
 
 RUN go get -d ./...
-
+COPY common/ ./common/
 COPY saga/ ./saga/   
 COPY Blog/ ./Blog/
 
