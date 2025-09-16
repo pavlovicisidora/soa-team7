@@ -16,11 +16,24 @@ import (
 	blog_proto "github.com/pavlovicisidora/soa-team7/Backend/Blog/proto"
 	follower_proto "github.com/pavlovicisidora/soa-team7/Backend/Follower/proto"
 	stakeholders_proto "github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/proto"
+	"github.com/pavlovicisidora/soa-team7/Backend/common/tracing"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
 func main() {
+	jaegerEndpoint := os.Getenv("JAEGER_ENDPOINT")
+	if jaegerEndpoint == "" {
+		log.Fatal("JAEGER_ENDPOINT environment variable not set")
+	}
+	tracerCloser, err := tracing.InitTracer("api-gateway", jaegerEndpoint)
+	if err != nil {
+		log.Fatalf("failed to initialize tracer: %v", err)
+	}
+	defer tracerCloser.Close()
+
 	blogServiceAddress := os.Getenv("BLOG_SERVICE_ADDRESS")
 	if blogServiceAddress == "" {
 		blogServiceAddress = "localhost:8082"
@@ -38,6 +51,11 @@ func main() {
 	tourServiceAddress := os.Getenv("TOUR_SERVICE_ADDRESS")
 	if tourServiceAddress == "" {
 		tourServiceAddress = "localhost:9090"
+	}
+	grpcDialOptions := []grpc.DialOption{
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithUnaryInterceptor(otelgrpc.UnaryClientInterceptor()),
+		grpc.WithStreamInterceptor(otelgrpc.StreamClientInterceptor()),
 	}
 
 	shoppingServiceAddress := os.Getenv("SHOPPING_SERVICE_ADDRESS")
@@ -59,32 +77,32 @@ func main() {
 		}
 	}
 
-	conn, err := grpc.NewClient(blogServiceAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(blogServiceAddress, grpcDialOptions...)
 	if err != nil {
 		log.Fatalf("Failed to connect to blog service: %v", err)
 	}
 	defer conn.Close()
 
-	connTour, err := grpc.NewClient(tourServiceAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	connTour, err := grpc.NewClient(tourServiceAddress, grpcDialOptions...)
 	if err != nil {
 		log.Fatalf("Failed to connect to tour service: %v", err)
 	}
 	defer connTour.Close()
 
 	stakeholdersGrpcAddress := "stakeholders-server:8089"
-	stakeholdersConn, err := grpc.NewClient(stakeholdersGrpcAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	stakeholdersConn, err := grpc.NewClient(stakeholdersGrpcAddress, grpcDialOptions...)
 	if err != nil {
 		log.Fatalf("Failed to connect to stakeholders gRPC service: %v", err)
 	}
 	defer stakeholdersConn.Close()
 
-	connStakeholders, err := grpc.NewClient(stakeholdersServiceAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	connStakeholders, err := grpc.NewClient(stakeholdersServiceAddress, grpcDialOptions...)
 	if err != nil {
 		log.Fatalf("Failed to connect to tour service: %v", err)
 	}
 	defer connStakeholders.Close()
 
-	followerConn, err := grpc.NewClient(followerServiceAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	followerConn, err := grpc.NewClient(followerServiceAddress, grpcDialOptions...)
 	if err != nil {
 		log.Fatalf("Failed to connect to follower service: %v", err)
 	}
@@ -150,12 +168,13 @@ func main() {
 		port = "8080"
 	}
 
+	tracedRouter := otelhttp.NewHandler(router, "api-gateway-http-server")
 	log.Printf("API Gateway starting on port %s", port)
 	allowedOrigins := handlers.AllowedOrigins([]string{"http://localhost:4200"})
 	allowedMethods := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"})
 	allowedHeaders := handlers.AllowedHeaders([]string{"Content-Type", "Authorization"})
 
-	corsRouter := handlers.CORS(allowedOrigins, allowedMethods, allowedHeaders)(router)
+	corsRouter := handlers.CORS(allowedOrigins, allowedMethods, allowedHeaders)(tracedRouter)
 
 	log.Printf("API Gateway starting on port %s", port)
 	if err := http.ListenAndServe(":"+port, corsRouter); err != nil {

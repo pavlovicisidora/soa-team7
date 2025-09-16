@@ -9,6 +9,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -88,6 +90,15 @@ func (r *UserRepository) UpdateUser(ctx context.Context, user model.User) error 
 }
 
 func (r *UserRepository) Login(ctx context.Context, username string, password string) (model.User, error) {
+	tr := otel.Tracer("repository")
+	ctx, span := tr.Start(ctx, "repository.login")
+	defer span.End()
+
+	span.SetAttributes(
+		attribute.String("db.system", "mongodb"),
+		attribute.String("db.statement", "FindOne"),
+		attribute.String("db.user.username", username),
+	)
 	collection := r.client.Database(r.dbName).Collection(r.collectionName)
 
 	var user model.User
@@ -97,6 +108,7 @@ func (r *UserRepository) Login(ctx context.Context, username string, password st
 		if err == mongo.ErrNoDocuments {
 			return model.User{}, fmt.Errorf("this username doesn't exist")
 		}
+		span.RecordError(err)
 		return model.User{}, err
 	}
 
@@ -165,6 +177,16 @@ func (r *UserRepository) FindAllInfo(ctx context.Context, userID string) ([]mode
 	return users, nil
 }
 func (r *UserRepository) FindUserById(ctx context.Context, id primitive.ObjectID) (*model.User, error) {
+	tr := otel.Tracer("repository")
+	ctx, span := tr.Start(ctx, "repository.findbyid")
+	defer span.End()
+
+	span.SetAttributes(
+		attribute.String("db.system", "mongodb"),
+		attribute.String("db.statement", "FindOne"),
+		attribute.String("db.user.id", id.Hex()),
+	)
+
 	collection := r.client.Database(r.dbName).Collection(r.collectionName)
 
 	var user model.User
@@ -173,6 +195,7 @@ func (r *UserRepository) FindUserById(ctx context.Context, id primitive.ObjectID
 
 	err := collection.FindOne(ctx, filter).Decode(&user)
 	if err != nil {
+		span.RecordError(err)
 		return nil, err
 	}
 

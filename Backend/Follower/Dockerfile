@@ -10,6 +10,7 @@ COPY Stakeholders/go.mod Stakeholders/go.sum ./Stakeholders/
 COPY Blog/go.mod Blog/go.sum ./Blog/
 COPY Shopping/go.mod Shopping/go.sum ./Shopping/
 COPY saga/go.mod ./saga/
+COPY common/go.mod ./common/
 RUN go get -d ./...
 COPY saga/ ./saga/ 
 COPY Follower/ ./Follower/

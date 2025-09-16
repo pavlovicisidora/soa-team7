@@ -11,6 +11,8 @@ import (
 	"github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/repo"
 	"github.com/pavlovicisidora/soa-team7/Backend/saga"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 )
 
 type UserService struct {
@@ -27,6 +29,14 @@ func (service *UserService) GetAllUsers(ctx context.Context) ([]model.User, erro
 
 }
 func (service *UserService) Create(ctx context.Context, user *model.User) error {
+	tr := otel.Tracer("service")
+	ctx, span := tr.Start(ctx, "user.service.create")
+	defer span.End()
+
+	span.SetAttributes(
+		attribute.String("user.username", user.Username),
+		attribute.String("user.role", user.Role),
+	)
 	existingUser, err := service.UserRepository.FindByUsername(ctx, user.Username)
 	if err != nil {
 		return fmt.Errorf("DB error: %v", err)
@@ -47,15 +57,25 @@ func (service *UserService) Create(ctx context.Context, user *model.User) error 
 
 	err = service.UserRepository.CreateUser(ctx, user)
 	if err != nil {
+		span.RecordError(err)
 		return err
 	}
 	return nil
 }
 
 func (service *UserService) Login(ctx context.Context, username string, password string) (model.User, error) {
+	tr := otel.Tracer("service")
+	ctx, span := tr.Start(ctx, "user.service.login")
+	defer span.End()
+
+	span.SetAttributes(
+		attribute.String("user.username", username),
+	)
+
 	user, err := service.UserRepository.Login(ctx, username, password)
 
 	if err != nil {
+		span.RecordError(err)
 		return model.User{}, err
 	}
 	return user, err

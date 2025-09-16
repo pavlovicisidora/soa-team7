@@ -14,15 +14,27 @@ import (
 	pb "github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/proto"
 	"github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/repo"
 	"github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/service"
+	"github.com/pavlovicisidora/soa-team7/Backend/common/tracing"
 	"github.com/pavlovicisidora/soa-team7/Backend/saga"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
 
 func main() {
-	err := godotenv.Load()
+	jaegerEndpoint := os.Getenv("JAEGER_ENDPOINT")
+	if jaegerEndpoint == "" {
+		log.Fatal("JAEGER_ENDPOINT environment variable not set")
+	}
+	tracerCloser, err := tracing.InitTracer("stakeholders-service", jaegerEndpoint)
+	if err != nil {
+		log.Fatalf("failed to initialize tracer: %v", err)
+	}
+	defer tracerCloser.Close()
+
+	err = godotenv.Load()
 	if err != nil {
 		log.Println("Error loading .env file, using default values.")
 	}
@@ -100,7 +112,10 @@ func main() {
 		log.Fatalf("Failed to listen for gRPC: %v", err)
 	}
 
-	grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer(
+		grpc.UnaryInterceptor(otelgrpc.UnaryServerInterceptor()),
+		grpc.StreamInterceptor(otelgrpc.StreamServerInterceptor()),
+	)
 
 	// Koristi novi gRPC handler
 	grpcStakeholderServer := handler.NewStakeholderGRPCServer(*userService, *profileService)

@@ -7,6 +7,13 @@ services:
     container_name: "api_gateway"
     ports:
       - "8080:8080"
+    networks:
+      - monitoring
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "service.api_gateway"
     environment:
       - PORT=8080
       - BLOG_SERVICE_ADDRESS=blog_server:8082 
@@ -15,6 +22,7 @@ services:
       - FOLLOWER_SERVICE_ADDRESS=follower_server:8084 # Dodato
       - SHOPPING_SERVICE_ADDRESS=shopping_server:8085
       - JWT_SECRET_KEY=tvoja-super-tajna-rec 
+      - JAEGER_ENDPOINT=http://jaeger:14268/api/traces
     volumes:
       - ./api_gateway_uploads:/uploads
     depends_on:
@@ -33,12 +41,20 @@ services:
     hostname: "stakeholders-server"
     ports:
       - "8081:8081"
+    networks:
+      - monitoring
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "service.stakeholders"
     environment:
       - PORT=8081
       - MONGO_URI=mongodb://root:pass@mongo:27017
       - MONGO_DB_NAME=stakeholders_db
       - MONGO_COLLECTION_NAME=stakeholders
       - NATS_URI=nats://nats-server:4222
+      - JAEGER_ENDPOINT=http://jaeger:14268/api/traces
     depends_on:
       mongo:
         condition: service_healthy
@@ -54,12 +70,20 @@ services:
     hostname: "blog-server"
     ports:
       - "8082:8082"
+    networks:
+      - monitoring
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "service.blog"
     environment:
       - PORT=8082
       - MONGO_URI=mongodb://root:pass@mongo:27017
       - MONGO_DB_NAME=blog_db
       - MONGO_COLLECTION_NAME=blog
       - NATS_URI=nats://nats-server:4222
+      - JAEGER_ENDPOINT=http://jaeger:14268/api/traces
     cap_add:
       - NET_ADMIN
       - NET_RAW
@@ -78,6 +102,13 @@ services:
     hostname: "tour-server"
     ports:
       - "8083:8083"
+    networks:
+      - monitoring
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "service.tour"
     environment:
       - PORT=8083
       - DB_HOST=postgres
@@ -98,11 +129,19 @@ services:
     hostname: "follower-server"
     ports:
       - "8084:8084"
+    networks:
+      - monitoring
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "service.follower"
     environment:
       - PORT=8084
       - NEO4J_URI=bolt://neo4j:7687 # Adresa Neo4j Bolt protokola
       - NEO4J_USERNAME=neo4j
       - NEO4J_PASSWORD=neo4j_password 
+      - JAEGER_ENDPOINT=http://jaeger:14268/api/traces
     depends_on:
       neo4j: 
         condition: service_healthy
@@ -148,7 +187,9 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:8222"]
       interval: 10s
       timeout: 5s
-      retries: 5   
+      retries: 5
+    networks:
+      - monitoring  
         
   neo4j:
     image: neo4j:5
@@ -172,6 +213,8 @@ services:
       retries: 10
     volumes:
       - neo4j_data:/data
+    networks:
+      - monitoring
 
   mongo:
     image: mongo
@@ -189,6 +232,8 @@ services:
       retries: 10
     volumes:
       - mongo_store:/data/db
+    networks:
+      - monitoring
 
   mongo-express:
     image: mongo-express
@@ -206,6 +251,8 @@ services:
       - "9200:8081"
     volumes:
       - mongo_express_data:/data/db
+    networks:
+      - monitoring
 
   postgres:
     image: postgres:15
@@ -223,6 +270,8 @@ services:
       test: ["CMD-SHELL", "pg_isready -U tour_db"]
       interval: 10s
       retries: 5
+    networks:
+      - monitoring
 
 volumes:
   mongo_store:
@@ -230,3 +279,12 @@ volumes:
   postgres_data:
   neo4j_data: 
   neo4j_plugins: 
+
+
+networks:
+  servers:
+    name: servers
+    driver: bridge
+  monitoring:
+    name: monitoring
+    external: true
