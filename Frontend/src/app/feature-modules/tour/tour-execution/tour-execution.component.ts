@@ -55,11 +55,14 @@ export class TourExecutionComponent implements OnInit {
 
   abandon(): void {
     if (!confirm('Are you sure you want to abandon tour?')) return;
+
+
     
     this.tourService.abandonTour(this.executionId).subscribe({
       next: (exec) => {
         console.log('Tour abandoned.', exec);
         alert('Tour successfully abandoned.');
+        localStorage.removeItem('executionId');
         this.router.navigate(['/']);
       },
       error: (err) => console.error('Error:', err)
