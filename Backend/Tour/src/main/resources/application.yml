@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: tour-service
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  otlp:
+    tracing:
+      endpoint: http://jaeger:4318
