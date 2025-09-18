@@ -91,7 +91,7 @@ func main() {
 			return
 		}
 
-		if err := userService.HandleBlockUserCompensation(context.Background(), event.UserID); err != nil {
+		if err := userService.HandleBlockUserCompensation(event.UserID); err != nil {
 			log.Printf("Failed to handle block user compensation for user %s: %v", event.UserID, err)
 		}
 	})

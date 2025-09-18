@@ -67,6 +67,7 @@ func (s *StakeholderGRPCServer) Login(ctx context.Context, req *pb.LoginRequest)
 	user, err := s.UserService.Login(ctx, req.GetUsername(), req.GetPassword())
 	if err != nil {
 		// Konvertuj greške u gRPC status kodove
+		log.Printf("ERROR: Login failed for user %s: %v", req.GetUsername(), err)
 		if strings.Contains(err.Error(), "Invalid credentials") {
 			return nil, status.Errorf(codes.Unauthenticated, "Invalid username or password")
 		}
@@ -82,6 +83,7 @@ func (s *StakeholderGRPCServer) Login(ctx context.Context, req *pb.LoginRequest)
 
 	token, err := auth.GenerateJWT(user.ID.Hex(), user.Role)
 	if err != nil {
+		log.Printf("ERROR: Failed to generate JWT for user %s: %v", user.Username, err)
 		return nil, status.Errorf(codes.Internal, "Failed to generate token: %v", err)
 	}
 
@@ -106,12 +108,14 @@ func (s *StakeholderGRPCServer) Create(ctx context.Context, req *pb.CreateUserRe
 
 	// Proveri validnost uloge pre kreiranja
 	if user.Role != "VODIC" && user.Role != "TURISTA" && user.Role != "ADMIN" { // Dodao sam i ADMIN za svaki slučaj
+		log.Printf("WARN: Invalid role '%s' provided for new user %s", user.Role, user.Username)
 		return nil, status.Errorf(codes.InvalidArgument, "Invalid role. Role must be VODIC, TURISTA or ADMIN.")
 	}
 
 	err := s.UserService.Create(ctx, user)
 	if err != nil {
 		if strings.Contains(err.Error(), "already exists") { // Ili za email
+			log.Printf("ERROR: Failed to create user %s: %v", req.GetUsername(), err)
 			return nil, status.Errorf(codes.AlreadyExists, "User with username %s already exists", req.GetUsername())
 		}
 		return nil, status.Errorf(codes.Internal, "Failed to create user: %v", err)
@@ -131,7 +135,7 @@ func (s *StakeholderGRPCServer) GetAllUsers(ctx context.Context, req *pb.GetAllU
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Failed to fetch all users: %v", err)
 	}
-
+	log.Printf("Successfully fetched %d users.", len(users))
 	var protoUsers []*pb.User
 	for _, user := range users {
 		protoUsers = append(protoUsers, toProtoUser(&user))
@@ -183,11 +187,13 @@ func (s *StakeholderGRPCServer) BlockUser(ctx context.Context, req *pb.BlockUser
 
 	username := req.GetUsername()
 	if username == "" {
+		log.Printf("WARN: BlockUser request received with empty username.")
 		return nil, status.Errorf(codes.InvalidArgument, "Username cannot be empty")
 	}
 
 	err := s.UserService.BlockUser(ctx, username)
 	if err != nil {
+		log.Printf("ERROR: Failed to block user %s: %v", username, err)
 		if strings.Contains(err.Error(), "User not found") {
 			return nil, status.Errorf(codes.NotFound, "User %s not found", username)
 		}
@@ -199,13 +205,16 @@ func (s *StakeholderGRPCServer) BlockUser(ctx context.Context, req *pb.BlockUser
 }
 
 func (h *StakeholderGRPCServer) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.GetUserResponse, error) {
+	log.Printf("gRPC GetUser request for user ID: %s", req.GetUserId())
 	userID, err := primitive.ObjectIDFromHex(req.GetUserId())
 	if err != nil {
+		log.Printf("ERROR: Invalid User ID format for GetUser: %s", req.GetUserId())
 		return nil, status.Errorf(codes.InvalidArgument, "Invalid User ID format")
 	}
 
 	user, err := h.UserService.FindById(ctx, userID)
 	if err != nil {
+		log.Printf("ERROR: Failed to get user with ID %s: %v", req.GetUserId(), err)
 		return nil, status.Errorf(codes.NotFound, "User not found")
 	}
 
@@ -217,7 +226,7 @@ func (h *StakeholderGRPCServer) GetUser(ctx context.Context, req *pb.GetUserRequ
 		Latitude:  user.Latitude,
 		Longitude: user.Longitude,
 	}
-
+	log.Printf("Successfully fetched user %s", user.Username)
 	return &pb.GetUserResponse{User: protoUser}, nil
 }
 

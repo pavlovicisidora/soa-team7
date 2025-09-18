@@ -150,6 +150,8 @@ services:
     hostname: "shopping-server"
     ports:
       - "8085:8085"
+    networks:
+      - monitoring
     environment:
       - PORT=8085
       - MONGO_URI=mongodb://root:pass@mongo:27017
