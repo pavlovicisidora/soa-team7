@@ -24,17 +24,9 @@ import (
 )
 
 func main() {
-	jaegerAgentHost := os.Getenv("JAEGER_AGENT_HOST")
-	if jaegerAgentHost == "" {
-		jaegerAgentHost = "jaeger" // Fallback na ime servisa
-	}
-	jaegerAgentPort := os.Getenv("JAEGER_AGENT_PORT")
-	if jaegerAgentPort == "" {
-		jaegerAgentPort = "6831" // Fallback na default port
-	}
+	otlpEndpoint := "jaeger:4317"
 
-	// Pozivamo ažuriranu funkciju
-	tracerCloser, err := tracing.InitTracer("stakeholders-service", jaegerAgentHost, jaegerAgentPort)
+	tracerCloser, err := tracing.InitTracer("stakeholders-service", otlpEndpoint)
 	if err != nil {
 		log.Fatalf("failed to initialize tracer: %v", err)
 	}
@@ -99,7 +91,7 @@ func main() {
 			return
 		}
 
-		if err := userService.HandleBlockUserCompensation(context.Background(), event.UserID); err != nil {
+		if err := userService.HandleBlockUserCompensation(event.UserID); err != nil {
 			log.Printf("Failed to handle block user compensation for user %s: %v", event.UserID, err)
 		}
 	})

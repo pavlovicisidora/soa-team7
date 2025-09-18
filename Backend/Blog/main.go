@@ -23,16 +23,9 @@ import (
 )
 
 func main() {
-	jaegerAgentHost := os.Getenv("JAEGER_AGENT_HOST")
-	if jaegerAgentHost == "" {
-		jaegerAgentHost = "jaeger"
-	}
-	jaegerAgentPort := os.Getenv("JAEGER_AGENT_PORT")
-	if jaegerAgentPort == "" {
-		jaegerAgentPort = "6831"
-	}
+	otlpEndpoint := "jaeger:4317"
 
-	tracerCloser, err := tracing.InitTracer("blog-service", jaegerAgentHost, jaegerAgentPort)
+	tracerCloser, err := tracing.InitTracer("blog-service", otlpEndpoint) // Prosleđujemo novi endpoint
 	if err != nil {
 		log.Fatalf("failed to initialize tracer: %v", err)
 	}
