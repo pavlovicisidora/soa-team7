@@ -47,6 +47,7 @@ func (s *StakeholderGRPCServer) GetUserProfileById(ctx context.Context, req *pb.
 		log.Printf("Profile not found for ID %s: %v", userIdStr, err)
 		return nil, status.Errorf(codes.NotFound, "Profile not found for user ID: %s", userIdStr)
 	}
+	log.Printf("Successfully fetched profile for user ID: %s", userIdStr)
 	return toProtoProfile(profile), nil
 }
 func (s *StakeholderGRPCServer) PatchProfile(ctx context.Context, req *pb.PatchProfileRequest) (*pb.PatchProfileResponse, error) {
@@ -54,6 +55,7 @@ func (s *StakeholderGRPCServer) PatchProfile(ctx context.Context, req *pb.PatchP
 
 	userId, err := primitive.ObjectIDFromHex(req.GetUserId())
 	if err != nil {
+		log.Printf("ERROR: Invalid user ID format in PatchProfile: %s", req.GetUserId())
 		return nil, status.Errorf(codes.InvalidArgument, "Invalid user ID in token")
 	}
 
@@ -76,10 +78,12 @@ func (s *StakeholderGRPCServer) PatchProfile(ctx context.Context, req *pb.PatchP
 	}
 
 	if len(updates) == 0 {
+		log.Printf("WARN: PatchProfile request for user %s with no fields to update.", req.GetUserId())
 		return nil, status.Errorf(codes.InvalidArgument, "No fields to update")
 	}
 
 	if err := s.ProfileService.UpdateUserProfileFields(ctx, userId, updates); err != nil {
+		log.Printf("ERROR: Failed to update profile for user %s: %v", req.GetUserId(), err)
 		return nil, status.Errorf(codes.Internal, "Failed to update profile: %v", err)
 	}
 

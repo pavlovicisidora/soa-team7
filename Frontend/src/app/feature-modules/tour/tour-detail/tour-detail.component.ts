@@ -8,6 +8,8 @@ import { forkJoin, of, switchMap } from 'rxjs';
 import { Review } from '../review.model';
 import { Validators } from 'ngx-editor';
 import { StakeholderService } from '../../stakeholder/stakeholder.service';
+import { ShoppingService } from '../../shopping/shopping.service';
+import { AuthService } from 'src/app/auth/auth.service';
 
 @Component({
   selector: 'app-tour-detail',
@@ -21,9 +23,12 @@ export class TourDetailComponent implements OnInit{
    selectedFiles: File[] = [];
   isUploading: boolean = false;
   isStartingTour = false;
+  isTourist = false;
+  hasPurchasedTour = false;
 
-  constructor(private route: ActivatedRoute, private tourService: TourService, private reviewService: ReviewService, private fb: FormBuilder, private stakeholderService: StakeholderService, private router: Router){}
+  constructor(private route: ActivatedRoute, private tourService: TourService, private reviewService: ReviewService, private fb: FormBuilder, private stakeholderService: StakeholderService, private router: Router, private shoppingService: ShoppingService, private authService: AuthService){}
   ngOnInit(): void {
+    this.isTourist = this.authService.isTourist();
     const tourId = Number(this.route.snapshot.paramMap.get('id'))
     if(tourId){
       this.loadTourAndReviews(tourId);
@@ -33,7 +38,18 @@ export class TourDetailComponent implements OnInit{
       comment: ['', Validators.required],
       visitingdate: [null, Validators.required] 
     });
+    
+    if (this.authService.getUsername != null) { 
+      this.checkPurchaseStatus(tourId);
+    }
   }
+
+  checkPurchaseStatus(tourId: number): void {
+    this.shoppingService.checkToken(tourId).subscribe(response => {
+      this.hasPurchasedTour = response.hasToken;
+    });
+  }
+
   loadTourAndReviews(tourId: number): void {
     forkJoin({
       tour: this.tourService.getTourById(tourId),
@@ -151,5 +167,16 @@ export class TourDetailComponent implements OnInit{
         this.isStartingTour = false;
       }
     });
+  }
+
+  addToCart(tourId: number): void {
+    this.shoppingService.addToCart(tourId).subscribe({
+      next: (cart) => alert(`${cart.items[cart.items.length - 1].tour_name} is added to cart!`),
+      error: (err) => alert('Error adding to cart: ' + err.error)
+    });
+  }
+
+  goToKeypoints(tourId: number): void {
+    this.router.navigate(['/keypoint-manage', tourId]);
   }
 }

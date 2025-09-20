@@ -51,5 +51,9 @@ export class AuthService{
         localStorage.removeItem('role');
     }
 
+    isTourist(): boolean {
+        return this.getRole() === 'TURISTA';
+    }
+
 
 }

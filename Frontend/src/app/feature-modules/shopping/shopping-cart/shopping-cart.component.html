@@ -1,0 +1,28 @@
+<div class="cart-container">
+  <h2>Your cart</h2>
+  
+  <div *ngIf="isLoading">
+    <p>Loading cart...</p>
+  </div>
+  
+  <div *ngIf="cart.items.length === 0">
+    <p>Your cart is empty.</p>
+  </div>
+  
+  <div *ngIf="cart.items.length > 0">
+    <ul class="item-list">
+      <li *ngFor="let item of cart.items" class="cart-item">
+        <span>{{ item.tour_name }}</span>
+        <span class="price"> {{ item.price | currency:'EUR' }}</span>
+        <button (click)="removeItem(item)" class="remove-btn"> Remove</button>
+      </li>
+    </ul>
+    
+    <hr>
+    
+    <div class="cart-summary">
+      <h3>Total: {{ cart.total_price | currency:'EUR' }}</h3>
+      <button (click)="checkout()" class="checkout-btn">Checkout</button>
+    </div>
+  </div>
+</div>

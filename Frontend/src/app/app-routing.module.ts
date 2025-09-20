@@ -15,6 +15,7 @@ import { ProfileComponent } from './feature-modules/stakeholder/profile/profile.
 import { KeypointManageComponent } from './feature-modules/tour/keypoint-manage/keypoint-manage.component';
 import { RecommendedUsersComponent } from './feature-modules/follower/recommended-users/recommended-users.component';
 import { TourExecutionComponent } from './feature-modules/tour/tour-execution/tour-execution.component';
+import { ShoppingCartComponent } from './feature-modules/shopping/shopping-cart/shopping-cart.component';
 
 const routes: Routes = [
   { path: 'blog-list', component: BlogListComponent },
@@ -32,6 +33,7 @@ const routes: Routes = [
   { path: 'keypoint-manage/:tourId', component: KeypointManageComponent },
   { path: 'recommended-users', component: RecommendedUsersComponent },
   { path: 'tour-execution/:id', component: TourExecutionComponent },
+  { path: 'cart', component: ShoppingCartComponent },
   
 ];
 

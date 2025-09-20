@@ -14,12 +14,14 @@
           <span>{{ tour.price | currency:'EUR' }}</span>
         </div>
       </div>
-      <div *ngIf="tour.status != 'DRAFT'">
+      <div *ngIf="tour.status != 'DRAFT' && isTourist && hasPurchasedTour">
         <button (click)="startTour()" [disabled]="isStartingTour">
           <span *ngIf="!isStartingTour">Start tour</span>
           <span *ngIf="isStartingTour">Starting...</span>
         </button>
       </div>
+      <button *ngIf="hasPurchasedTour" class="keypoints-button" (click)="goToKeypoints(tour.id)">Keypoints</button>
+      <button *ngIf="tour.status=='PUBLISHED' && isTourist && !hasPurchasedTour" (click)="addToCart(tour.id)">Add to cart</button>
     </section>
 
     <section class="reviews-section">
