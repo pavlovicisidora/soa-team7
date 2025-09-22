@@ -76,6 +76,10 @@ export class TourService {
     return this.http.post<TourExecution>(`/api/tours/execution/${executionId}/complete`, {});
   }
 
+  completeKeypoint(execId: number,kpId: number): Observable<TourExecution>{
+    return this.http.put<TourExecution>(`/api/tours/execution/${execId}/keypoint/${kpId}/complete`, {});
+  }
+
   getTourExecution(executionId: number): Observable<TourExecution> {
     return this.http.get<TourExecution>(`/api/tours/execution/${executionId}`);
   }

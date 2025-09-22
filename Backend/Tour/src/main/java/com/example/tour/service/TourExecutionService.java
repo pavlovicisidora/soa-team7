@@ -8,6 +8,8 @@ import com.example.tour.repository.TourRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 import java.util.List;
 //import java.util.Optional;
@@ -58,10 +60,16 @@ public class TourExecutionService {
                 .orElseThrow(() -> new RuntimeException("TourExecution not found"));
     }
 
+    @Transactional
     public TourExecution completeKeyPoint(Integer executionId, int keyPointId) {
         TourExecution tourExecution = getTourExecution(executionId);
         List<ExecutedKeyPoint> executedList = tourExecution.getExecutedKeyPoints();
 
+        if(keyPointId == 0){
+            tourExecution.setLastActivity(LocalDateTime.now());
+            return tourExecutionRepository.save(tourExecution);
+        }
+        
         for(ExecutedKeyPoint e : executedList){
             if(e.getKeypointId() == keyPointId)
                 throw new RuntimeException("Keypoint already completed!");
@@ -71,13 +79,12 @@ public class TourExecutionService {
         executedList.add(executed);
 
         tourExecution.setExecutedKeyPoints(executedList);
-
+        tourExecution.setLastActivity(LocalDateTime.now());
         //Ako je odradio sve KT koje je trebao onda je i zavrsio turu uspesno
         if(executedList.size() == tourExecution.getKPtoBeCompleted()){
 
             tourExecution.setStatus(TourExecutionStatus.COMPLETED);
             tourExecution.setCompletionTime(LocalDateTime.now());
-            tourExecution.setLastActivity(LocalDateTime.now());
 
         }
             return tourExecutionRepository.save(tourExecution);
