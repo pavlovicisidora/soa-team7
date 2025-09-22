@@ -1,39 +1,52 @@
 <div class="execution-container" *ngIf="execution; else loading">
   <div *ngIf="execution.tour" class="tour-info">
-    <h2>Active tour: {{ execution.tour.name }}</h2>
+    <h2>Aktivna tura: {{ execution.tour.name }}</h2>
     <p class="description">{{ execution.tour.description }}</p>
     <p>
       <small>Status: <strong>{{ execution.status }}</strong></small> | 
-      <small *ngIf="execution.start_time">Started at: {{ execution.start_time | date:'dd.MM.yyyy. HH:mm' }}</small>
+      <small *ngIf="execution.start_time">Započeta: {{ execution.start_time | date:'dd.MM.yyyy. HH:mm' }}</small>
     </p>
   </div>
   
   <hr>
 
   <div *ngIf="currentUser" class="position-info">
-    <h3>Your current position</h3>
+    <h3>Tvoja trenutna pozicija (simulacija)</h3>
     <p *ngIf="currentUser.latitude && currentUser.longitude">
-      Latitude: {{ currentUser.latitude.toFixed(4) }}, Longitude: {{ currentUser.longitude.toFixed(4) }}
+      Geografska širina: {{ currentUser.latitude.toFixed(4) }}, Geografska dužina: {{ currentUser.longitude.toFixed(4) }}
     </p>
     <p *ngIf="!currentUser.latitude">
-      Position not set. <a routerLink="/position-simulator">Go to simulator</a>.
+      Pozicija nije postavljena. **Klikni na mapu da simuliraš svoju lokaciju.**
     </p>
-  </div>
-  
-  <hr>
-
-  <div class="progress-info">
-      <p>the map, key points and progress...</p> <!-- srkijev deo -->
-  </div>
-  
-  <hr>
-
-  <div class="actions">
-    <button (click)="abandon()" class="abandon-btn">Abandon tour</button>
-    <button (click)="complete()" class="complete-btn">Complete tour</button>
   </div>
 </div>
 
+<!-- Kontejner za mapu -->
+<div id="map" style="height: 500px; width: 100%; margin-bottom: 20px;"></div>
+
+<!-- Tabela sa preostalim ključnim tačkama -->
+<div class="keypoints-container" *ngIf="uncompletedKeypoints && uncompletedKeypoints.length > 0">
+  <h3>Preostale ključne tačke</h3>
+  <table class="keypoints-table">
+    <thead>
+      <tr>
+        <th>Naziv</th>
+        <th>Opis</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let kp of uncompletedKeypoints">
+        <td>{{ kp.name }}</td>
+        <td>{{ kp.description }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="actions">
+  <button (click)="abandon()" class="abandon-btn">Napusti turu</button>
+</div>
+
 <ng-template #loading>
-  <p>Loading active tour...</p>
+  <p>Učitavanje aktivne ture...</p>
 </ng-template>

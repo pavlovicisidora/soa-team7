@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v6.32.0
-// source: proto/tour.proto
+// source: tour.proto
 
 package proto
 
@@ -25,7 +25,7 @@ const (
 	TourGrpcService_GetTourById_FullMethodName      = "/tour.TourGrpcService/GetTourById"
 	TourGrpcService_StartTour_FullMethodName        = "/tour.TourGrpcService/StartTour"
 	TourGrpcService_AbandonTour_FullMethodName      = "/tour.TourGrpcService/AbandonTour"
-	TourGrpcService_CompleteTour_FullMethodName     = "/tour.TourGrpcService/CompleteTour"
+	TourGrpcService_CompleteKeyPoint_FullMethodName = "/tour.TourGrpcService/CompleteKeyPoint"
 	TourGrpcService_GetTourExecution_FullMethodName = "/tour.TourGrpcService/GetTourExecution"
 )
 
@@ -39,7 +39,7 @@ type TourGrpcServiceClient interface {
 	GetTourById(ctx context.Context, in *GetTourByIdRequest, opts ...grpc.CallOption) (*GetTourByIdResponse, error)
 	StartTour(ctx context.Context, in *StartTourRequest, opts ...grpc.CallOption) (*StartTourResponse, error)
 	AbandonTour(ctx context.Context, in *AbandonTourRequest, opts ...grpc.CallOption) (*AbandonTourResponse, error)
-	CompleteTour(ctx context.Context, in *CompleteTourRequest, opts ...grpc.CallOption) (*CompleteTourResponse, error)
+	CompleteKeyPoint(ctx context.Context, in *CompleteKeyPointRequest, opts ...grpc.CallOption) (*CompleteKeyPointResponse, error)
 	GetTourExecution(ctx context.Context, in *GetTourExecutionRequest, opts ...grpc.CallOption) (*GetTourExecutionResponse, error)
 }
 
@@ -111,10 +111,10 @@ func (c *tourGrpcServiceClient) AbandonTour(ctx context.Context, in *AbandonTour
 	return out, nil
 }
 
-func (c *tourGrpcServiceClient) CompleteTour(ctx context.Context, in *CompleteTourRequest, opts ...grpc.CallOption) (*CompleteTourResponse, error) {
+func (c *tourGrpcServiceClient) CompleteKeyPoint(ctx context.Context, in *CompleteKeyPointRequest, opts ...grpc.CallOption) (*CompleteKeyPointResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CompleteTourResponse)
-	err := c.cc.Invoke(ctx, TourGrpcService_CompleteTour_FullMethodName, in, out, cOpts...)
+	out := new(CompleteKeyPointResponse)
+	err := c.cc.Invoke(ctx, TourGrpcService_CompleteKeyPoint_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -141,7 +141,7 @@ type TourGrpcServiceServer interface {
 	GetTourById(context.Context, *GetTourByIdRequest) (*GetTourByIdResponse, error)
 	StartTour(context.Context, *StartTourRequest) (*StartTourResponse, error)
 	AbandonTour(context.Context, *AbandonTourRequest) (*AbandonTourResponse, error)
-	CompleteTour(context.Context, *CompleteTourRequest) (*CompleteTourResponse, error)
+	CompleteKeyPoint(context.Context, *CompleteKeyPointRequest) (*CompleteKeyPointResponse, error)
 	GetTourExecution(context.Context, *GetTourExecutionRequest) (*GetTourExecutionResponse, error)
 	mustEmbedUnimplementedTourGrpcServiceServer()
 }
@@ -171,8 +171,8 @@ func (UnimplementedTourGrpcServiceServer) StartTour(context.Context, *StartTourR
 func (UnimplementedTourGrpcServiceServer) AbandonTour(context.Context, *AbandonTourRequest) (*AbandonTourResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AbandonTour not implemented")
 }
-func (UnimplementedTourGrpcServiceServer) CompleteTour(context.Context, *CompleteTourRequest) (*CompleteTourResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CompleteTour not implemented")
+func (UnimplementedTourGrpcServiceServer) CompleteKeyPoint(context.Context, *CompleteKeyPointRequest) (*CompleteKeyPointResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CompleteKeyPoint not implemented")
 }
 func (UnimplementedTourGrpcServiceServer) GetTourExecution(context.Context, *GetTourExecutionRequest) (*GetTourExecutionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTourExecution not implemented")
@@ -306,20 +306,20 @@ func _TourGrpcService_AbandonTour_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _TourGrpcService_CompleteTour_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CompleteTourRequest)
+func _TourGrpcService_CompleteKeyPoint_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CompleteKeyPointRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TourGrpcServiceServer).CompleteTour(ctx, in)
+		return srv.(TourGrpcServiceServer).CompleteKeyPoint(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: TourGrpcService_CompleteTour_FullMethodName,
+		FullMethod: TourGrpcService_CompleteKeyPoint_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TourGrpcServiceServer).CompleteTour(ctx, req.(*CompleteTourRequest))
+		return srv.(TourGrpcServiceServer).CompleteKeyPoint(ctx, req.(*CompleteKeyPointRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -374,8 +374,8 @@ var TourGrpcService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _TourGrpcService_AbandonTour_Handler,
 		},
 		{
-			MethodName: "CompleteTour",
-			Handler:    _TourGrpcService_CompleteTour_Handler,
+			MethodName: "CompleteKeyPoint",
+			Handler:    _TourGrpcService_CompleteKeyPoint_Handler,
 		},
 		{
 			MethodName: "GetTourExecution",
@@ -383,5 +383,5 @@ var TourGrpcService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "proto/tour.proto",
+	Metadata: "tour.proto",
 }
