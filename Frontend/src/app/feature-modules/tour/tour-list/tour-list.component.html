@@ -4,7 +4,14 @@
     <div class="tour-card" *ngFor="let tour of tours">
       <div class="card-header">
         <h3>{{ tour.name }}</h3>
-        <span class="difficulty difficulty-{{ tour.difficulty | lowercase }}">{{ tour.difficulty }}</span>
+        <div>
+          <span class="status status-{{ tour.status | lowercase }}">{{ tour.status }}</span>
+          <span *ngIf="tour.status == 'ARCHIVED'" class="tag"> {{ tour.archived_date_time | date: 'dd.MM.yyyy. HH:mm'}}</span>
+          <span *ngIf="tour.status == 'PUBLISHED'" class="tag"> {{ tour.published_date_time | date: 'dd.MM.yyyy. HH:mm'}}</span>
+        </div>
+        <button (click)="startEdit(tour)" [disabled]="editingTourId !== null">Update</button>
+
+     
       </div>
       <div class="card-body">
         <p>{{ tour.description }}</p>
@@ -12,14 +19,54 @@
       <div class="card-footer">
         <div class="tags">
           <span *ngFor="let tag of tour.tags" class="tag">{{ tag }}</span>
+          <span class="tag">Distance: {{ tour.distance_in_km }} km</span>
         </div>
         <div class="status-price">
-          <span class="status status-{{ tour.status | lowercase }}">{{ tour.status }}</span>
+           <span class="difficulty difficulty-{{ tour.difficulty | lowercase }}">{{ tour.difficulty }}</span>
           <span class="price">{{ tour.price | currency:'EUR' }}</span>
         </div>
         <!-- Novo dugme za Keypoints -->
         <button class="keypoints-button" (click)="goToKeypoints(tour.id)">Keypoints</button>
       </div>
+     <!-- === FORMA ZA IZMENU (prikazuje se SAMO ako se ova tura menja) === -->
+      <ng-container *ngIf="editingTourId === tour.id && tourToEdit">
+        <div class="update-form">
+          <h3>Editing: {{ tourToEdit.name }}</h3>
+          
+          <div class="form-group">
+            <label for="name-{{tour.id}}">Name:</label>
+            <input type="text" id="name-{{tour.id}}" [(ngModel)]="tourToEdit.name" class="form-control">
+          </div>
+          
+          <div class="form-group">
+            <label for="description-{{tour.id}}">Description:</label>
+            <textarea id="description-{{tour.id}}" [(ngModel)]="tourToEdit.description" class="form-control"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="difficulty-{{tour.id}}">Difficulty:</label>
+            <input type="text" id="difficulty-{{tour.id}}" [(ngModel)]="tourToEdit.difficulty" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label for="price-{{tour.id}}">Price:</label>
+            <input type="number" id="price-{{tour.id}}" [(ngModel)]="tourToEdit.price" class="form-control">
+          </div>
+          
+          <div class="form-group">
+            <label for="status-{{tour.id}}">Status:</label>
+            <select id="status-{{tour.id}}" [(ngModel)]="tourToEdit.status" class="form-control">
+              <option *ngFor="let statusOption of tourStatusOptions" [value]="statusOption">{{ statusOption }}</option>
+            </select>
+          </div>
+
+          <div class="form-actions">
+            <button class="save-button" (click)="saveUpdate()">Save</button>
+            <button class="cancel-button" (click)="cancelEdit()">Cancel</button>
+          </div>
+        </div>
+      </ng-container>
+
     </div>
   </div>
 

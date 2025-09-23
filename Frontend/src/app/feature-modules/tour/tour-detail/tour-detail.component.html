@@ -13,7 +13,37 @@
           <small>Price</small>
           <span>{{ tour.price | currency:'EUR' }}</span>
         </div>
+        <div class="meta-item">
+          <small>Distance</small>
+          <span>{{ tour.distance_in_km }} km</span>
+        </div>
+        <div class="meta-item">
+          <small>Published</small>
+          <span>{{ tour.published_date_time | date: 'dd.MM.yyyy.' }}</span>
+        </div>
       </div>
+
+
+    <br>
+    <br>
+      <h3>Prva ključna tačka na ruti</h3>
+
+      <!-- Prikazujemo ovaj blok samo ako prva ključna točka postoji -->
+      <div *ngIf="firstKeypoint" class="keypoint-display">
+        
+        <img *ngIf="firstKeypoint.image" [src]="firstKeypoint.image" alt="Slika ključne tačke" class="keypoint-image">
+
+        <div class="keypoint-details">
+          <h4>{{ firstKeypoint.name }}</h4>
+          <p>{{ firstKeypoint.description }}</p>
+        </div>
+
+      </div>
+
+
+
+
+
       <div *ngIf="tour.status != 'DRAFT' && isTourist && hasPurchasedTour">
         <button (click)="startTour()" [disabled]="isStartingTour">
           <span *ngIf="!isStartingTour">Start tour</span>

@@ -108,6 +108,7 @@ func (h *KeyPointHandler) GetKeyPointsTour(w http.ResponseWriter, r *http.Reques
 	//	http.Error(w, "Forbidden: only VODIC can see keypoints.", http.StatusForbidden)
 	//	return
 	//}   ZAKOMENTARISAO SAM JER MI TREBA I ZA TURISTU -SRKI <3
+
 	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
 	defer cancel()
 	tourID, err := strconv.Atoi(id)

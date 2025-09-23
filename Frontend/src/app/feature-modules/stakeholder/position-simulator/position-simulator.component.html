@@ -1,14 +1,16 @@
-<div *ngIf="currentUser" class="user-info">
-  <h2>Position simulator for: {{ currentUser.username }}</h2>
-  <p>Email: {{ currentUser.mail }} | Role: {{ currentUser.role }}</p>
-  <p *ngIf="currentUser.latitude && currentUser.longitude">
-    Your saved location: Lat: {{ currentUser.latitude.toFixed(4) }}, Long: {{ currentUser.longitude.toFixed(4) }}
-  </p>
-  <p *ngIf="!currentUser.latitude">You have not set your position yet.</p>
+<div class="simulator-main">
+  <div *ngIf="currentUser" class="user-info">
+    <h2>Position simulator for: {{ currentUser.username }}</h2>
+    <p>Email: {{ currentUser.mail }} | Role: {{ currentUser.role }}</p>
+    <p *ngIf="currentUser.latitude && currentUser.longitude">
+      Your saved location: Lat: {{ currentUser.latitude.toFixed(4) }}, Long: {{ currentUser.longitude.toFixed(4) }}
+    </p>
+    <p *ngIf="!currentUser.latitude">You have not set your position yet.</p>
+  </div>
+
+  <hr>
+
+  <p>Click on the map to set your current location.</p>
+
+  <div id="map" style="height: 500px; width: 100%;"></div>
 </div>
-
-<hr>
-
-<p>Click on the map to set your current location.</p>
-
-<div id="map" style="height: 500px; width: 100%;"></div>

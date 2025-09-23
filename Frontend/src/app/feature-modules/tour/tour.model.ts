@@ -7,4 +7,7 @@ export interface Tour{
     status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
     price: number;
     authorId: string;
+    distance_in_km: number;
+    published_date_time?: any;
+    archived_date_time?: any;
 }

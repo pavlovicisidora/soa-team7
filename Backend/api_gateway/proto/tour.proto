@@ -15,7 +15,8 @@ service TourGrpcService {
   rpc GetAllToursById(GetAllToursByIdRequest) returns (GetAllToursByIdResponse);
   rpc GetAllTours(GetAllToursRequest) returns (GetAllToursResponse);
   rpc GetTourById(GetTourByIdRequest) returns (GetTourByIdResponse);
-  
+  rpc UpdateTour(UpdateTourRequest) returns (UpdateTourResponse);
+
   rpc StartTour(StartTourRequest) returns (StartTourResponse);
   rpc AbandonTour(AbandonTourRequest) returns (AbandonTourResponse);
   rpc CompleteKeyPoint(CompleteKeyPointRequest) returns (CompleteKeyPointResponse);
@@ -31,6 +32,14 @@ message Tour {
   string status = 6;
   double price = 7;
   string author_id = 8;
+  double distance_in_km = 9;
+  google.protobuf.Timestamp published_date_time = 10;
+  google.protobuf.Timestamp archived_date_time = 11;
+}
+enum TourStatus {
+  DRAFT = 0;
+  PUBLISHED = 1;
+  ARCHIVED = 2;
 }
 
 message CreateTourRequest {
@@ -58,6 +67,13 @@ message GetTourByIdRequest{
   int32 tour_id = 1;
 }
 message GetTourByIdResponse{
+  Tour tour = 1;
+}
+
+message UpdateTourRequest {
+  Tour tour = 1;
+}
+message UpdateTourResponse {
   Tour tour = 1;
 }
 

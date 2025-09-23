@@ -1,45 +1,63 @@
-<h2>Blogs</h2>
-<div *ngIf="!blogs || blogs.length === 0">
-  <p>There is no blogs.</p>
-</div>
-
-<div *ngFor="let blog of blogs" class="blog-post">
-  <h3>{{ blog.title }}</h3>
-  <small>Author ID: {{ blog.user_id }}</small><br>
-  <small>Published: {{ blog.created_at | date: 'dd.MM.yyyy. HH:mm' }}</small> 
-  
-  <div class="blog-content" [innerHTML] = "blog.content"></div>
-  
-  <div class="image-gallery" *ngIf="blog.images && blog.images.length > 0">
-    <div *ngFor="let image of blog.images" class="gallery-item">
-      <img [src]="'http://localhost:8080' + image.url" alt="Blog image">
-    </div>
-  </div>
-  
-  <div class="likes-section">
-    <span>Likes: {{ blog.like_count }}</span>
-    <button (click)="like(blog.id)">Like</button>
-    <button (click)="unlike(blog.id)">Unlike</button>
+<div class="blogs-main-div">
+  <h2>Blogs</h2>
+  <div *ngIf="!blogs || blogs.length === 0">
+    <p>There is no blogs.</p>
   </div>
 
-  <div class="comments-section">
-  <button (click)="loadComments(blog.id)">Prikaži komentare</button>
+  <!-- Glavni blog post kontejner -->
+  <div *ngFor="let blog of blogs" class="blog-post">
 
-  <div *ngIf="commentsByBlog[blog.id]">
-    <div *ngIf="commentsByBlog[blog.id].length > 0; else noComments">
-      <div *ngFor="let comment of commentsByBlog[blog.id]">
-         <small>{{ comment.author_id }} • <b>{{ comment.created_at | date:'dd.MM.yyyy. HH:mm' }}</b>:</small>
-  {{ comment.text }}
+    <!-- Flex kontejner za slike i tekst -->
+    <div class="blog-flex">
+
+      <!-- 1. Galerija slika (Lijeva kolona) -->
+      <div class="image-gallery" *ngIf="blog.images && blog.images.length > 0">
+        <div *ngFor="let image of blog.images" class="gallery-item">
+          <img [src]="'http://localhost:8080' + image.url" alt="Blog image">
+        </div>
+      </div>
+
+      <!-- 2. Tekstualni sadržaj (Desna kolona koja se širi) -->
+      <div class="blog-text-content">
+
+        <!-- Kontejner za pozicioniranje datuma -->
+        <div class="text-container">
+          <small class="published-text">Published: {{ blog.created_at | date: 'dd.MM.yyyy. HH:mm' }}</small>
+          <h3>{{ blog.title }}</h3>
+          <small>Author ID: {{ blog.user_id }}</small><br>
+
+          <div class="blog-content" [innerHTML]="blog.content"></div>
+
+          <div class="likes-section">
+            <span>Likes: {{ blog.like_count }}</span>
+            <button (click)="like(blog.id)">Like</button>
+            <button (click)="unlike(blog.id)">Unlike</button>
+          </div>
+        </div>
       </div>
     </div>
-    <ng-template #noComments>
-      <p>Još nema komentara.</p>
-    </ng-template>
-  </div>
 
-  <div class="add-comment">
-    <input type="text" [(ngModel)]="newCommentTexts[blog.id]" placeholder="Napiši komentar..." />
-    <button (click)="submitComment(blog.id)">Pošalji</button>
-  </div>
+    <!-- Sekcija za komentare (ispod flex kontejnera) -->
+    <div class="comments-section">
+      <button (click)="loadComments(blog.id)">Prikaži komentare</button>
 
+      <div *ngIf="commentsByBlog[blog.id]">
+        <div *ngIf="commentsByBlog[blog.id].length > 0; else noComments">
+          <div *ngFor="let comment of commentsByBlog[blog.id]">
+            <small>{{ comment.author_id }} • <b>{{ comment.created_at | date:'dd.MM.yyyy. HH:mm' }}</b>:</small>
+            {{ comment.text }}
+          </div>
+        </div>
+        <ng-template #noComments>
+          <p>Još nema komentara.</p>
+        </ng-template>
+      </div>
+
+      <div class="add-comment">
+        <input type="text" [(ngModel)]="newCommentTexts[blog.id]" placeholder="Napiši komentar..." />
+        <button (click)="submitComment(blog.id)">Pošalji</button>
+      </div>
+    </div>
+
+  </div>
 </div>
