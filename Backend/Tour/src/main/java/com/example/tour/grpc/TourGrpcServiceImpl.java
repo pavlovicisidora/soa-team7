@@ -1,6 +1,7 @@
 package com.example.tour.grpc;
 
 import com.example.tour.grpc.TourGrpcServiceGrpc;
+import com.example.tour.model.Status;
 import com.example.tour.model.Tour;
 import com.example.tour.model.TourExecution;
 import com.example.tour.service.TourService;
@@ -52,29 +53,9 @@ public class TourGrpcServiceImpl extends TourGrpcServiceGrpc.TourGrpcServiceImpl
     public void getAllToursById(GetAllToursByIdRequest request, StreamObserver<GetAllToursByIdResponse> responseObserver) {
         List<Tour> tours = tourService.findAllToursById(request.getAuthorId());
         GetAllToursByIdResponse.Builder responseBuilder = GetAllToursByIdResponse.newBuilder();
+
         for (Tour tour : tours) {
-            com.example.tour.grpc.Tour grpcTour = com.example.tour.grpc.Tour.newBuilder()
-                    .setId(tour.getId())
-                    .setName(tour.getName())
-                    .setDescription(tour.getDescription())
-                    .setDifficulty(tour.getDifficulty())
-                    .addAllTags(tour.getTags())
-                    .setStatus(tour.getStatus().name()) 
-                    .setPrice(tour.getPrice())
-                    .setAuthorId(tour.getAuthorId())
-                    .build();
-            responseBuilder.addTours(grpcTour);
-        }
-        responseObserver.onNext(responseBuilder.build());
-        responseObserver.onCompleted();
-    }
-    
-    @Override
-    public void getAllTours(GetAllToursRequest request, StreamObserver<GetAllToursResponse> responseObserver) {
-        List<Tour> tours = tourService.findAllTours();
-        GetAllToursResponse.Builder responseBuilder = GetAllToursResponse.newBuilder();
-        for (Tour tour : tours) {
-            com.example.tour.grpc.Tour grpcTour = com.example.tour.grpc.Tour.newBuilder()
+            com.example.tour.grpc.Tour.Builder grpcTourBuilder = com.example.tour.grpc.Tour.newBuilder()
                     .setId(tour.getId())
                     .setName(tour.getName())
                     .setDescription(tour.getDescription())
@@ -83,8 +64,71 @@ public class TourGrpcServiceImpl extends TourGrpcServiceGrpc.TourGrpcServiceImpl
                     .setStatus(tour.getStatus().name())
                     .setPrice(tour.getPrice())
                     .setAuthorId(tour.getAuthorId())
-                    .build();
-            responseBuilder.addTours(grpcTour);
+                    .setDistanceInKm(tour.getDistanceInKm());
+
+            if (tour.getArchivedDateTime() != null) {
+                grpcTourBuilder.setArchivedDateTime(
+                        Timestamp.newBuilder()
+                                .setSeconds(tour.getArchivedDateTime().toEpochSecond(ZoneOffset.UTC))
+                                .setNanos(tour.getArchivedDateTime().getNano())
+                                .build()
+                );
+            }
+
+            if (tour.getPublishedDateTime() != null) {
+                grpcTourBuilder.setPublishedDateTime(
+                        Timestamp.newBuilder()
+                                .setSeconds(tour.getPublishedDateTime().toEpochSecond(ZoneOffset.UTC))
+                                .setNanos(tour.getPublishedDateTime().getNano())
+                                .build()
+                );
+            }
+
+            responseBuilder.addTours(grpcTourBuilder.build());
+        }
+
+        responseObserver.onNext(responseBuilder.build());
+        responseObserver.onCompleted();
+    }
+    
+    @Override
+    public void getAllTours(GetAllToursRequest request, StreamObserver<GetAllToursResponse> responseObserver) {
+        List<Tour> tours = tourService.findAllTours();
+        GetAllToursResponse.Builder responseBuilder = GetAllToursResponse.newBuilder();
+
+        for (Tour tour : tours) {
+            if(tour.getStatus() == Status.PUBLISHED) {
+                com.example.tour.grpc.Tour.Builder grpcTourBuilder = com.example.tour.grpc.Tour.newBuilder()
+                        .setId(tour.getId())
+                        .setName(tour.getName())
+                        .setDescription(tour.getDescription())
+                        .setDifficulty(tour.getDifficulty())
+                        .addAllTags(tour.getTags())
+                        .setStatus(tour.getStatus().name())
+                        .setPrice(tour.getPrice())
+                        .setAuthorId(tour.getAuthorId())
+                        .setDistanceInKm(tour.getDistanceInKm());
+
+                if (tour.getArchivedDateTime() != null) {
+                    grpcTourBuilder.setArchivedDateTime(
+                            Timestamp.newBuilder()
+                                    .setSeconds(tour.getArchivedDateTime().toEpochSecond(ZoneOffset.UTC))
+                                    .setNanos(tour.getArchivedDateTime().getNano())
+                                    .build()
+                    );
+                }
+
+                if (tour.getPublishedDateTime() != null) {
+                    grpcTourBuilder.setPublishedDateTime(
+                            Timestamp.newBuilder()
+                                    .setSeconds(tour.getPublishedDateTime().toEpochSecond(ZoneOffset.UTC))
+                                    .setNanos(tour.getPublishedDateTime().getNano())
+                                    .build()
+                    );
+                }
+
+                responseBuilder.addTours(grpcTourBuilder.build());
+            }
         }
         responseObserver.onNext(responseBuilder.build());
         responseObserver.onCompleted();
@@ -93,7 +137,8 @@ public class TourGrpcServiceImpl extends TourGrpcServiceGrpc.TourGrpcServiceImpl
     @Override
     public void getTourById(GetTourByIdRequest request, StreamObserver<GetTourByIdResponse> responseObserver) {
         Tour tour = tourService.findById(request.getTourId());
-        com.example.tour.grpc.Tour grpcTour = com.example.tour.grpc.Tour.newBuilder()
+
+        com.example.tour.grpc.Tour.Builder grpcTourBuilder = com.example.tour.grpc.Tour.newBuilder()
                 .setId(tour.getId())
                 .setName(tour.getName())
                 .setDescription(tour.getDescription())
@@ -102,8 +147,30 @@ public class TourGrpcServiceImpl extends TourGrpcServiceGrpc.TourGrpcServiceImpl
                 .setStatus(tour.getStatus().name())
                 .setPrice(tour.getPrice())
                 .setAuthorId(tour.getAuthorId())
+                .setDistanceInKm(tour.getDistanceInKm());
+
+        if (tour.getArchivedDateTime() != null) {
+            grpcTourBuilder.setArchivedDateTime(
+                    Timestamp.newBuilder()
+                            .setSeconds(tour.getArchivedDateTime().toEpochSecond(ZoneOffset.UTC))
+                            .setNanos(tour.getArchivedDateTime().getNano())
+                            .build()
+            );
+        }
+
+        if (tour.getPublishedDateTime() != null) {
+            grpcTourBuilder.setPublishedDateTime(
+                    Timestamp.newBuilder()
+                            .setSeconds(tour.getPublishedDateTime().toEpochSecond(ZoneOffset.UTC))
+                            .setNanos(tour.getPublishedDateTime().getNano())
+                            .build()
+            );
+        }
+
+        GetTourByIdResponse response = GetTourByIdResponse.newBuilder()
+                .setTour(grpcTourBuilder.build())
                 .build();
-        GetTourByIdResponse response= GetTourByIdResponse.newBuilder().setTour(grpcTour).build();
+
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
@@ -174,15 +241,76 @@ public class TourGrpcServiceImpl extends TourGrpcServiceGrpc.TourGrpcServiceImpl
     }
 
     private com.example.tour.grpc.Tour toGrpcTour(Tour tour) {
-        return com.example.tour.grpc.Tour.newBuilder()
-            .setId(tour.getId())
-            .setName(tour.getName())
-            .setDescription(tour.getDescription())
-            .setDifficulty(tour.getDifficulty())
-            .addAllTags(tour.getTags())
-            .setStatus(tour.getStatus().name())
-            .setPrice(tour.getPrice())
-            .setAuthorId(tour.getAuthorId())
-            .build();
+        com.example.tour.grpc.Tour.Builder builder = com.example.tour.grpc.Tour.newBuilder()
+                .setId(tour.getId())
+                .setName(tour.getName())
+                .setDescription(tour.getDescription())
+                .setDifficulty(tour.getDifficulty())
+                .addAllTags(tour.getTags())
+                .setStatus(tour.getStatus().name())
+                .setPrice(tour.getPrice())
+                .setAuthorId(tour.getAuthorId())
+                .setDistanceInKm(tour.getDistanceInKm());
+        
+
+        if (tour.getPublishedDateTime() != null) {
+            Timestamp publishedTs = Timestamp.newBuilder()
+                    .setSeconds(tour.getPublishedDateTime().toEpochSecond(ZoneOffset.UTC))
+                    .build();
+            builder.setPublishedDateTime(publishedTs);
+        }
+
+        if (tour.getArchivedDateTime() != null) {
+            Timestamp archivedTs = Timestamp.newBuilder()
+                    .setSeconds(tour.getArchivedDateTime().toEpochSecond(ZoneOffset.UTC))
+                    .build();
+            builder.setArchivedDateTime(archivedTs);
+        }
+
+        return builder.build();
+    }
+
+    @Override
+    public void updateTour(UpdateTourRequest request, StreamObserver<UpdateTourResponse> responseObserver) {
+
+        com.example.tour.grpc.Tour grpcTour = request.getTour();
+
+        Tour tourToUpdate = new Tour();
+        tourToUpdate.setId(grpcTour.getId());
+        tourToUpdate.setName(grpcTour.getName());
+        tourToUpdate.setDescription(grpcTour.getDescription());
+        tourToUpdate.setDifficulty(grpcTour.getDifficulty());
+        tourToUpdate.setTags(grpcTour.getTagsList());
+        tourToUpdate.setStatus(com.example.tour.model.Status.valueOf(grpcTour.getStatus()));
+        tourToUpdate.setPrice(grpcTour.getPrice());
+        tourToUpdate.setAuthorId(grpcTour.getAuthorId());
+        tourToUpdate.setDistanceInKm(grpcTour.getDistanceInKm());
+
+        if (grpcTour.hasPublishedDateTime()) {
+            Timestamp ts = grpcTour.getPublishedDateTime();
+            tourToUpdate.setPublishedDateTime(
+                    java.time.LocalDateTime.ofInstant(java.time.Instant.ofEpochSecond(ts.getSeconds(), ts.getNanos()), ZoneOffset.UTC)
+            );
+        }
+        if (grpcTour.hasArchivedDateTime()) {
+            Timestamp ts = grpcTour.getArchivedDateTime();
+            tourToUpdate.setArchivedDateTime(
+                    java.time.LocalDateTime.ofInstant(java.time.Instant.ofEpochSecond(ts.getSeconds(), ts.getNanos()), ZoneOffset.UTC)
+            );
+        }
+
+
+        Tour updatedTourFromDb = tourService.updateTour(tourToUpdate);
+
+
+        com.example.tour.grpc.Tour responseGrpcTour = toGrpcTour(updatedTourFromDb);
+
+
+        UpdateTourResponse response = UpdateTourResponse.newBuilder()
+                .setTour(responseGrpcTour)
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
     }
 }

@@ -1,7 +1,9 @@
 package com.example.tour.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -23,6 +25,14 @@ public class Tour {
     private Double price;
     @Column(name="author_id",nullable = false)
     private String authorId;
+    
+    @JsonProperty("distance_km")
+    @Column(name = "distance_km")
+    private Double distanceInKm;
+    @Column(name = "published_date_time")
+    private LocalDateTime publishedDateTime;
+    @Column(name = "archived_date_time")
+    private LocalDateTime archivedDateTime;
 
     @PrePersist
     public void setInitialValues(){
@@ -37,7 +47,7 @@ public class Tour {
     public Tour() {
     }
 
-    public Tour(Integer id, String name, String description, String difficulty, List<String> tags, Status status, Double price, String authorId) {
+    public Tour(Integer id, String name, String description, String difficulty, List<String> tags, Status status, Double price, String authorId, double distanceInKm, LocalDateTime publishedDateTime, LocalDateTime archivedDateTime) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -46,6 +56,9 @@ public class Tour {
         this.status = status;
         this.price = price;
         this.authorId = authorId;
+        this.distanceInKm = distanceInKm;
+        this.publishedDateTime = publishedDateTime;
+        this.archivedDateTime = archivedDateTime;
     }
 
     public Integer getId() {
@@ -110,5 +123,21 @@ public class Tour {
 
     public void setAuthorId(String authorId) {
         this.authorId = authorId;
+    }
+
+    public LocalDateTime getPublishedDateTime() { return publishedDateTime; }
+
+    public void setPublishedDateTime(LocalDateTime publishedDateTime) { this.publishedDateTime = publishedDateTime; }
+    
+    public LocalDateTime getArchivedDateTime() { return archivedDateTime; }
+    
+    public void setArchivedDateTime(LocalDateTime archivedDateTime) { this.archivedDateTime = archivedDateTime; }
+
+    public Double getDistanceInKm() {
+        return distanceInKm;
+    }
+
+    public void setDistanceInKm(Double distanceInKm) {
+        this.distanceInKm = distanceInKm;
     }
 }

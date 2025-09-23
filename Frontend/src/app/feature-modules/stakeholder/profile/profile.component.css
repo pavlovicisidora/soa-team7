@@ -91,3 +91,67 @@
   padding: 2rem;
   color: #777;
 }
+
+.edit-form {
+  margin-left: 20px;
+  width: 100%;
+  max-width: 600px; /* Ista širina kao i profile-card */
+  background: #fff;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box; /* Osigurava da padding ne poveća širinu */
+}
+
+.edit-form form {
+  display: flex;
+  flex-direction: column;
+}
+
+.edit-form label {
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  color: #555;
+}
+
+.edit-form input[type="text"],
+.edit-form textarea {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem; /* Razmak između polja */
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-family: inherit; /* Koristi isti font kao i ostatak stranice */
+  box-sizing: border-box;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.edit-form input[type="text"]:focus,
+.edit-form textarea:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
+}
+
+.edit-form textarea {
+  min-height: 120px; /* Postavlja minimalnu visinu za biografiju */
+  resize: vertical; /* Omogućuje korisniku promjenu visine */
+}
+
+.edit-form button[type="submit"] {
+  padding: 12px 20px;
+  border: none;
+  background-color: #007bff; /* Plava boja, kao i header */
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: bold;
+  transition: background-color 0.3s;
+  align-self: flex-end; /* Gura gumb na desnu stranu */
+}
+
+.edit-form button[type="submit"]:hover {
+  background-color: #0056b3;
+}

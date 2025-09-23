@@ -103,11 +103,11 @@ func (h *KeyPointHandler) GetKeyPointsTour(w http.ResponseWriter, r *http.Reques
 	// 	return
 	// }
 
-	role := r.Context().Value("userRole").(string)
+	/*role := r.Context().Value("userRole").(string)
 	if role != "VODIC" {
 		http.Error(w, "Forbidden: only VODIC can see keypoints.", http.StatusForbidden)
 		return
-	}
+	}*/
 	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
 	defer cancel()
 	tourID, err := strconv.Atoi(id)

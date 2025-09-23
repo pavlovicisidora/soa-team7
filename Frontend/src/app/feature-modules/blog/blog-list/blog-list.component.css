@@ -1,14 +1,195 @@
+/* === GLAVNI RASPORED === */
+
+.blogs-main-div {
+  width: 80%;
+  margin: auto;
+}
+
+.blog-post {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 25px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.blog-flex {
+  display: flex;
+  flex-direction: row;
+  gap: 2%;
+}
+
+/* NOVA KLASA - Osigurava da tekstualni dio raste */
+.blog-text-content {
+  flex-grow: 1; /* Naređuje elementu da zauzme sav preostali prostor */
+  min-width: 0;   /* Sprječava probleme s prelijevanjem sadržaja u flexboxu */
+}
+
+/* ISPRAVLJENA KLASA - Sada služi samo za pozicioniranje datuma */
+.text-container {
+  position: relative; /* Postavlja kontekst za apsolutno pozicioniranje djeteta */
+  padding-top: 25px;  /* Stvara prostor na vrhu da naslov ne ide ispod datuma */
+}
+
+/* ISPRAVLJENA KLASA - Koristi apsolutno pozicioniranje */
+.published-text {
+  position: absolute;
+  top: 0;
+  right: 0;
+  color: #777;
+  font-size: 13px;
+}
+
+
+/* === STILOVI ELEMENATA UNUTAR BLOGA === */
+
+h2 {
+  font-size: 28px;
+  margin-top: 3%;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.blog-post h3 {
+  font-size: 22px;
+  margin-bottom: 5px;
+  color: #222;
+}
+
+.blog-post small {
+  color: #777;
+  font-size: 13px;
+}
+
+.blog-content {
+  margin: 15px 0;
+  line-height: 1.6;
+  font-size: 15px;
+  color: #444;
+}
+
+/* === GALERIJA SLIKA === */
+
 .image-gallery {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 12px;
   margin: 15px 0;
+  width: 20%;      /* Fiksna širina za galeriju */
+  flex-shrink: 0; /* Sprječava da se galerija smanji */
+}
+
+.gallery-item {
+  flex: 1 1 200px;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .gallery-item img {
-  max-width: 200px; 
+  width: 100%;
   height: auto;
   border-radius: 8px;
-  border: 1px solid #ddd;
-  padding: 5px;
+  transition: transform 0.3s;
+  display: block; /* Uklanja mali prazan prostor ispod slike */
 }
+
+.gallery-item img:hover {
+  transform: scale(1.05);
+}
+
+/* === LAJK SEKCIJA === */
+
+.likes-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 15px 0;
+  font-size: 14px;
+  color: #333;
+}
+
+.likes-section button {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.2s;
+}
+
+.likes-section button:first-of-type {
+  background: #4caf50;
+  color: white;
+}
+
+.likes-section button:first-of-type:hover {
+  background: #43a047;
+}
+
+.likes-section button:last-of-type {
+  background: #f44336;
+  color: white;
+}
+
+.likes-section button:last-of-type:hover {
+  background: #e53935;
+}
+
+/* === SEKCIJA KOMENTARA === */
+
+.comments-section {
+  margin-top: 20px;
+  border-top: 1px solid #eee;
+  padding-top: 15px;
+}
+
+.comments-section button {
+  margin-bottom: 10px;
+  padding: 6px 12px;
+  border: none;
+  background: #135185;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.comments-section button:hover {
+  background: #1976d2;
+}
+
+.comments-section div {
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.add-comment {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.add-comment input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.add-comment button {
+  padding: 8px 14px;
+  border: none;
+  background: #2196f3;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.add-comment button:hover {
+  background: #43a047;
+}
+

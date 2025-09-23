@@ -10,6 +10,7 @@ import { Validators } from 'ngx-editor';
 import { StakeholderService } from '../../stakeholder/stakeholder.service';
 import { ShoppingService } from '../../shopping/shopping.service';
 import { AuthService } from 'src/app/auth/auth.service';
+import { Keypoint } from '../keypoint.model';
 
 @Component({
   selector: 'app-tour-detail',
@@ -25,6 +26,8 @@ export class TourDetailComponent implements OnInit{
   isStartingTour = false;
   isTourist = false;
   hasPurchasedTour = false;
+
+  firstKeypoint: Keypoint | null = null; 
 
   constructor(private route: ActivatedRoute, private tourService: TourService, private reviewService: ReviewService, private fb: FormBuilder, private stakeholderService: StakeholderService, private router: Router, private shoppingService: ShoppingService, private authService: AuthService){}
   ngOnInit(): void {
@@ -53,14 +56,25 @@ export class TourDetailComponent implements OnInit{
   loadTourAndReviews(tourId: number): void {
     forkJoin({
       tour: this.tourService.getTourById(tourId),
-      reviews: this.reviewService.getReviewsForTour(tourId)
+      reviews: this.reviewService.getReviewsForTour(tourId),
+      keypoints: this.tourService.getKeypointsByTourId(tourId)
     }).subscribe({
-      next: ({ tour, reviews }) => {
-        this.tour = tour;
+      next: ({ tour, reviews, keypoints }) => {
+         this.tour = {
+        ...tour,
+        published_date_time: tour.published_date_time
+          ? new Date((tour.published_date_time as any).seconds * 1000)
+          : null,
+        archived_date_time: tour.archived_date_time
+          ? new Date((tour.archived_date_time as any).seconds * 1000)
+          : null
+      };
         this.reviews = reviews.map(review => {
         const timestamp = review.createdDate as any; 
         return { ...review,  createdDate: new Date(timestamp.seconds * 1000)  };
       }).sort((a, b) => b.createdDate.getTime() - a.createdDate.getTime());
+
+      this.firstKeypoint = keypoints && keypoints.length > 0 ? keypoints[0] : null;
     },
       error: (err) => {
         console.error("Error loading the tour and reviews:", err);

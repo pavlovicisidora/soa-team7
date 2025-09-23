@@ -79,4 +79,8 @@ export class TourService {
   getTourExecution(executionId: number): Observable<TourExecution> {
     return this.http.get<TourExecution>(`/api/tours/execution/${executionId}`);
   }
+
+   updateTour(tour: Tour): Observable<Tour> {
+    return this.http.put<Tour>(this.apiUrl, tour);
+  }
 }

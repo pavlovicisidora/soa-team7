@@ -1,0 +1,60 @@
+/* Stil za spremnik s informacijama o korisniku */
+.user-info {
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  font-family: sans-serif;
+}
+
+/* Stil za glavni naslov (ime korisnika) */
+.user-info h2 {
+  color: #343a40;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-size: 1.8rem;
+}
+
+/* Stil za paragrafe (email, uloga, lokacija) */
+.user-info p {
+  color: #6c757d;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin: 0.25rem 0;
+}
+
+/* Stil za poruku ako lokacija nije postavljena */
+.user-info p:last-child {
+  font-style: italic;
+  color: #888;
+}
+
+/* Stil za horizontalnu liniju */
+hr {
+  border: 0;
+  height: 1px;
+  background-color: #dee2e6;
+  margin: 2rem 0;
+}
+
+/* Stil za uputu iznad mape */
+p {
+  text-align: center;
+  font-size: 1.1rem;
+  color: #495057;
+  margin-bottom: 1.5rem;
+}
+
+/* Stil za spremnik mape */
+#map {
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.simulator-main{
+    background-color: white;
+    padding: 20px;
+    margin: 3%;
+    border-radius: 25px;
+}

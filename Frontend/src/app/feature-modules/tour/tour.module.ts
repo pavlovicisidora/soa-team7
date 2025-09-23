@@ -8,7 +8,7 @@ import { TourDetailComponent } from './tour-detail/tour-detail.component';
 import { RouterModule } from '@angular/router';
 import { KeypointManageComponent } from './keypoint-manage/keypoint-manage.component';
 import { TourExecutionComponent } from './tour-execution/tour-execution.component';
-
+import { FormsModule } from '@angular/forms'; 
 
 
 @NgModule({
@@ -23,7 +23,8 @@ import { TourExecutionComponent } from './tour-execution/tour-execution.componen
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    RouterModule
+    RouterModule,
+    FormsModule
   ],
   exports: [
     TourCreateComponent,
