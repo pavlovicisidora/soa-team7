@@ -1,0 +1,75 @@
+/* Container for the whole component */
+.execution-container {
+  padding: 15px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.tour-info h2 {
+  margin-top: 0;
+  color: #333;
+}
+
+.description {
+  color: #666;
+}
+
+/* Position info styles */
+.position-info {
+  background-color: #eef;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+/* Keypoints table styles */
+.keypoints-container {
+  margin-top: 20px;
+}
+
+.keypoints-table {
+  width: 100%;
+  border-collapse: collapse;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.keypoints-table th, .keypoints-table td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+}
+
+.keypoints-table th {
+  background-color: #4CAF50;
+  color: white;
+  font-weight: bold;
+}
+
+.keypoints-table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.keypoints-table tr:hover {
+  background-color: #ddd;
+}
+
+/* Action buttons styling */
+.actions {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.abandon-btn {
+  background-color: #f44336; /* Red */
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.abandon-btn:hover {
+  background-color: #d32f2f;
+}

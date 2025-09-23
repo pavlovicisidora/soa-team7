@@ -142,7 +142,12 @@ export class TourDetailComponent implements OnInit{
 
   startTour(): void {
     if (!this.tour) return;
-    this.isStartingTour = true;
+
+    if(localStorage.getItem('executionId') != null){
+      alert('You already have one tour started!')
+      return
+    }
+     this.isStartingTour = true;
 
     this.stakeholderService.getUser().subscribe({
       next: (profile) => {
@@ -162,6 +167,7 @@ export class TourDetailComponent implements OnInit{
           next: (execution) => {
             console.log('Successfully started the tour!', execution);
             this.isStartingTour = false;
+            localStorage.setItem('executionId', execution.id.toString());
             this.router.navigate(['/tour-execution', execution.id]);
           },
           error: (err) => {

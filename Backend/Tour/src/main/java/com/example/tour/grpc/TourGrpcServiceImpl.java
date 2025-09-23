@@ -176,6 +176,7 @@ public class TourGrpcServiceImpl extends TourGrpcServiceGrpc.TourGrpcServiceImpl
     }
 
 
+
     private com.example.tour.grpc.TourExecution toGrpcExecution(TourExecution execution) {
         Timestamp startTime = Timestamp.newBuilder()
                 .setSeconds(execution.getStartTime().toEpochSecond(ZoneOffset.UTC))
@@ -214,13 +215,15 @@ public class TourGrpcServiceImpl extends TourGrpcServiceGrpc.TourGrpcServiceImpl
     }
 
     @Override
-    public void completeTour(CompleteTourRequest request, StreamObserver<CompleteTourResponse> responseObserver) {
-        TourExecution updatedExecution = tourExecutionService.completeTour(request.getTourExecutionId());
+    public void completeKeyPoint(CompleteKeyPointRequest request, StreamObserver<CompleteKeyPointResponse> responseObserver) {
+        TourExecution updatedExecution = tourExecutionService.completeKeyPoint(request.getTourExecutionId(),request.getKeypointExecutionId());
         com.example.tour.grpc.TourExecution grpcExecution = toGrpcExecution(updatedExecution);
-        CompleteTourResponse response = CompleteTourResponse.newBuilder().setTourExecution(grpcExecution).build();
+        CompleteKeyPointResponse response = CompleteKeyPointResponse.newBuilder().setTourExecution(grpcExecution).build();
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
+
+
 
     @Override
     public void getTourExecution(GetTourExecutionRequest request, StreamObserver<GetTourExecutionResponse> responseObserver) {

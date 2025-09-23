@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-navbar',
@@ -8,7 +9,28 @@ import { Component } from '@angular/core';
 export class NavbarComponent {
   menuOpen = false;
 
+  constructor(private router: Router) {}
+
   toggleMenu() {
     this.menuOpen = !this.menuOpen;
   }
+
+  // Provera da li je korisnik ulogovan
+  isLoggedIn(): boolean {
+    return localStorage.getItem('username') !== null;
+  }
+
+  logout() {
+    localStorage.clear();
+    this.router.navigate(['/']); 
+  }
+
+  goToTourExecution() {
+  const executionId = localStorage.getItem('executionId');
+  if (executionId) {
+    this.router.navigate(['/tour-execution', executionId]);
+  } else {
+    alert('No tour currently started!');
+  }
+}
 }
