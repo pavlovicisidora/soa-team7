@@ -3,7 +3,10 @@ package main
 import (
 	"log"
 	"net/http"
+	"net/http/httputil"
+	"net/url"
 	"os"
+	"strings"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -13,11 +16,22 @@ import (
 	blog_proto "github.com/pavlovicisidora/soa-team7/Backend/Blog/proto"
 	follower_proto "github.com/pavlovicisidora/soa-team7/Backend/Follower/proto"
 	stakeholders_proto "github.com/pavlovicisidora/soa-team7/Backend/Stakeholders/proto"
+	"github.com/pavlovicisidora/soa-team7/Backend/common/tracing"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
 func main() {
+	otlpEndpoint := "jaeger:4317"
+
+	tracerCloser, err := tracing.InitTracer("api-gateway", otlpEndpoint) // Prosleđujemo novi endpoint
+	if err != nil {
+		log.Fatalf("failed to initialize tracer: %v", err)
+	}
+	defer tracerCloser.Close()
+
 	blogServiceAddress := os.Getenv("BLOG_SERVICE_ADDRESS")
 	if blogServiceAddress == "" {
 		blogServiceAddress = "localhost:8082"
@@ -36,33 +50,57 @@ func main() {
 	if tourServiceAddress == "" {
 		tourServiceAddress = "localhost:9090"
 	}
+	grpcDialOptions := []grpc.DialOption{
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithUnaryInterceptor(otelgrpc.UnaryClientInterceptor()),
+		grpc.WithStreamInterceptor(otelgrpc.StreamClientInterceptor()),
+	}
 
-	conn, err := grpc.NewClient(blogServiceAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	shoppingServiceAddress := os.Getenv("SHOPPING_SERVICE_ADDRESS")
+	if shoppingServiceAddress == "" {
+		shoppingServiceAddress = "localhost:8085"
+	}
+	shoppingURL, _ := url.Parse("http://" + shoppingServiceAddress)
+	shoppingProxy := httputil.NewSingleHostReverseProxy(shoppingURL)
+	shoppingProxy.Director = func(req *http.Request) {
+		originalReq := req
+
+		req.URL.Scheme = shoppingURL.Scheme
+		req.URL.Host = shoppingURL.Host
+		req.URL.Path = originalReq.URL.Path
+
+		userID := originalReq.Context().Value(middleware.UserKey)
+		if userID != nil {
+			req.Header.Set("X-User-ID", userID.(string))
+		}
+	}
+
+	conn, err := grpc.NewClient(blogServiceAddress, grpcDialOptions...)
 	if err != nil {
 		log.Fatalf("Failed to connect to blog service: %v", err)
 	}
 	defer conn.Close()
 
-	connTour, err := grpc.NewClient(tourServiceAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	connTour, err := grpc.NewClient(tourServiceAddress, grpcDialOptions...)
 	if err != nil {
 		log.Fatalf("Failed to connect to tour service: %v", err)
 	}
 	defer connTour.Close()
 
 	stakeholdersGrpcAddress := "stakeholders-server:8089"
-	stakeholdersConn, err := grpc.NewClient(stakeholdersGrpcAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	stakeholdersConn, err := grpc.NewClient(stakeholdersGrpcAddress, grpcDialOptions...)
 	if err != nil {
 		log.Fatalf("Failed to connect to stakeholders gRPC service: %v", err)
 	}
 	defer stakeholdersConn.Close()
 
-	connStakeholders, err := grpc.NewClient(stakeholdersServiceAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	connStakeholders, err := grpc.NewClient(stakeholdersServiceAddress, grpcDialOptions...)
 	if err != nil {
 		log.Fatalf("Failed to connect to tour service: %v", err)
 	}
 	defer connStakeholders.Close()
 
-	followerConn, err := grpc.NewClient(followerServiceAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	followerConn, err := grpc.NewClient(followerServiceAddress, grpcDialOptions...)
 	if err != nil {
 		log.Fatalf("Failed to connect to follower service: %v", err)
 	}
@@ -118,18 +156,23 @@ func main() {
 	apiRouter.PathPrefix("/keypoints").Handler(http.StripPrefix("/api", keyPointHandler))
 	apiRouter.PathPrefix("/reviews").Handler(http.StripPrefix("/api", reviewHandler))
 	apiRouter.PathPrefix("/profile").Handler(http.StripPrefix("/api", profileHandler))
+	apiRouter.PathPrefix("/shopping").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		r.URL.Path = strings.TrimPrefix(r.URL.Path, "/api/shopping")
+		shoppingProxy.ServeHTTP(w, r)
+	})
 
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}
 
+	tracedRouter := otelhttp.NewHandler(router, "api-gateway-http-server")
 	log.Printf("API Gateway starting on port %s", port)
 	allowedOrigins := handlers.AllowedOrigins([]string{"http://localhost:4200"})
 	allowedMethods := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"})
 	allowedHeaders := handlers.AllowedHeaders([]string{"Content-Type", "Authorization"})
 
-	corsRouter := handlers.CORS(allowedOrigins, allowedMethods, allowedHeaders)(router)
+	corsRouter := handlers.CORS(allowedOrigins, allowedMethods, allowedHeaders)(tracedRouter)
 
 	log.Printf("API Gateway starting on port %s", port)
 	if err := http.ListenAndServe(":"+port, corsRouter); err != nil {

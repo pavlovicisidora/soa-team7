@@ -9,6 +9,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -27,6 +29,11 @@ func NewUserRepository(client *mongo.Client, dbName, collectionName string) *Use
 }
 
 func (r *UserRepository) GetAllUsers(ctx context.Context) ([]model.User, error) {
+	tr := otel.Tracer("repository")
+	ctx, span := tr.Start(ctx, "repo.GetAllUsers")
+	defer span.End()
+	span.SetAttributes(attribute.String("db.system", "mongodb"), attribute.String("db.statement", "Find"))
+
 	collection := r.client.Database(r.dbName).Collection(r.collectionName)
 	// Empty filter = get all documents
 	cursor, err := collection.Find(ctx, bson.M{})
@@ -37,6 +44,7 @@ func (r *UserRepository) GetAllUsers(ctx context.Context) ([]model.User, error) 
 
 	var users []model.User
 	if err := cursor.All(ctx, &users); err != nil {
+		span.RecordError(err)
 		return nil, err
 	}
 
@@ -44,10 +52,16 @@ func (r *UserRepository) GetAllUsers(ctx context.Context) ([]model.User, error) 
 }
 
 func (r *UserRepository) CreateUser(ctx context.Context, user *model.User) error {
+	tr := otel.Tracer("repository")
+	ctx, span := tr.Start(ctx, "repo.CreateUser")
+	defer span.End()
+	span.SetAttributes(attribute.String("db.system", "mongodb"), attribute.String("db.statement", "InsertOne"))
+
 	collection := r.client.Database(r.dbName).Collection(r.collectionName)
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
+		span.RecordError(err)
 		return err
 	}
 	user.Password = string(hashedPassword)
@@ -60,6 +74,14 @@ func (r *UserRepository) CreateUser(ctx context.Context, user *model.User) error
 }
 
 func (r *UserRepository) UpdateUser(ctx context.Context, user model.User) error {
+	tr := otel.Tracer("repository")
+	ctx, span := tr.Start(ctx, "repo.UpdateUser")
+	defer span.End()
+	span.SetAttributes(
+		attribute.String("db.system", "mongodb"),
+		attribute.String("db.statement", "UpdateOne"),
+		attribute.String("user.username", user.Username),
+	)
 	collection := r.client.Database(r.dbName).Collection(r.collectionName)
 
 	filter := bson.M{"username": user.Username}
@@ -75,6 +97,7 @@ func (r *UserRepository) UpdateUser(ctx context.Context, user model.User) error 
 	}
 	result, err := collection.UpdateOne(ctx, filter, update)
 	if err != nil {
+		span.RecordError(err)
 		return err
 	}
 
@@ -88,6 +111,15 @@ func (r *UserRepository) UpdateUser(ctx context.Context, user model.User) error 
 }
 
 func (r *UserRepository) Login(ctx context.Context, username string, password string) (model.User, error) {
+	tr := otel.Tracer("repository")
+	ctx, span := tr.Start(ctx, "repository.login")
+	defer span.End()
+
+	span.SetAttributes(
+		attribute.String("db.system", "mongodb"),
+		attribute.String("db.statement", "FindOne"),
+		attribute.String("db.user.username", username),
+	)
 	collection := r.client.Database(r.dbName).Collection(r.collectionName)
 
 	var user model.User
@@ -97,6 +129,7 @@ func (r *UserRepository) Login(ctx context.Context, username string, password st
 		if err == mongo.ErrNoDocuments {
 			return model.User{}, fmt.Errorf("this username doesn't exist")
 		}
+		span.RecordError(err)
 		return model.User{}, err
 	}
 
@@ -109,6 +142,15 @@ func (r *UserRepository) Login(ctx context.Context, username string, password st
 
 }
 func (r *UserRepository) FindByUsername(ctx context.Context, username string) (model.User, error) {
+	tr := otel.Tracer("repository")
+	ctx, span := tr.Start(ctx, "repo.FindByUsername")
+	defer span.End()
+	span.SetAttributes(
+		attribute.String("db.system", "mongodb"),
+		attribute.String("db.statement", "FindOne"),
+		attribute.String("user.username", username),
+	)
+
 	collection := r.client.Database(r.dbName).Collection(r.collectionName)
 
 	var user model.User
@@ -117,6 +159,7 @@ func (r *UserRepository) FindByUsername(ctx context.Context, username string) (m
 		if err == mongo.ErrNoDocuments {
 			return model.User{}, nil
 		}
+		span.RecordError(err)
 		return model.User{}, err
 	}
 	return user, err
@@ -124,6 +167,15 @@ func (r *UserRepository) FindByUsername(ctx context.Context, username string) (m
 }
 
 func (r *UserRepository) FindByMail(ctx context.Context, mail string) (model.User, error) {
+	tr := otel.Tracer("repository")
+	ctx, span := tr.Start(ctx, "repo.FindByMail")
+	defer span.End()
+	span.SetAttributes(
+		attribute.String("db.system", "mongodb"),
+		attribute.String("db.statement", "FindOne"),
+		attribute.String("user.mail", mail),
+	)
+
 	collection := r.client.Database(r.dbName).Collection(r.collectionName)
 
 	var user model.User
@@ -132,13 +184,25 @@ func (r *UserRepository) FindByMail(ctx context.Context, mail string) (model.Use
 		if err == mongo.ErrNoDocuments {
 			return model.User{}, nil
 		}
+		span.RecordError(err)
+
 		return model.User{}, err
 	}
 	return user, err
 }
 func (r *UserRepository) FindAllInfo(ctx context.Context, userID string) ([]model.User, error) {
+	tr := otel.Tracer("repository")
+	ctx, span := tr.Start(ctx, "repo.FindAllInfo")
+	defer span.End()
+	span.SetAttributes(
+		attribute.String("db.system", "mongodb"),
+		attribute.String("db.statement", "Find"),
+		attribute.String("user.id_excluded", userID),
+	)
+
 	userObjectID, err := primitive.ObjectIDFromHex(userID)
 	if err != nil {
+		span.RecordError(err)
 		return nil, fmt.Errorf("invalid userID format: %v", err)
 	}
 	collection := r.client.Database(r.dbName).Collection(r.collectionName)
@@ -165,6 +229,16 @@ func (r *UserRepository) FindAllInfo(ctx context.Context, userID string) ([]mode
 	return users, nil
 }
 func (r *UserRepository) FindUserById(ctx context.Context, id primitive.ObjectID) (*model.User, error) {
+	tr := otel.Tracer("repository")
+	ctx, span := tr.Start(ctx, "repository.findbyid")
+	defer span.End()
+
+	span.SetAttributes(
+		attribute.String("db.system", "mongodb"),
+		attribute.String("db.statement", "FindOne"),
+		attribute.String("db.user.id", id.Hex()),
+	)
+
 	collection := r.client.Database(r.dbName).Collection(r.collectionName)
 
 	var user model.User
@@ -173,6 +247,7 @@ func (r *UserRepository) FindUserById(ctx context.Context, id primitive.ObjectID
 
 	err := collection.FindOne(ctx, filter).Decode(&user)
 	if err != nil {
+		span.RecordError(err)
 		return nil, err
 	}
 
@@ -203,6 +278,14 @@ func (r *UserRepository) UpdateUserProfileById(ctx context.Context, id primitive
 }*/
 
 func (r *UserRepository) UpdateUserProfileFields(ctx context.Context, id primitive.ObjectID, updates map[string]interface{}) error {
+	tr := otel.Tracer("repository")
+	ctx, span := tr.Start(ctx, "repo.UpdateUserProfileFields")
+	defer span.End()
+	span.SetAttributes(
+		attribute.String("db.system", "mongodb"),
+		attribute.String("db.statement", "UpdateOne"),
+		attribute.String("user.id", id.Hex()),
+	)
 	collection := r.client.Database(r.dbName).Collection(r.collectionName)
 
 	update := bson.M{"$set": bson.M{}}
@@ -212,6 +295,7 @@ func (r *UserRepository) UpdateUserProfileFields(ctx context.Context, id primiti
 
 	result, err := collection.UpdateOne(ctx, bson.M{"_id": id}, update)
 	if err != nil {
+		span.RecordError(err)
 		return err
 	}
 
@@ -223,11 +307,21 @@ func (r *UserRepository) UpdateUserProfileFields(ctx context.Context, id primiti
 }
 
 func (r *UserRepository) UpdateUserPosition(ctx context.Context, id primitive.ObjectID, lat, long float64) error {
+	tr := otel.Tracer("repository")
+	ctx, span := tr.Start(ctx, "repo.UpdateUserPosition")
+	defer span.End()
+	span.SetAttributes(
+		attribute.String("db.system", "mongodb"),
+		attribute.String("db.statement", "UpdateOne"),
+		attribute.String("user.id", id.Hex()),
+	)
+
 	collection := r.client.Database(r.dbName).Collection(r.collectionName)
 	filter := bson.M{"_id": id}
 	update := bson.M{"$set": bson.M{"latitude": lat, "longitude": long}}
 	result, err := collection.UpdateOne(ctx, filter, update)
 	if err != nil {
+		span.RecordError(err)
 		return err
 	}
 	if result.MatchedCount == 0 {

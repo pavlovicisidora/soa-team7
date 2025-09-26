@@ -8,6 +8,7 @@ import { takeUntil } from 'rxjs/operators';
 import { TourService } from '../tour.service'; // Pretpostavka da imate KeypointService
 import { Keypoint } from '../keypoint.model';
 import { ActivatedRoute } from '@angular/router';
+import { Tour } from '../tour.model';
 
 const iconRetinaUrl = 'assets/marker-icon-2x-blue.png';
 const iconUrl = 'assets/marker-icon-blue.png';
@@ -31,6 +32,8 @@ L.Marker.prototype.options.icon = iconDefault;
 })
 export class KeypointManageComponent implements OnInit, OnDestroy {
   private tourId: number | undefined; // Ulazni parametar za ID ture
+  private currentTour: Tour | null = null;
+
 
   private map: any;
   private marker: any;
@@ -67,6 +70,7 @@ export class KeypointManageComponent implements OnInit, OnDestroy {
         const id = params.get('tourId');
         if (id) {
           this.tourId = +id;
+          this.loadTourDetails(this.tourId);
           //this.initializeMap();
           this.loadKeypointsForTour(this.tourId);
           console.log("Tour ID:", this.tourId);
@@ -173,8 +177,56 @@ export class KeypointManageComponent implements OnInit, OnDestroy {
         use: false,
         waypointIcon: false
       }).addTo(this.map!);
+
+       this.routingControl.on('routesfound', (e: any) => {
+        const routes = e.routes;
+        if (routes.length > 0) {
+          const summary = routes[0].summary;
+          // summary.totalDistance je u metrima
+          const distanceInKm = summary.totalDistance / 1000;
+          const roundedDistance = Math.round(distanceInKm * 100) / 100; // Zaokruživanje na 2 decimale
+
+          console.log(`Route calculated. Total distance: ${roundedDistance} km`);
+          
+          // Pozivamo metodu za ažuriranje ture sa novom distancom
+          this.updateTourWithDistance(roundedDistance);
+        }
+      });
     }
   }
+  }
+
+  private updateTourWithDistance(distanceInKm: number): void {
+    if (!this.currentTour) {
+      console.error('Cannot update tour because tour data is not loaded.');
+      return;
+    }
+
+    // Proveravamo da li se distanca zaista promenila da izbegnemo nepotrebne API pozive
+    if (this.currentTour.distance_in_km === distanceInKm) {
+      console.log('Distance has not changed. Skipping update.');
+      return;
+    }
+
+    // Kreiramo kopiju trenutne ture i ažuriramo samo distancu
+    const tourToUpdate: Tour = {
+      ...this.currentTour,
+      distance_in_km: distanceInKm
+    };
+
+    console.log('Sending tour update with new distance:', tourToUpdate);
+    this.keypointService.updateTour(tourToUpdate)
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (updatedTour) => {
+          // Ažuriramo lokalnu kopiju ture sa onim što je server vratio
+          this.currentTour = updatedTour;
+          console.log('Tour updated successfully on the server!', updatedTour);
+        },
+        error: (err) => {
+          console.error('Failed to update tour distance:', err);
+        }
+      });
   }
 
   clearMarkersAndRoute(): void {
@@ -255,5 +307,18 @@ export class KeypointManageComponent implements OnInit, OnDestroy {
   clearFormAndEditingState(): void {
     this.keypointForm.reset();
     this.editingKeypointId = null;
+  }
+
+
+   loadTourDetails(tourId: number): void {
+    this.keypointService.getTourById(tourId)
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (tour) => {
+          this.currentTour = tour;
+          console.log("Loaded tour details:", this.currentTour);
+        },
+        error: (err) => console.error("Failed to load tour details:", err)
+      });
   }
 }

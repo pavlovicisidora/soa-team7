@@ -1,4 +1,4 @@
-FROM golang:1.25-alpine as builder
+FROM golang:1.25-alpine AS builder
 WORKDIR /app
 
 RUN go mod init temp-build-module
@@ -8,13 +8,17 @@ COPY api_gateway/go.mod api_gateway/go.sum ./api_gateway/
 COPY Blog/go.mod Blog/go.sum ./Blog/
 COPY Stakeholders/go.mod Stakeholders/go.sum ./Stakeholders/
 COPY Follower/go.mod Follower/go.sum ./Follower/
-
+COPY Shopping/go.mod Shopping/go.sum ./Shopping/
+COPY saga/go.mod ./saga/
+COPY common/go.mod ./common/
 RUN go get -d ./...
-
+COPY saga/ ./saga/ 
+COPY common/ ./common/
 COPY api_gateway/ ./api_gateway/
 COPY Blog/ ./Blog/ 
 COPY Follower/ ./Follower/
 COPY Stakeholders/ ./Stakeholders/
+COPY Shopping/ ./Shopping/
 
 WORKDIR /app/api_gateway
 

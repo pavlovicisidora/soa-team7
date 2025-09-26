@@ -3,6 +3,7 @@ WORKDIR /app
 
 COPY Tour/pom.xml .
 COPY Tour/src ./src
+COPY Shopping/go.mod Shopping/go.sum ./Shopping/
 
 RUN mvn clean package -DskipTests
 
